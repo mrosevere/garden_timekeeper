@@ -1,0 +1,25 @@
+:root {
+    --pastel-green: #d8f3dc;
+    --pastel-blue: #d0e8ff;
+    --pastel-yellow: #fff4cc;
+    --pastel-pink: #ffdce5;
+    --pastel-purple: #e8d9ff;
+}
+
+body {
+    background-color: var(--pastel-green);
+}
+
+/* Ensure that the body fills all of the viewport */
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
