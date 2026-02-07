@@ -8,6 +8,8 @@ Covers:
 - Failed login attempts
 - User registration
 - Access control for protected views
+
+To skip a test, use: #@skip("<enter your skip message here>")
 """
 
 from django.test import TestCase
@@ -44,7 +46,7 @@ class AuthTests(TestCase):
 
         self.assertIn("_auth_user_id", self.client.session)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "core/home.html")
+        self.assertTemplateUsed(response, "core/dashboard.html")
 
     # ================== Failed login Attempts ==================
     def test_login_fails_with_no_credentials(self):
@@ -84,14 +86,24 @@ class AuthTests(TestCase):
     def test_protected_admin_view_redirects_if_not_logged_in(self):
         """Unauthenticated users are redirected to the admin login page."""
         response = self.client.get(reverse("admin:index"))
+        # Response code = 302 (redirect)
         self.assertEqual(response.status_code, 302)
+        # Redirects to the admin login page
         self.assertIn("/admin/login/", response.url)
 
     # ================== Access control for App protected views ==============
-    @skip("Dashboard view not implemented yet")
     def test_protected_view_redirects_if_not_logged_in(self):
         """Unauthenticated users should be redirected to the login page."""
-        pass
+        response = self.client.get(reverse("dashboard"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_dashboard_loads_for_logged_in_user(self):
+        """Authenticated users should be able to access the dashboard."""
+        self.client.login(username="mark", password="testpass123")
+        response = self.client.get(reverse("dashboard"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "core/dashboard.html")
 
     # ================== User Registration tests ==================
     def test_registration_page_loads(self):
@@ -173,3 +185,38 @@ class AuthTests(TestCase):
         self.assertTemplateUsed(response, "accounts/register.html")
         # The error message tells the user the reason.
         self.assertContains(response, "Username already taken")
+
+
+# ================== Remember me tests ==================
+class RememberMeTests(TestCase):
+
+    # create a generic user for all tests
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="mark",
+            password="testpass123"
+        )
+        self.login_url = reverse("login")
+
+    def test_login_without_remember_me_expires_on_browser_close(self):
+        response = self.client.post(self.login_url, {
+            "username": "mark",
+            "password": "testpass123",
+        })
+        # response code should be 302 (redirect)
+        self.assertEqual(response.status_code, 302)
+
+        # Should expire when browser closes
+        self.assertTrue(self.client.session.get_expire_at_browser_close())
+
+    def test_login_with_remember_me_sets_long_expiry(self):
+        response = self.client.post(self.login_url, {
+            "username": "mark",
+            "password": "testpass123",
+            "remember_me": "on",
+        })
+
+        self.assertEqual(response.status_code, 302)
+
+        # Should NOT expire on browser close
+        self.assertFalse(self.client.session.get_expire_at_browser_close())
