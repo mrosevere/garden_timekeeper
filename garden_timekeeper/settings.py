@@ -161,3 +161,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Crispy Forms settings
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# where to send the user on login
+LOGIN_REDIRECT_URL = "dashboard"
+
+# Force user to login again after browser is closed
+SESSION_EXPIRE_AT_BROWSER_CLOSE = os.getenv(
+    "SESSION_EXPIRE_AT_BROWSER_CLOSE", "True"
+    ) == "True"

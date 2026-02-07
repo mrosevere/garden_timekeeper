@@ -35,13 +35,20 @@ def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
+        remember_me = request.POST.get("remember_me")
 
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
+            if not remember_me:
+                # Session ends when browser closes
+                request.session.set_expiry(0)
+            else:
+                # 2 weeks (Django default)
+                request.session.set_expiry(1209600)
             messages.success(request, "Welcome back!")
-            return redirect("home")
+            return redirect("dashboard")
 
         messages.error(request, "Invalid username or password")
 

@@ -9,6 +9,7 @@ tasks, or user accounts.
 
 
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 
 def home(request):
@@ -20,3 +21,13 @@ def home(request):
     users.
     """
     return render(request, 'core/home.html')
+
+
+# Dashboard is only available if user is logged in.
+@login_required
+def dashboard(request):
+    """
+    Display the main dashboard for logged‑in users.
+    This will later show summary data (beds, plants, tasks).
+    """
+    return render(request, "core/dashboard.html")
