@@ -1,0 +1,50 @@
+<!--
+Registration page template.
+
+Renders the custom RegistrationForm with Bootstrap styling.
+Displays:
+- Field-specific validation errors
+- Custom error messages from the view
+- Success and error alerts via Django's messages framework
+
+This template loops through all form fields dynamically, ensuring that
+future changes to the form (e.g., adding email or profile fields) require
+no template updates.
+-->
+
+{% extends "core/base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Create an Account</h2>
+
+<form method="POST" novalidate>
+    {% csrf_token %}
+
+    <!-- Display custom messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-2">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Render each form field with Bootstrap styling and inline errors -->
+    {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+
+            {% if field.errors %}
+                <div class="text-danger small">{{ field.errors.0 }}</div>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <button class="btn btn-success">Register</button>
+</form>
+
+<p class="mt-3">
+    Already have an account? <a href="{% url 'login' %}">Login here</a>.
+</p>
+{% endblock %}
