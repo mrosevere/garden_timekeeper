@@ -12,5 +12,10 @@ from . import views
 
 urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
-    path('', views.home, name='home'),
+
+    # Garden beds
+    path("beds/", views.bed_list, name="bed_list"),
+    path("beds/<int:pk>/", views.bed_detail, name="bed_detail"),
+
+    path("", views.home, name="home"),
 ]

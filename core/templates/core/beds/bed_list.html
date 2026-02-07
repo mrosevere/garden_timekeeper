@@ -1,0 +1,17 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<h1>Your Garden Beds</h1>
+
+{% if beds %}
+    <ul class="list-group">
+        {% for bed in beds %}
+            <li class="list-group-item">
+                <a href="{% url 'bed_detail' bed.pk %}">{{ bed.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no garden beds yet.</p>
+{% endif %}
+{% endblock %}

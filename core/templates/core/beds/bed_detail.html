@@ -1,0 +1,10 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<h1>{{ bed.name }}</h1>
+
+<p><strong>Location:</strong> {{ bed.location|default:"Not specified" }}</p>
+<p>{{ bed.description }}</p>
+
+<a href="{% url 'bed_list' %}" class="btn btn-secondary mt-3">Back to beds</a>
+{% endblock %}
