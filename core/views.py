@@ -10,6 +10,7 @@ tasks, or user accounts.
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import GardenBed
+from .forms import GardenBedForm
 
 
 def home(request):
@@ -27,7 +28,7 @@ def home(request):
 @login_required
 def dashboard(request):
     """
-    Display the main dashboard for logged‑in users.
+    Display the main dashboard for logged in users.
     This will later show summary data (beds, plants, tasks).
     """
     return render(request, "core/dashboard.html")
@@ -36,6 +37,7 @@ def dashboard(request):
 # ===================================================
 @login_required
 def bed_list(request):
+    """     """
     beds = GardenBed.objects.filter(owner=request.user)
     return render(request, "core/beds/bed_list.html", {"beds": beds})
 
@@ -44,3 +46,47 @@ def bed_list(request):
 def bed_detail(request, pk):
     bed = get_object_or_404(GardenBed, pk=pk, owner=request.user)
     return render(request, "core/beds/bed_detail.html", {"bed": bed})
+
+
+# =================Bed Views ===============================
+@login_required
+def bed_create(request):
+    """ bed create"""
+    if request.method == "POST":
+        form = GardenBedForm(request.POST)
+        if form.is_valid():
+            bed = form.save(commit=False)
+            bed.owner = request.user
+            bed.save()
+            return redirect("bed_list")
+    else:
+        form = GardenBedForm()
+
+    return render(request, "core/beds/bed_create.html", {"form": form})
+
+
+@login_required
+def bed_edit(request, pk):
+    bed = get_object_or_404(GardenBed, pk=pk, owner=request.user)
+
+    if request.method == "POST":
+        form = GardenBedForm(request.POST, instance=bed)
+        if form.is_valid():
+            form.save()
+            return redirect("bed_detail", pk=bed.pk)
+    else:
+        form = GardenBedForm(instance=bed)
+    return render(request, "core/beds/bed_edit.html", {"bed": bed})
+
+
+@login_required
+def bed_delete(request, pk):
+    bed = get_object_or_404(GardenBed, pk=pk, owner=request.user)
+    if request.method == "POST":
+        bed.delete()
+        return redirect("bed_list")
+
+    return render(request, "core/beds/bed_detail.html", {
+        "bed": bed,
+        "delete_mode": True
+    })

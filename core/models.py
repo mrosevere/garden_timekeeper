@@ -18,7 +18,7 @@ class GardenBed(models.Model):
         on_delete=models.CASCADE,
         related_name="garden_beds"
     )
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     location = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
