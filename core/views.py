@@ -11,6 +11,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import GardenBed
 from .forms import GardenBedForm
+from django.db import IntegrityError
+from django.core.exceptions import ValidationError
+
 
 
 def home(request):
@@ -51,14 +54,17 @@ def bed_detail(request, pk):
 # =================Bed Views ===============================
 @login_required
 def bed_create(request):
-    """ bed create"""
+    """ Create new bed - check for DB integrity errors and handle them """
     if request.method == "POST":
         form = GardenBedForm(request.POST)
         if form.is_valid():
             bed = form.save(commit=False)
             bed.owner = request.user
-            bed.save()
-            return redirect("bed_list")
+            try:
+                bed.save()
+                return redirect("bed_list")
+            except IntegrityError:
+                form.add_error("name", "You already have a bed with this name.")
     else:
         form = GardenBedForm()
 
@@ -72,11 +78,17 @@ def bed_edit(request, pk):
     if request.method == "POST":
         form = GardenBedForm(request.POST, instance=bed)
         if form.is_valid():
-            form.save()
-            return redirect("bed_detail", pk=bed.pk)
+            try:
+                form.save()
+                return redirect("bed_list")
+            except IntegrityError:
+                form.add_error("name", "you already have a bed with this name.")
     else:
         form = GardenBedForm(instance=bed)
-    return render(request, "core/beds/bed_edit.html", {"bed": bed})
+    return render(request, "core/beds/bed_edit.html", {
+        "bed": bed,
+        "form": form
+        })
 
 
 @login_required
