@@ -1,18 +1,20 @@
-{% extends "core/base.html" %}
-
-{% block content %}
+{% extends "core/base.html" %} {% block content %}
 <div class="container py-4">
-    <h1 class="mb-3">Dashboard</h1>
-    <p class="lead">Welcome back, {{ user.username }}.</p>
+  <h1 class="mb-3">Dashboard</h1>
+  <p class="lead">Welcome back, {{ user.username }}.</p>
 
-    <hr>
+  <hr />
 
-    <p>This is your main hub. Soon you’ll see:</p>
-    <ul>
-        <li>Summary of your garden beds</li>
-        <li>Plants you’re tracking</li>
-        <li>Upcoming tasks</li>
-        <li>Quick actions</li>
-    </ul>
+  <p>This is your main hub. Soon you’ll see:</p>
+  <ul>
+    <li>Summary of your garden beds</li>
+    <li>Plants you’re tracking</li>
+    <li>Upcoming tasks</li>
+    <li>Quick actions</li>
+        <li><a href="{% url 'bed_list' %}">View your garden beds</a></li>
+    <li>
+        <a href="{% url 'bed_create' %}">Add a new garden bed</a>
+    </li>
+  </ul>
 </div>
 {% endblock %}
