@@ -1,15 +1,12 @@
-{% extends "core/base.html" %}
-
-{% block content %}
+{% extends "core/base.html" %} {% block content %}
 <div class="container py-4">
-    <h1 class="mb-3">Add a New Garden Bed</h1>
+  <h1 class="mb-3">Add a New Garden Bed</h1>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Create Bed</button>
-    </form>
+  <form method="post">
+    {% csrf_token %} {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Create Bed</button>
+  </form>
 
-    <a href="{% url 'bed_list' %}" class="btn btn-secondary mt-3">Back to beds</a>
+  <a href="{% url 'bed_list' %}" class="btn btn-secondary mt-3">Back to beds</a>
 </div>
 {% endblock %}
