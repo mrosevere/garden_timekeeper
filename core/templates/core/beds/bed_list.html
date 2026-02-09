@@ -1,38 +1,53 @@
-{% extends "core/base.html" %} {% block content %}
-<h1>Your Garden Beds</h1>
+{% extends "core/base.html" %}
 
-<!-- Check if there are any beds and display them -->
-{% if beds %}
-<ul class="list-group">
-  {% for bed in beds %}
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <a href="{% url 'bed_detail' bed.pk %}">{{ bed.name }}</a>
-    <a href="{% url 'bed_detail' bed.pk %}">{{ bed.location }}</a>
-    <a href="{% url 'bed_detail' bed.pk %}">{{ bed.description }}</a>
+{% block content %}
+<div class="container py-4">
+    <h1>Your Garden Beds</h1>
 
-    <span>
-        <!-- Edit Bed -->
-      <a
-        href="{% url 'bed_edit' bed.pk %}"
-        class="btn btn-sm btn-outline-secondary me-2"
-      >
-        Edit
-      </a>
+    <a href="{% url 'bed_create' %}" class="btn btn-primary mb-3">Add New Bed</a>
 
-      <!-- Delete Modal (Trigger modal for confirmation) -->
-      <button
-        class="btn btn-sm btn-outline-danger"
-        data-bs-toggle="modal"
-        data-bs-target="#deleteModal-{{ bed.pk }}"
-      >
-        Delete
-      </button>
-    </span>
-  </li>
-  {% endfor %}
-</ul>
+    {% if beds %}
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Created</th>
+                    <th style="width: 150px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bed in beds %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'bed_detail' bed.pk %}">
+                                {{ bed.name }}
+                            </a>
+                        </td>
+                        <td>{{ bed.location|default:"—" }}</td>
+                        <td>{{ bed.created_at|date:"Y-m-d" }}</td>
+                        <td>
+                            <a href="{% url 'bed_edit' bed.pk %}" class="btn btn-sm btn-outline-secondary me-2">
+                                Edit
+                            </a>
 
-<!-- Delete Confirmation Modals -->
+                            <!-- Delete modal trigger -->
+                            <button class="btn btn-sm btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal-{{ bed.pk }}">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no garden beds yet.</p>
+    {% endif %}
+</div>
+
+<!-- Delete modals -->
 {% for bed in beds %}
 <div class="modal fade" id="deleteModal-{{ bed.pk }}" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
@@ -52,20 +67,11 @@
           {% csrf_token %}
           <button type="submit" class="btn btn-danger">Yes, delete</button>
         </form>
-
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Cancel
-        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
       </div>
 
     </div>
   </div>
 </div>
 {% endfor %}
-
-<!-- No Beds Message -->
-{% else %}
-<p>You have no garden beds yet.</p>
-{% endif %}
-<a href="{% url 'bed_create' %}" class="btn btn-primary mb-3">Add New Bed</a>
 {% endblock %}

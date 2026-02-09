@@ -12,8 +12,7 @@ from django.contrib.auth.decorators import login_required
 from .models import GardenBed
 from .forms import GardenBedForm
 from django.db import IntegrityError
-from django.core.exceptions import ValidationError
-
+# from django.core.exceptions import ValidationError
 
 
 def home(request):
@@ -64,7 +63,9 @@ def bed_create(request):
                 bed.save()
                 return redirect("bed_list")
             except IntegrityError:
-                form.add_error("name", "You already have a bed with this name.")
+                form.add_error(
+                    "name", "You already have a bed with this name."
+                    )
     else:
         form = GardenBedForm()
 
@@ -82,7 +83,9 @@ def bed_edit(request, pk):
                 form.save()
                 return redirect("bed_list")
             except IntegrityError:
-                form.add_error("name", "you already have a bed with this name.")
+                form.add_error(
+                    "name", "you already have a bed with this name."
+                    )
     else:
         form = GardenBedForm(instance=bed)
     return render(request, "core/beds/bed_edit.html", {
