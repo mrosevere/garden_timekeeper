@@ -1,13 +1,17 @@
 {% extends "core/base.html" %} {% block content %}
 <h1>Your Garden Beds</h1>
 
+<!-- Check if there are any beds and display them -->
 {% if beds %}
 <ul class="list-group">
   {% for bed in beds %}
   <li class="list-group-item d-flex justify-content-between align-items-center">
     <a href="{% url 'bed_detail' bed.pk %}">{{ bed.name }}</a>
+    <a href="{% url 'bed_detail' bed.pk %}">{{ bed.location }}</a>
+    <a href="{% url 'bed_detail' bed.pk %}">{{ bed.description }}</a>
 
     <span>
+        <!-- Edit Bed -->
       <a
         href="{% url 'bed_edit' bed.pk %}"
         class="btn btn-sm btn-outline-secondary me-2"
@@ -15,7 +19,7 @@
         Edit
       </a>
 
-      <!-- Trigger modal -->
+      <!-- Delete Modal (Trigger modal for confirmation) -->
       <button
         class="btn btn-sm btn-outline-danger"
         data-bs-toggle="modal"
@@ -28,6 +32,7 @@
   {% endfor %}
 </ul>
 
+<!-- Delete Confirmation Modals -->
 {% for bed in beds %}
 <div class="modal fade" id="deleteModal-{{ bed.pk }}" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
@@ -58,6 +63,7 @@
 </div>
 {% endfor %}
 
+<!-- No Beds Message -->
 {% else %}
 <p>You have no garden beds yet.</p>
 {% endif %}
