@@ -3,7 +3,7 @@
   <h1 class="mb-3">Add a New Garden Bed</h1>
 
   <form method="post">
-    {% csrf_token %} {{ form.as_p }}
+    {% csrf_token %} {{ form|crispy }}
     <button type="submit" class="btn btn-primary">Create Bed</button>
   </form>
 

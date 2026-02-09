@@ -3,7 +3,7 @@
   <h1 class="mb-3">Edit: "{{ bed.name }}"</h1>
 
   <form method="post">
-    {% csrf_token %} {{ form.as_p }}
+    {% csrf_token %} {{ form|crispy }}
     <button type="submit" class="btn btn-success">Save Changes</button>
   </form>
 
