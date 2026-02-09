@@ -90,7 +90,6 @@ WSGI_APPLICATION = 'garden_timekeeper.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 # Use SQLite for development and testing (when there is no URL)
 DATABASES = {
     'default': dj_database_url.parse(
