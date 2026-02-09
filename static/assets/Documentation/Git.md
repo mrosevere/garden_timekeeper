@@ -54,10 +54,9 @@ This ensures your work starts from the most recent version of the project.
 
 ## 3. Creating a Feature Branch
 
-
 To create your branch:
 
-    git checkout -b <branchName>
+    git checkout -b feature/<feature-name>
 
 ---
 
