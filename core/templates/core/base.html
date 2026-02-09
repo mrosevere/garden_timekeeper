@@ -39,6 +39,7 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
+            <!-- Login Navigation -->
             <ul class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
@@ -53,8 +54,18 @@
                     </li>
                 {% endif %}
             </ul>
+            <!-- Page Navigation -->
             <li class="nav-item">
               <a class="nav-link" href="/">Home</a>
+            </li>
+             <li class="nav-item">
+              <a class="nav-link" href="/dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/beds">bed List</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/beds/<int:pk>">bed detail</a>
             </li>
           </ul>
         </div>
