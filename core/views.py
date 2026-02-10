@@ -17,7 +17,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.db import IntegrityError
 
-from .models import GardenBed, Plant
+from .models import GardenBed, Plant, PlantLifespan, PlantType
 from .forms import GardenBedForm, PlantForm
 
 
@@ -183,7 +183,37 @@ class PlantListView(LoginRequiredMixin, ListView):
     context_object_name = "plants"
 
     def get_queryset(self):
-        return Plant.objects.filter(owner=self.request.user)
+        qs = Plant.objects.filter(owner=self.request.user)
+
+        # Filtering
+        lifespan = self.request.GET.get("lifespan")
+        if lifespan:
+            qs = qs.filter(lifespan=lifespan)
+
+        plant_type = self.request.GET.get("type")
+        if plant_type:
+            qs = qs.filter(type=plant_type)
+
+        # Sorting
+        allowed_sorts = [
+            "name", "-name",
+            "planting_date", "-planting_date",
+            "type", "-type",
+            "lifespan", "-lifespan",
+            "bed__name", "-bed__name",
+        ]
+
+        sort = self.request.GET.get("sort")
+        if sort in allowed_sorts:
+            qs = qs.order_by(sort)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["lifespan_choices"] = PlantLifespan.choices
+        context["type_choices"] = PlantType.choices
+        return context
 
 
 class PlantDetailView(LoginRequiredMixin, DetailView):
