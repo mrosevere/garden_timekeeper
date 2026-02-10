@@ -16,6 +16,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.db import IntegrityError
+from django.contrib import messages
 
 from .models import GardenBed, Plant, PlantLifespan, PlantType
 from .forms import GardenBedForm, PlantForm
@@ -106,7 +107,10 @@ class BedCreateView(LoginRequiredMixin, CreateView):
             form.add_error("name", "You already have a bed with this name.")
             return self.form_invalid(form)
 
-        # This code is now reachable
+        # Success message (for creating via modal)
+        messages.success(self.request, "New bed created successfully.")
+        
+        # next for inline modal creation
         next_url = self.request.POST.get("next")
         if next_url:
             return redirect(next_url)
