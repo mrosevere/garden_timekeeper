@@ -1,4 +1,6 @@
-{% extends "core/base.html" %} {% block content %} {% load crispy_forms_tags %}
+{% extends "core/base.html" %} 
+{% block content %} 
+{% load crispy_forms_tags %}
 
 <div class="container py-4">
   <h1 class="mb-3">Add a New Garden Plant</h1>
@@ -56,7 +58,7 @@
   </div>
 
   <a href="{% url 'plant_list' %}" class="btn btn-secondary mt-3"
-    >Back to plants</a
+    >Cancel</a
   >
 </div>
 {% endblock %}

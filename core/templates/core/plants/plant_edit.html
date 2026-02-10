@@ -1,15 +1,64 @@
-{% extends "core/base.html" %} {% block content %}
-
+{% extends "core/base.html" %} 
+{% block content %}
 {% load crispy_forms_tags %}
 
 <div class="container py-4">
   <h1 class="mb-3">Edit: "{{ plant.name }}"</h1>
 
+<form method="post">
+  {% csrf_token %}
+
+  <!-- Create Plant Crispy Form -->
   <form method="post">
-    {% csrf_token %} {{ form|crispy }}
-    <button type="submit" class="btn btn-success">Save Changes</button>
+    {% csrf_token %}
+    {% crispy form %}
+    <button type="submit" class="btn btn-primary">Save Changes</button>
   </form>
 
-  <a href="{% url 'plant_list' %}" class="btn btn-secondary mt-3">Cancel</a>
+  <!-- Create Bed Modal for inline bed creation -->
+  <div
+    class="modal fade"
+    id="createBedModal"
+    tabindex="-1"
+    aria-labelledby="createBedModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createBedModalLabel">
+            Create a New Garden Bed
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <form method="post" action="{% url 'bed_create' %}">
+          {% csrf_token %}
+          <div class="modal-body">{{ bed_form|crispy }}</div>
+            <!-- Hidden field to redirect back to plant creation after bed creation -->
+            <input type="hidden" name="next" value="{% url 'plant_edit' plant.id %}">
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Create Bed</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <a href="{% url 'plant_list' %}" class="btn btn-secondary mt-3"
+    >cancel</a
+  >
 </div>
 {% endblock %}

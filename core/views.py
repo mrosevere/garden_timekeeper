@@ -109,7 +109,7 @@ class BedCreateView(LoginRequiredMixin, CreateView):
 
         # Success message (for creating via modal)
         messages.success(self.request, "New bed created successfully.")
-        
+
         # next for inline modal creation
         next_url = self.request.POST.get("next")
         if next_url:
@@ -187,7 +187,7 @@ class PlantListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = Plant.objects.filter(owner=self.request.user)
-        
+
         # Default sort
         qs = qs.order_by("name")
 
@@ -323,6 +323,12 @@ class PlantUpdateView(LoginRequiredMixin, UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
+
+    # For modal create bed directly from edit plant page
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["bed_form"] = GardenBedForm()
+        return context
 
 
 @login_required
