@@ -164,6 +164,7 @@ def bed_delete(request, pk):
 
     if request.method == "POST":
         bed.delete()
+        messages.success(request, "Bed deleted successfully.")
         return redirect("bed_list")
 
     return render(request, "core/beds/bed_detail.html", {
@@ -265,12 +266,17 @@ class PlantCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
-
+        # Exception handling when attempting to create a duplicate
         try:
-            return super().form_valid(form)
+            response = super().form_valid(form)
         except IntegrityError:
             form.add_error("name", "You already have a plant with this name.")
             return self.form_invalid(form)
+
+        # Success message
+        messages.success(self.request, "Plant created successfully.")
+
+        return response
 
     def get_form_kwargs(self):
         """
@@ -307,6 +313,9 @@ class PlantUpdateView(LoginRequiredMixin, UpdateView):
         return Plant.objects.filter(owner=self.request.user)
 
     def form_valid(self, form):
+        # confirmation message
+        messages.success(self.request, "Plant updated successfully.")
+        # exception handling for duplicate plant name
         try:
             return super().form_valid(form)
         except IntegrityError:
@@ -353,6 +362,7 @@ def plant_delete(request, pk):
 
     if request.method == "POST":
         plant.delete()
+        messages.success(request, "Plant deleted successfully.")
         return redirect("plant_list")
 
     return render(request, "core/plants/plant_detail.html", {
