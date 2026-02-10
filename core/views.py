@@ -101,10 +101,17 @@ class BedCreateView(LoginRequiredMixin, CreateView):
         form.instance.owner = self.request.user
 
         try:
-            return super().form_valid(form)
+            response = super().form_valid(form)
         except IntegrityError:
             form.add_error("name", "You already have a bed with this name.")
             return self.form_invalid(form)
+
+        # This code is now reachable
+        next_url = self.request.POST.get("next")
+        if next_url:
+            return redirect(next_url)
+
+        return response
 
 
 class BedUpdateView(LoginRequiredMixin, UpdateView):
@@ -217,6 +224,23 @@ class PlantCreateView(LoginRequiredMixin, CreateView):
             form.add_error("name", "You already have a plant with this name.")
             return self.form_invalid(form)
 
+    def get_form_kwargs(self):
+        """
+        Extend default form kwargs to include the logged-in user.
+
+        This allows the PlantForm to filter the 'bed' queryset so that
+        users can only assign plants to their own garden beds.
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    # For modal create bed directly from create plant
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["bed_form"] = GardenBedForm()
+        return context
+
 
 class PlantUpdateView(LoginRequiredMixin, UpdateView):
     """
@@ -240,6 +264,17 @@ class PlantUpdateView(LoginRequiredMixin, UpdateView):
         except IntegrityError:
             form.add_error("name", "You already have a plant with this name.")
             return self.form_invalid(form)
+
+    def get_form_kwargs(self):
+        """
+        Extend default form kwargs to include the logged-in user.
+
+        This allows the PlantForm to filter the 'bed' queryset so that
+        users can only assign plants to their own garden beds.
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
 
 @login_required
