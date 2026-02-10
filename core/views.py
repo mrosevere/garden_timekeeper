@@ -8,16 +8,16 @@ privacy and personalised garden management.
 """
 
 # Django
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView
+)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.db import IntegrityError
-from django.contrib.auth.mixins import LoginRequiredMixin 
-from django.views.generic import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView)
-# Models
+
 from .models import GardenBed, Plant
-# Forms
 from .forms import GardenBedForm, PlantForm
 
 
@@ -50,91 +50,85 @@ def dashboard(request):
 
 # ================= Garden Bed Views =======================
 
-@login_required
-def bed_list(request):
+
+class BedListView(LoginRequiredMixin, ListView):
     """
-    Display a list of all garden beds belonging to the logged-in user.
+    Display a list of garden beds belonging to the logged-in user.
 
-    Only beds owned by the current user are shown, ensuring that users
-    can view and manage only their own garden layout.
+    This view uses Django's ListView to retrieve and render only the
+    beds owned by the current user, ensuring per-user data isolation.
     """
-    beds = GardenBed.objects.filter(owner=request.user)
-    return render(request, "core/beds/bed_list.html", {"beds": beds})
+    model = GardenBed
+    template_name = "core/beds/bed_list.html"
+    # Set context rather than using default object_list / gardenbed_list
+    context_object_name = "beds"  
+
+    def get_queryset(self):
+        return GardenBed.objects.filter(owner=self.request.user)
 
 
-@login_required
-def bed_detail(request, pk):
+class BedDetailView(LoginRequiredMixin, DetailView):
     """
     Display detailed information for a single garden bed.
 
-    The view ensures that the requested bed belongs to the current user.
-    If the bed does not exist or is not owned by the user, a 404 error
-    is raised.
+    The view restricts access to beds owned by the logged-in user,
+    raising a 404 if the requested bed does not belong to them.
     """
-    bed = get_object_or_404(GardenBed, pk=pk, owner=request.user)
-    return render(request, "core/beds/bed_detail.html", {"bed": bed})
+    model = GardenBed
+    template_name = "core/beds/bed_detail.html"
+    # Set context rather than using default object_list / gardenbed_list
+    context_object_name = "bed"
+
+    def get_queryset(self):
+        return GardenBed.objects.filter(owner=self.request.user)
 
 
-@login_required
-def bed_create(request):
+class BedCreateView(LoginRequiredMixin, CreateView):
     """
     Create a new garden bed for the logged-in user.
 
-    On POST:
-        - Validate form data.
-        - Assign the current user as the bed owner.
-        - Handle IntegrityError if the user already has a bed with the
-          same name.
-    On GET:
-        - Display an empty form for creating a new bed.
+    Django's CreateView handles form display, validation, and saving.
+    The logged-in user is automatically assigned as the bed owner
+    before the object is saved. Duplicate names are caught and
+    surfaced as form errors.
     """
-    if request.method == "POST":
-        form = GardenBedForm(request.POST)
-        if form.is_valid():
-            bed = form.save(commit=False)
-            bed.owner = request.user
-            try:
-                bed.save()
-                return redirect("bed_list")
-            except IntegrityError:
-                form.add_error(
-                    "name", "You already have a bed with this name.")
-    else:
-        form = GardenBedForm()
+    model = GardenBed
+    form_class = GardenBedForm
+    template_name = "core/beds/bed_create.html"
+    success_url = reverse_lazy("bed_list")
 
-    return render(request, "core/beds/bed_create.html", {"form": form})
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            form.add_error("name", "You already have a bed with this name.")
+            return self.form_invalid(form)
 
 
-@login_required
-def bed_edit(request, pk):
+class BedUpdateView(LoginRequiredMixin, UpdateView):
     """
     Edit an existing garden bed belonging to the logged-in user.
 
-    On POST:
-        - Validate and save changes.
-        - Handle IntegrityError if the updated name conflicts with an
-          existing bed owned by the user.
-    On GET:
-        - Display the form pre-filled with the bed's current data.
+    This view reuses Django's UpdateView to handle form rendering and
+    validation. Duplicate names are caught and surfaced as form errors.
     """
-    bed = get_object_or_404(GardenBed, pk=pk, owner=request.user)
+    model = GardenBed
+    form_class = GardenBedForm
+    template_name = "core/beds/bed_edit.html"
+    success_url = reverse_lazy("bed_list")
+    context_object_name = "bed"
 
-    if request.method == "POST":
-        form = GardenBedForm(request.POST, instance=bed)
-        if form.is_valid():
-            try:
-                form.save()
-                return redirect("bed_list")
-            except IntegrityError:
-                form.add_error(
-                    "name", "You already have a bed with this name.")
-    else:
-        form = GardenBedForm(instance=bed)
+    def get_queryset(self):
+        return GardenBed.objects.filter(owner=self.request.user)
 
-    return render(request, "core/beds/bed_edit.html", {
-        "bed": bed,
-        "form": form
-    })
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            form.add_error("name", "You already have a bed with this name.")
+            return self.form_invalid(form)
 
 
 @login_required
@@ -142,10 +136,18 @@ def bed_delete(request, pk):
     """
     Delete a garden bed belonging to the logged-in user.
 
+    This function-based view is intentionally retained instead of using
+    Django's DeleteView so that the existing modal-based confirmation
+    workflow can be preserved. The delete confirmation is rendered within
+    the bed_detail template using `delete_mode`, allowing the modal to
+    appear without requiring a separate confirmation page.
+
     On POST:
         - Permanently delete the bed and redirect to the bed list.
+
     On GET:
-        - Render the bed detail page in delete confirmation mode.
+        - Render the bed detail page with delete mode enabled so the
+          modal confirmation can be displayed.
     """
     bed = get_object_or_404(GardenBed, pk=pk, owner=request.user)
 
@@ -157,60 +159,3 @@ def bed_delete(request, pk):
         "bed": bed,
         "delete_mode": True
     })
-
-
-# ================= Plant Views =======================
-
-@login_required
-def plant_list(request):
-    """
-    Display a list of all plants belonging to the logged-in user.
-
-    Only plants owned by the current user are shown, ensuring that users
-    can view and manage only their own garden plants.
-    """
-    plants = Plant.objects.filter(owner=request.user)
-    return render(request, "core/plants/plant_list.html", {"plants": plants})
-
-
-@login_required
-def plant_detail(request, pk):
-    """
-    Display detailed information for a single garden plant.
-
-    The view ensures that the requested plant belongs to the current user.
-    If the plant does not exist or is not owned by the user, a 404 error
-    is raised.
-    """
-    plant = get_object_or_404(Plant, pk=pk, owner=request.user)
-    return render(request, "core/plants/plant_detail.html", {"plant": plant})
-
-
-@login_required
-def plant_create(request):
-    """
-    Create a new garden plant for the logged-in user.
-
-    On POST:
-        - Validate form data.
-        - Assign the current user as the plant owner.
-        - Handle IntegrityError if the user already has a plant with the
-          same name.
-    On GET:
-        - Display an empty form for creating a new plant.
-    """
-    if request.method == "POST":
-        form = PlantForm(request.POST)
-        if form.is_valid():
-            plant = form.save(commit=False)
-            plant.owner = request.user
-            try:
-                plant.save()
-                return redirect("plant_list")
-            except IntegrityError:
-                form.add_error(
-                    "name", "You already have a plant with this name.")
-    else:
-        form = PlantForm()
-
-    return render(request, "core/plants/plant_create.html", {"form": form})
