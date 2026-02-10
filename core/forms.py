@@ -1,7 +1,7 @@
 from django import forms
 from .models import GardenBed, Plant
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout
+from crispy_forms.layout import Layout, HTML
 
 
 class GardenBedForm(forms.ModelForm):
@@ -43,10 +43,10 @@ class PlantForm(forms.ModelForm):
         fields = [
             "name",
             "latin_name",
+            "bed",
             "lifespan",
             "type",
             "planting_date",
-            "bed",
             "notes"
             ]
         widgets = {
@@ -94,14 +94,32 @@ class PlantForm(forms.ModelForm):
         # prevents auto rendering of beds
         self.helper.render_unmentioned_fields = False
 
+        # Define the layout to set position of custom bed field.
         self.helper.layout = Layout(
             "name",
             "latin_name",
+
+            HTML("""
+                <div class="mb-3">
+                    {{ form.bed.label_tag }}
+                    <div class="d-flex align-items-center gap-2">
+                    {{ form.bed }}
+                    <a
+                        href="{% url 'bed_create' %}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createBedModal"
+                        class="btn btn-outline-secondary btn-sm"
+                    >
+                        + Add new bed
+                    </a>
+                    </div>
+                </div>
+            """),
+
             "lifespan",
             "type",
             "planting_date",
             "notes",
-            # Beds deliberately excluded as custom html used
         )
 
         # Apply queryset filtering
