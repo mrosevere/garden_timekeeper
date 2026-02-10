@@ -4,6 +4,61 @@
 
   <a href="{% url 'plant_create' %}" class="btn btn-primary mb-3">Add New Plant</a>
 
+  <form method="get" class="row g-3 mb-4">
+
+  <!-- Lifespan Filter -->
+  <div class="col-md-3">
+    <label class="form-label">Lifespan</label>
+    <select name="lifespan" class="form-select">
+      <option value="">All</option>
+      {% for value, label in lifespan_choices %}
+        <option value="{{ value }}" {% if request.GET.lifespan == value %}selected{% endif %}>
+          {{ label }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Type Filter -->
+  <div class="col-md-3">
+    <label class="form-label">Type</label>
+    <select name="type" class="form-select">
+      <option value="">All</option>
+      {% for value, label in type_choices %}
+        <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>
+          {{ label }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Sort -->
+  <div class="col-md-3">
+    <label class="form-label">Sort by</label>
+    <select name="sort" class="form-select">
+      <option value="">Default</option>
+      <option value="name" {% if request.GET.sort == "name" %}selected{% endif %}>Name (A–Z)</option>
+      <option value="-name" {% if request.GET.sort == "-name" %}selected{% endif %}>Name (Z–A)</option>
+      <option value="planting_date" {% if request.GET.sort == "planting_date" %}selected{% endif %}>Oldest first</option>
+      <option value="-planting_date" {% if request.GET.sort == "-planting_date" %}selected{% endif %}>Newest first</option>
+      <option value="bed__name" {% if request.GET.sort == "bed__name" %}selected{% endif %}>Bed (A–Z)</option>
+      <option value="-bed__name" {% if request.GET.sort == "-bed__name" %}selected{% endif %}>Bed (Z–A)</option>
+    </select>
+  </div>
+
+  <!-- Submit -->
+  <div class="col-md-2 d-flex align-items-end">
+    <button class="btn btn-primary w-100">Apply</button>
+  </div>
+
+  <!-- Reset -->
+  <div class="col-md-1 d-flex align-items-end">
+    <a href="{% url 'plant_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
+  </div>
+
+</form>
+
+
   {% if plants %}
   <table class="table table-striped align-middle">
     <thead>
