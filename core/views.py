@@ -183,6 +183,9 @@ class PlantListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = Plant.objects.filter(owner=self.request.user)
+        
+        # Default sort
+        qs = qs.order_by("name")
 
         # == Filtering ==
         # Filter by lifespan

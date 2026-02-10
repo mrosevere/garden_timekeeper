@@ -84,9 +84,9 @@
 
     <!-- Name -->
     <th>
-      <a href="?sort={% if request.GET.sort == 'name' %}-name{% else %}name{% endif %}{% if request.GET %}&{{ request.GET.urlencode|cut:'sort=' }}{% endif %}">
+      <a href="?sort={% if request.GET.sort == 'name' or not request.GET.sort %}-name{% else %}name{% endif %}{% if request.GET %}&{{ request.GET.urlencode|cut:'sort=' }}{% endif %}">
         Name
-        {% if request.GET.sort == "name" %}
+        {% if request.GET.sort == "name" or not request.GET.sort %}
           <i class="fa-solid fa-arrow-up ms-1"></i>
         {% elif request.GET.sort == "-name" %}
           <i class="fa-solid fa-arrow-down ms-1"></i>
