@@ -86,7 +86,7 @@ class Plant(models.Model):
     allowing personalised garden tracking.
     """
 
-    user = models.ForeignKey(
+    owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="plants"
