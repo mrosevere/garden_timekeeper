@@ -1,96 +1,168 @@
-{% extends "core/base.html" %} {% block content %}
+{% extends "core/base.html" %}
+{% block content %}
 <div class="container py-4">
   <h1>Your Garden Plants</h1>
 
   <a href="{% url 'plant_create' %}" class="btn btn-primary mb-3">Add New Plant</a>
 
+  <!-- Filter + Sort Bar -->
   <form method="get" class="row g-3 mb-4">
 
-  <!-- Lifespan Filter -->
-  <div class="col-md-3">
-    <label class="form-label">Lifespan</label>
-    <select name="lifespan" class="form-select">
-      <option value="">All</option>
-      {% for value, label in lifespan_choices %}
-        <option value="{{ value }}" {% if request.GET.lifespan == value %}selected{% endif %}>
-          {{ label }}
-        </option>
-      {% endfor %}
-    </select>
-  </div>
+    <!-- Search by name -->
+    <div class="col-md-3">
+      <label class="form-label">Search</label>
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="bi bi-search"></i>
+        </span>
+        <input
+          type="text"
+          name="search"
+          class="form-control"
+          placeholder="Search by name..."
+          value="{{ request.GET.search }}"
+        >
+      </div>
+    </div>
 
-  <!-- Type Filter -->
-  <div class="col-md-3">
-    <label class="form-label">Type</label>
-    <select name="type" class="form-select">
-      <option value="">All</option>
-      {% for value, label in type_choices %}
-        <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>
-          {{ label }}
-        </option>
-      {% endfor %}
-    </select>
-  </div>
+    <!-- Bed Filter -->
+    <div class="col-md-3">
+      <label class="form-label">Bed</label>
+      <select name="bed" class="form-select">
+        <option value="">All</option>
+        {% for bed in request.user.garden_beds.all %}
+          <option value="{{ bed.id }}" {% if request.GET.bed == bed.id|stringformat:"s" %}selected{% endif %}>
+            {{ bed.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
 
-  <!-- Sort -->
-  <div class="col-md-3">
-    <label class="form-label">Sort by</label>
-    <select name="sort" class="form-select">
-      <option value="">Default</option>
-      <option value="name" {% if request.GET.sort == "name" %}selected{% endif %}>Name (A–Z)</option>
-      <option value="-name" {% if request.GET.sort == "-name" %}selected{% endif %}>Name (Z–A)</option>
-      <option value="planting_date" {% if request.GET.sort == "planting_date" %}selected{% endif %}>Oldest first</option>
-      <option value="-planting_date" {% if request.GET.sort == "-planting_date" %}selected{% endif %}>Newest first</option>
-      <option value="bed__name" {% if request.GET.sort == "bed__name" %}selected{% endif %}>Bed (A–Z)</option>
-      <option value="-bed__name" {% if request.GET.sort == "-bed__name" %}selected{% endif %}>Bed (Z–A)</option>
-    </select>
-  </div>
+    <!-- Lifespan Filter -->
+    <div class="col-md-2">
+      <label class="form-label">Lifespan</label>
+      <select name="lifespan" class="form-select">
+        <option value="">All</option>
+        {% for value, label in lifespan_choices %}
+          <option value="{{ value }}" {% if request.GET.lifespan == value %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
 
-  <!-- Submit -->
-  <div class="col-md-2 d-flex align-items-end">
-    <button class="btn btn-primary w-100">Apply</button>
-  </div>
+    <!-- Type Filter -->
+    <div class="col-md-2">
+      <label class="form-label">Type</label>
+      <select name="type" class="form-select">
+        <option value="">All</option>
+        {% for value, label in type_choices %}
+          <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
 
-  <!-- Reset -->
-  <div class="col-md-1 d-flex align-items-end">
-    <a href="{% url 'plant_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
-  </div>
+    <!-- Apply -->
+    <div class="col-md-1 d-flex align-items-end">
+      <button class="btn btn-primary w-100">Apply</button>
+    </div>
 
-</form>
+    <!-- Reset -->
+    <div class="col-md-1 d-flex align-items-end">
+      <a href="{% url 'plant_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
+    </div>
 
+  </form>
 
-  {% if plants %}
+  <!-- Plant Table -->
+  {% if object_list %}
   <table class="table table-striped align-middle">
     <thead>
-      <tr>
-        <th>Name</th>
-        <th>Garden Bed</th>
-        <th>Planting Date</th>
-        <th style="width: 150px">Actions</th>
-      </tr>
-    </thead>
+  <tr>
+
+    <!-- Name -->
+    <th>
+      <a href="?sort={% if request.GET.sort == 'name' %}-name{% else %}name{% endif %}{% if request.GET %}&{{ request.GET.urlencode|cut:'sort=' }}{% endif %}">
+        Name
+        {% if request.GET.sort == "name" %}
+          <i class="fa-solid fa-arrow-up ms-1"></i>
+        {% elif request.GET.sort == "-name" %}
+          <i class="fa-solid fa-arrow-down ms-1"></i>
+        {% endif %}
+      </a>
+    </th>
+
+    <!-- Location (Garden Bed Name) -->
+    <th>
+      <a href="?sort={% if request.GET.sort == 'bed__name' %}-bed__name{% else %}bed__name{% endif %}{% if request.GET %}&{{ request.GET.urlencode|cut:'sort=' }}{% endif %}">
+        Location
+        {% if request.GET.sort == "bed__name" %}
+          <i class="fa-solid fa-arrow-up ms-1"></i>
+        {% elif request.GET.sort == "-bed__name" %}
+          <i class="fa-solid fa-arrow-down ms-1"></i>
+        {% endif %}
+      </a>
+    </th>
+
+    <!-- Planting Date -->
+    <th>
+      <a href="?sort={% if request.GET.sort == 'planting_date' %}-planting_date{% else %}planting_date{% endif %}{% if request.GET %}&{{ request.GET.urlencode|cut:'sort=' }}{% endif %}">
+        Planting Date
+        {% if request.GET.sort == "planting_date" %}
+          <i class="fa-solid fa-arrow-up ms-1"></i>
+        {% elif request.GET.sort == "-planting_date" %}
+          <i class="fa-solid fa-arrow-down ms-1"></i>
+        {% endif %}
+      </a>
+    </th>
+
+    <!-- Lifespan -->
+    <th>
+      <a href="?sort={% if request.GET.sort == 'lifespan' %}-lifespan{% else %}lifespan{% endif %}{% if request.GET %}&{{ request.GET.urlencode|cut:'sort=' }}{% endif %}">
+        Lifespan
+        {% if request.GET.sort == "lifespan" %}
+          <i class="fa-solid fa-arrow-up ms-1"></i>
+        {% elif request.GET.sort == "-lifespan" %}
+          <i class="fa-solid fa-arrow-down ms-1"></i>
+        {% endif %}
+      </a>
+    </th>
+
+    <!-- Type -->
+    <th>
+      <a href="?sort={% if request.GET.sort == 'type' %}-type{% else %}type{% endif %}{% if request.GET %}&{{ request.GET.urlencode|cut:'sort=' }}{% endif %}">
+        Type
+        {% if request.GET.sort == "type" %}
+          <i class="fa-solid fa-arrow-up ms-1"></i>
+        {% elif request.GET.sort == "-type" %}
+          <i class="fa-solid fa-arrow-down ms-1"></i>
+        {% endif %}
+      </a>
+    </th>
+
+    <!-- Actions (not sortable) -->
+    <th style="width: 150px">Actions</th>
+
+  </tr>
+</thead>
+    
+
     <tbody>
-      {% for plant in plants %}
+      {% for plant in object_list %}
       <tr>
-        <td>
-          <a href="{% url 'plant_detail' plant.pk %}"> {{ plant.name }} </a>
-        </td>
+        <td><a href="{% url 'plant_detail' plant.pk %}">{{ plant.name }}</a></td>
         <td>{{ plant.bed|default:"—" }}</td>
         <td>{{ plant.planting_date|date:"Y-m-d" }}</td>
+        <td>{{ plant.get_lifespan_display }}</td>
+        <td>{{ plant.get_type_display }}</td>
         <td>
-          <a
-            href="{% url 'plant_edit' plant.pk %}"
-            class="btn btn-sm btn-outline-secondary me-2"
-          >
-            Edit
-          </a>
+          <a href="{% url 'plant_edit' plant.pk %}" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
 
-          <!-- Delete modal trigger -->
-          <button
-            class="btn btn-sm btn-outline-danger"
-            data-bs-toggle="modal"
-            data-bs-target="#deleteModal-{{ plant.pk }}"
-          >
+          <button class="btn btn-sm btn-outline-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteModal-{{ plant.pk }}">
             Delete
           </button>
         </td>
@@ -98,23 +170,67 @@
       {% endfor %}
     </tbody>
   </table>
-  <!-- Delete modals -->
-  {% for plant in plants %}
-  <div
-    class="modal fade"
-    id="deleteModal-{{ plant.pk }}"
-    tabindex="-1"
-    aria-hidden="true"
-  >
+
+  <!-- Summary -->
+  <p class="text-muted text-center">
+    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    ({{ page_obj.paginator.count }} total)
+  </p>
+
+  <!-- Pagination -->
+  <nav aria-label="Plant pagination">
+    <ul class="pagination justify-content-center">
+
+      <!-- Previous -->
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link"
+             href="?page={{ page_obj.previous_page_number }}{% if request.GET %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">
+            Previous
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+      {% endif %}
+
+      <!-- Page Numbers -->
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?page={{ num }}{% if request.GET %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">
+              {{ num }}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      <!-- Next -->
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link"
+             href="?page={{ page_obj.next_page_number }}{% if request.GET %}&{{ request.GET.urlencode|cut:'page=' }}{% endif %}">
+            Next
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+
+    </ul>
+  </nav>
+
+  <!-- Delete Modals -->
+  {% for plant in object_list %}
+  <div class="modal fade" id="deleteModal-{{ plant.pk }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
+
         <div class="modal-header">
           <h5 class="modal-title">Delete Garden Plant</h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
 
         <div class="modal-body">
@@ -126,20 +242,16 @@
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Yes, delete</button>
           </form>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cancel
-          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         </div>
+
       </div>
     </div>
   </div>
-  {% endfor %} {% else %}
-  <p>You have no garden plants yet.</p>
+  {% endfor %}
+
+  {% else %}
+    <p>You have no garden plants that meet your current filters.</p>
   {% endif %}
 </div>
-
 {% endblock %}

@@ -61,7 +61,7 @@ class BedListView(LoginRequiredMixin, ListView):
     model = GardenBed
     template_name = "core/beds/bed_list.html"
     # Set context rather than using default object_list / gardenbed_list
-    context_object_name = "beds"
+    paginate_by = 2
 
     def get_queryset(self):
         return GardenBed.objects.filter(owner=self.request.user)
@@ -179,20 +179,31 @@ class PlantListView(LoginRequiredMixin, ListView):
     """
     model = Plant
     template_name = "core/plants/plant_list.html"
-    # Set context rather than using default object_list / plant_list
-    context_object_name = "plants"
+    paginate_by = 3
 
     def get_queryset(self):
         qs = Plant.objects.filter(owner=self.request.user)
 
-        # Filtering
+        # == Filtering ==
+        # Filter by lifespan
         lifespan = self.request.GET.get("lifespan")
         if lifespan:
             qs = qs.filter(lifespan=lifespan)
 
+        # filter by type
         plant_type = self.request.GET.get("type")
         if plant_type:
             qs = qs.filter(type=plant_type)
+
+        # filter by bed
+        bed_id = self.request.GET.get("bed")
+        if bed_id:
+            qs = qs.filter(bed_id=bed_id)
+
+        # Search by name (partial match)
+        search = self.request.GET.get("search")
+        if search:
+            qs = qs.filter(name__icontains=search)
 
         # Sorting
         allowed_sorts = [
