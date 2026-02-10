@@ -61,7 +61,7 @@ class BedListView(LoginRequiredMixin, ListView):
     model = GardenBed
     template_name = "core/beds/bed_list.html"
     # Set context rather than using default object_list / gardenbed_list
-    context_object_name = "beds"  
+    context_object_name = "beds"
 
     def get_queryset(self):
         return GardenBed.objects.filter(owner=self.request.user)
@@ -158,4 +158,115 @@ def bed_delete(request, pk):
     return render(request, "core/beds/bed_detail.html", {
         "bed": bed,
         "delete_mode": True
+    })
+
+
+# ================= Plant Views =======================
+
+class PlantListView(LoginRequiredMixin, ListView):
+    """
+    Display a list of plants belonging to the logged-in user.
+
+    This view uses Django's ListView to retrieve and render only the
+    plants owned by the current user, ensuring per-user data isolation.
+    """
+    model = Plant
+    template_name = "core/plants/plant_list.html"
+    # Set context rather than using default object_list / plant_list
+    context_object_name = "plants"
+
+    def get_queryset(self):
+        return Plant.objects.filter(owner=self.request.user)
+
+
+class PlantDetailView(LoginRequiredMixin, DetailView):
+    """
+    Display detailed information for a single plant.
+
+    The view restricts access to beds owned by the logged-in user,
+    raising a 404 if the requested bed does not belong to them.
+    """
+    model = Plant
+    template_name = "core/plants/plant_detail.html"
+    context_object_name = "plant"
+
+    def get_queryset(self):
+        return Plant.objects.filter(owner=self.request.user)
+
+
+class PlantCreateView(LoginRequiredMixin, CreateView):
+    """
+    Create a new plant for the logged-in user.
+
+    Django's CreateView handles form display, validation, and saving.
+    The logged-in user is automatically assigned as the plant owner
+    before the object is saved. Duplicate names are caught and
+    surfaced as form errors.
+    """
+    model = Plant
+    form_class = PlantForm
+    template_name = "core/plants/plant_create.html"
+    success_url = reverse_lazy("plant_list")
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            form.add_error("name", "You already have a plant with this name.")
+            return self.form_invalid(form)
+
+
+class PlantUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Edit an existing plant belonging to the logged-in user.
+
+    This view reuses Django's UpdateView to handle form rendering and
+    validation. Duplicate names are caught and surfaced as form errors.
+    """
+    model = Plant
+    form_class = PlantForm
+    template_name = "core/plants/plant_edit.html"
+    context_object_name = "plant"
+    success_url = reverse_lazy("plant_list")
+
+    def get_queryset(self):
+        return Plant.objects.filter(owner=self.request.user)
+
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            form.add_error("name", "You already have a plant with this name.")
+            return self.form_invalid(form)
+
+
+@login_required
+def plant_delete(request, pk):
+    """
+    Delete a plant belonging to the logged-in user.
+
+    This function-based view is intentionally retained instead of using
+    Django's DeleteView so that the existing modal-based confirmation
+    workflow can be preserved. The delete confirmation is rendered within
+    the bed_detail template using `delete_mode`, allowing the modal to
+    appear without requiring a separate confirmation page.
+
+    On POST:
+        - Permanently delete the bed and redirect to the bed list.
+
+    On GET:
+        - Render the bed detail page with delete mode enabled so the
+          modal confirmation can be displayed.
+    """
+    plant = get_object_or_404(Plant, pk=pk, owner=request.user)
+
+    if request.method == "POST":
+        plant.delete()
+        return redirect("plant_list")
+
+    return render(request, "core/plants/plant_detail.html", {
+        "plant": plant,
+        "delete_mode": True,
     })

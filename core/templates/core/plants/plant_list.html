@@ -1,10 +1,10 @@
 {% extends "core/base.html" %} {% block content %}
 <div class="container py-4">
-  <h1>Your Garden Beds</h1>
+  <h1>Your Garden Plants</h1>
 
-  <a href="{% url 'bed_create' %}" class="btn btn-primary mb-3">Add New Bed</a>
+  <a href="{% url 'plant_create' %}" class="btn btn-primary mb-3">Add New Plant</a>
 
-  {% if beds %}
+  {% if plants %}
   <table class="table table-striped align-middle">
     <thead>
       <tr>
@@ -15,16 +15,16 @@
       </tr>
     </thead>
     <tbody>
-      {% for bed in beds %}
+      {% for plant in plants %}
       <tr>
         <td>
-          <a href="{% url 'bed_detail' bed.pk %}"> {{ bed.name }} </a>
+          <a href="{% url 'plant_detail' plant.pk %}"> {{ plant.name }} </a>
         </td>
-        <td>{{ bed.location|default:"—" }}</td>
-        <td>{{ bed.created_at|date:"Y-m-d" }}</td>
+        <td>{{ plant.location|default:"—" }}</td>
+        <td>{{ plant.created_at|date:"Y-m-d" }}</td>
         <td>
           <a
-            href="{% url 'bed_edit' bed.pk %}"
+            href="{% url 'plant_edit' plant.pk %}"
             class="btn btn-sm btn-outline-secondary me-2"
           >
             Edit
@@ -34,7 +34,7 @@
           <button
             class="btn btn-sm btn-outline-danger"
             data-bs-toggle="modal"
-            data-bs-target="#deleteModal-{{ bed.pk }}"
+            data-bs-target="#deleteModal-{{ plant.pk }}"
           >
             Delete
           </button>
@@ -44,17 +44,17 @@
     </tbody>
   </table>
   <!-- Delete modals -->
-  {% for bed in beds %}
+  {% for plant in plants %}
   <div
     class="modal fade"
-    id="deleteModal-{{ bed.pk }}"
+    id="deleteModal-{{ plant.pk }}"
     tabindex="-1"
     aria-hidden="true"
   >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Delete Garden Bed</h5>
+          <h5 class="modal-title">Delete Garden Plant</h5>
           <button
             type="button"
             class="btn-close"
@@ -63,11 +63,11 @@
         </div>
 
         <div class="modal-body">
-          Are you sure you want to delete <strong>{{ bed.name }}</strong>?
+          Are you sure you want to delete <strong>{{ plant.name }}</strong>?
         </div>
 
         <div class="modal-footer">
-          <form method="post" action="{% url 'bed_delete' bed.pk %}">
+          <form method="post" action="{% url 'plant_delete' plant.pk %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Yes, delete</button>
           </form>
@@ -83,7 +83,7 @@
     </div>
   </div>
   {% endfor %} {% else %}
-  <p>You have no garden beds yet.</p>
+  <p>You have no garden plants yet.</p>
   {% endif %}
 </div>
 
