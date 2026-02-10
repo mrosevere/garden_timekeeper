@@ -1,5 +1,7 @@
 from django import forms
 from .models import GardenBed, Plant
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout
 
 
 class GardenBedForm(forms.ModelForm):
@@ -44,6 +46,7 @@ class PlantForm(forms.ModelForm):
             "lifespan",
             "type",
             "planting_date",
+            "bed",
             "notes"
             ]
         widgets = {
@@ -57,4 +60,49 @@ class PlantForm(forms.ModelForm):
                 attrs={"class": "form-select"}),
             "planting_date": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"}),
+            "bed": forms.Select(
+                attrs={"class": "form-select"}),
+            "notes": forms.Textarea(
+                attrs={"class": "form-control"})
         }
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialise the PlantForm with user specific context.
+
+        This override extracts the logged in user from the form kwargs and
+        restricts the 'bed' field queryset to only the GardenBed instances
+        owned by that user. This ensures users can assign plants only to
+        their own beds and prevents cross user data exposure.
+        kwargs = keyword arguments
+        *args = collects positional arguments into a tuple
+        **kwargs = collects keyword arguments into a dictionary
+        """
+        # remove user from kwargs dictionary,
+        # because ModelForm.__init__ does not expect a user
+        user = kwargs.pop("user")
+        super().__init__(*args, **kwargs)
+
+        # Crispy layout override
+        self.helper = FormHelper()
+        # prevents crispy from wrapping the form
+        self.helper.form_tag = False
+        # crispy won’t inject hidden fields
+        self.helper.disable_csrf = True
+        # prevents crispy from injecting extra fields
+        self.helper.include_media = False
+        # prevents auto rendering of beds
+        self.helper.render_unmentioned_fields = False
+
+        self.helper.layout = Layout(
+            "name",
+            "latin_name",
+            "lifespan",
+            "type",
+            "planting_date",
+            "notes",
+            # Beds deliberately excluded as custom html used
+        )
+
+        # Apply queryset filtering
+        self.fields["bed"].queryset = GardenBed.objects.filter(owner=user)

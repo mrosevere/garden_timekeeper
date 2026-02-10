@@ -1,8 +1,32 @@
 {% extends "core/base.html" %} {% block content %}
 <h1>Plant Details: {{ plant.name }}</h1>
 
-<p><strong>Location:</strong> {{ plant.location|default:"Not specified" }}</p>
-<p>{{ plant.description }}</p>
+<p><strong>Latin Name:</strong> {{ plant.latin_name|default:"Not specified" }}</p>
+<p><strong>Lifespan:</strong>
+  {% if plant.lifespan %}
+    {{ plant.get_lifespan_display }}
+  {% else %}
+    Not specified
+  {% endif %}
+</p>
+<p><strong>Type:</strong> 
+  {% if plant.type %}
+    {{ plant.get_type_display }}
+  {% else %}
+    Not specified
+  {% endif %}
+</p>
+<p><strong>Planting Date:</strong> {{ plant.planting_date|date:"  F j, Y" }}</p>
+<p><strong>Garden Bed:</strong>
+  {% if plant.bed %}
+    {{ plant.bed.name }}
+  {% else %}
+    Not specified
+  {% endif %}
+</p>
+<p><strong>Notes:</strong> {{ plant.notes|linebreaksbr|default:"No additional notes" }}</p>
+
+
 
 <a href="{% url 'plant_list' %}" class="btn btn-secondary mt-3">Back to plants</a>
 

@@ -101,6 +101,11 @@ class Plant(models.Model):
         choices=PlantType.choices,
     )
     planting_date = models.DateField(null=True, blank=True)
+    bed = models.ForeignKey(
+        GardenBed,
+        on_delete=models.CASCADE,
+        related_name="plants"
+    )
     notes = models.TextField(blank=True)
 
     def __str__(self):

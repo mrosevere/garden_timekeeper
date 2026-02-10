@@ -9,8 +9,8 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th>Location</th>
-        <th>Created</th>
+        <th>Garden Bed</th>
+        <th>Planting Date</th>
         <th style="width: 150px">Actions</th>
       </tr>
     </thead>
@@ -20,8 +20,8 @@
         <td>
           <a href="{% url 'plant_detail' plant.pk %}"> {{ plant.name }} </a>
         </td>
-        <td>{{ plant.location|default:"—" }}</td>
-        <td>{{ plant.created_at|date:"Y-m-d" }}</td>
+        <td>{{ plant.bed|default:"—" }}</td>
+        <td>{{ plant.planting_date|date:"Y-m-d" }}</td>
         <td>
           <a
             href="{% url 'plant_edit' plant.pk %}"
