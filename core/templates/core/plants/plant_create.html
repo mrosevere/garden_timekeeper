@@ -3,24 +3,13 @@
 <div class="container py-4">
   <h1 class="mb-3">Add a New Garden Plant</h1>
 
+<form method="post">
+  {% csrf_token %}
+
+  <!-- Create Plant Crispy Form -->
   <form method="post">
-    {% csrf_token %} {% crispy form %}
-
-    <div class="mb-3">
-      {{ form.bed.label_tag }}
-      <div class="d-flex align-items-center gap-2">
-        {{ form.bed }}
-        <a
-          href="{% url 'bed_create' %}"
-          data-bs-toggle="modal"
-          data-bs-target="#createBedModal"
-          class="btn btn-outline-secondary btn-sm"
-        >
-          + Add new bed
-        </a>
-      </div>
-    </div>
-
+    {% csrf_token %}
+    {% crispy form %}
     <button type="submit" class="btn btn-primary">Create Plant</button>
   </form>
 
