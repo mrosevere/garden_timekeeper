@@ -7,12 +7,21 @@ Timekeeper application and enforce per-user data ownership to ensure
 privacy and personalised garden management.
 """
 
+# Django
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
 from django.db import IntegrityError
+from django.contrib.auth.mixins import LoginRequiredMixin 
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView)
+# Models
 from .models import GardenBed, Plant
+# Forms
 from .forms import GardenBedForm, PlantForm
 
+
+# ================= Homepage Views =======================
 
 def home(request):
     """
@@ -24,6 +33,8 @@ def home(request):
     """
     return render(request, 'core/home.html')
 
+
+# ================= Dashboard Views =======================
 
 @login_required
 def dashboard(request):
@@ -146,3 +157,60 @@ def bed_delete(request, pk):
         "bed": bed,
         "delete_mode": True
     })
+
+
+# ================= Plant Views =======================
+
+@login_required
+def plant_list(request):
+    """
+    Display a list of all plants belonging to the logged-in user.
+
+    Only plants owned by the current user are shown, ensuring that users
+    can view and manage only their own garden plants.
+    """
+    plants = Plant.objects.filter(owner=request.user)
+    return render(request, "core/plants/plant_list.html", {"plants": plants})
+
+
+@login_required
+def plant_detail(request, pk):
+    """
+    Display detailed information for a single garden plant.
+
+    The view ensures that the requested plant belongs to the current user.
+    If the plant does not exist or is not owned by the user, a 404 error
+    is raised.
+    """
+    plant = get_object_or_404(Plant, pk=pk, owner=request.user)
+    return render(request, "core/plants/plant_detail.html", {"plant": plant})
+
+
+@login_required
+def plant_create(request):
+    """
+    Create a new garden plant for the logged-in user.
+
+    On POST:
+        - Validate form data.
+        - Assign the current user as the plant owner.
+        - Handle IntegrityError if the user already has a plant with the
+          same name.
+    On GET:
+        - Display an empty form for creating a new plant.
+    """
+    if request.method == "POST":
+        form = PlantForm(request.POST)
+        if form.is_valid():
+            plant = form.save(commit=False)
+            plant.owner = request.user
+            try:
+                plant.save()
+                return redirect("plant_list")
+            except IntegrityError:
+                form.add_error(
+                    "name", "You already have a plant with this name.")
+    else:
+        form = PlantForm()
+
+    return render(request, "core/plants/plant_create.html", {"form": form})
