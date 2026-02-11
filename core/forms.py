@@ -2,6 +2,7 @@ from django import forms
 from .models import GardenBed, Plant, PlantTask
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, HTML
+from django_summernote.widgets import SummernoteWidget
 
 
 class GardenBedForm(forms.ModelForm):
@@ -136,12 +137,7 @@ class PlantTaskForm(forms.ModelForm):
     """
     class Meta:
         model = PlantTask
-        fields = [
-            "name",
-            "all_year",
-            "seasonal_start_month",
-            "seasonal_end_month",
-            "frequency",
-            "repeat",
-            "notes",
-        ]
+        fields = "__all__"
+        widgets = {
+            "notes": SummernoteWidget(),
+        }

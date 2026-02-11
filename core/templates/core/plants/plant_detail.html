@@ -27,10 +27,12 @@
 <p><strong>Notes:</strong> {{ plant.notes|linebreaksbr|default:"No additional notes" }}</p>
 
 
-
+<!-- Return to plants button -->
 <a href="{% url 'plant_list' %}" class="btn btn-secondary mt-3">Back to plants</a>
 
+<!-- Edit Button -->
 <a href="{% url 'plant_edit' plant.pk %}" class="btn btn-warning">Edit</a>
+
 <!-- Delete Button with modal confirmation -->
 <button
   class="btn btn-danger"
@@ -39,6 +41,12 @@
 >
   Delete
 </button>
+
+<!-- Add Task Button -->
+<a href="{% url 'task_create' plant.id %}" class="btn btn-primary btn-sm">
+    Add Task
+</a>
+
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
@@ -69,5 +77,38 @@
     </div>
   </div>
 </div>
+
+<h3 class="mt-4">Tasks</h3>
+
+{% if plant.tasks.all %}
+    <ul class="list-group">
+
+        {% for task in plant.tasks.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                <div>
+                    <strong>{{ task.name }}</strong><br>
+                    <small>Next due: {{ task.next_due }}</small>
+                </div>
+
+                <div class="btn-group">
+                    <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-outline-secondary">
+                        Edit
+                    </a>
+                    <a href="{% url 'task_mark_done' task.id %}" class="btn btn-sm btn-success">
+                        Done
+                    </a>
+                    <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-warning">
+                        Skip
+                    </a>
+                </div>
+
+            </li>
+        {% endfor %}
+
+    </ul>
+{% else %}
+    <p>No tasks yet.</p>
+{% endif %}
 
 {% endblock %}

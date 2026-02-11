@@ -6,7 +6,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 from django.conf import settings
-from django_summernote.fields import SummernoteTextField
 from calendar import monthrange
 from datetime import date, timedelta
 # from django.utils import timezone
@@ -203,7 +202,7 @@ class PlantTask(models.Model):
     )
 
     # WYSIWYG Notes field using Summernotes
-    notes = SummernoteTextField(blank=True)
+    notes = models.TextField(blank=True)
 
     # Scheduling fields
     last_done = models.DateField(null=True, blank=True)

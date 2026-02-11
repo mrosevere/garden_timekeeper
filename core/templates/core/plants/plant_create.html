@@ -57,6 +57,13 @@
     </div>
   </div>
 
+    <!-- Add Task Button -->
+  {% if plant %}
+    <a href="{% url 'task_create' plant.id %}" class="btn btn-outline-primary btn-sm">
+        Add Task for {{ plant.name }}
+    </a>
+  {% endif %}
+  
   <a href="{% url 'plant_list' %}" class="btn btn-secondary mt-3"
     >Cancel</a
   >
