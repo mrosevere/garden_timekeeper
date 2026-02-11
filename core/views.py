@@ -61,11 +61,40 @@ class BedListView(LoginRequiredMixin, ListView):
     """
     model = GardenBed
     template_name = "core/beds/bed_list.html"
-    # Set context rather than using default object_list / gardenbed_list
-    paginate_by = 2
+    paginate_by = 3
 
     def get_queryset(self):
-        return GardenBed.objects.filter(owner=self.request.user)
+        qs = GardenBed.objects.filter(owner=self.request.user)
+
+        # Default sort
+        qs = qs.order_by("name")
+
+        # == Filtering ==
+        # Search by name (partial match)
+        search = self.request.GET.get("search")
+        if search:
+            qs = qs.filter(name__icontains=search)
+
+        # Filter by location
+        location = self.request.GET.get("location")
+        if location:
+            qs = qs.filter(location=location)
+
+        # Sorting
+        allowed_sorts = [
+            "name", "-name",
+            "location", "-location",
+            "created_at", "-created_at",
+        ]
+
+        sort = self.request.GET.get("sort")
+        if sort in allowed_sorts:
+            qs = qs.order_by(sort)
+
+        return qs
+
+
+# ===============================================================================
 
 
 class BedDetailView(LoginRequiredMixin, DetailView):
