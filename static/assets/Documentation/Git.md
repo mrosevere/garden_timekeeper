@@ -50,6 +50,15 @@ Before starting any new work:
 
 This ensures your work starts from the most recent version of the project.
 
+If you get messages about untracked files such as:
+ - accounts/__pycache__/...
+ - core/__pycache__/...
+- garden_timekeeper/__pycache__/...
+
+Run:
+
+    git clean -fd
+
 ---
 
 ## 3. Creating a Feature Branch
