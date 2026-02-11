@@ -18,8 +18,8 @@ from django.urls import reverse_lazy
 from django.db import IntegrityError
 from django.contrib import messages
 
-from .models import GardenBed, Plant, PlantLifespan, PlantType
-from .forms import GardenBedForm, PlantForm
+from .models import GardenBed, Plant, PlantLifespan, PlantType, PlantTask
+from .forms import GardenBedForm, PlantForm, PlantTaskForm
 
 
 # ================= Homepage Views =======================
@@ -92,9 +92,6 @@ class BedListView(LoginRequiredMixin, ListView):
             qs = qs.order_by(sort)
 
         return qs
-
-
-# ===============================================================================
 
 
 class BedDetailView(LoginRequiredMixin, DetailView):
@@ -397,4 +394,87 @@ def plant_delete(request, pk):
     return render(request, "core/plants/plant_detail.html", {
         "plant": plant,
         "delete_mode": True,
+    })
+
+
+# ================= Task Views =======================
+@login_required
+def task_create(request, plant_id):
+    """
+    Create a new task for the selected plant
+
+    Django's CreateView handles form display, validation, and saving.
+    The logged-in user is automatically assigned as the plant owner
+    before the object is saved. Duplicate names are caught and
+    surfaced as form errors.
+    """
+    plant = get_object_or_404(Plant, id=plant_id, owner=request.user)
+
+    if request.method == "POST":
+        form = PlantTaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.plant = plant
+            task.next_due = task.calculate_next_due()
+            task.save()
+            return redirect("plant_detail", plant_id=plant.id)
+    else:
+        form = PlantTaskForm()
+
+    return render(request, "tasks/task_form.html", {
+        "form": form,
+        "plant": plant,
+        "title": "Create Task"
+    })
+
+
+@login_required
+def task_mark_done(request, task_id):
+    """
+    Mark the task as done and save it.
+    """
+    task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
+    task.mark_done()
+    task.save()
+    return redirect("plant_detail", plant_id=task.plant.id)
+
+
+@login_required
+def task_skip(request, task_id):
+    """
+    Mark the task as skipped.
+
+    This allows the user to remove the task from their dashboard
+    without having to actually mark the task as done.
+    """
+    task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
+    task.skip()
+    task.save()
+    return redirect("plant_detail", plant_id=task.plant.id)
+
+
+@login_required
+def task_update(request, task_id):
+    """
+    Edit an existing task belonging to the logged-in user.
+    Recalculates next_due when frequency or seasonal window changes.
+    """
+    task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
+
+    if request.method == "POST":
+        form = PlantTaskForm(request.POST, instance=task)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.next_due = task.calculate_next_due()
+            task.save()
+            messages.success(request, "Task updated successfully.")
+            return redirect("plant_detail", plant_id=task.plant.id)
+    else:
+        form = PlantTaskForm(instance=task)
+
+    return render(request, "tasks/task_form.html", {
+        "form": form,
+        "task": task,
+        "plant": task.plant,
+        "title": "Edit Task"
     })
