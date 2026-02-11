@@ -28,6 +28,12 @@
     
     <!-- Custom static JS -->
     <script src="{% static 'assets/js/style.js' %}"></script>
+
+    <!-- favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/assets/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/assets/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/assets/images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/static/assets/images/favicon/site.webmanifest">
   </head>
 
   
@@ -35,7 +41,15 @@
   <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
-      <div class="container">
+      <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-center" style="height: 40px;">
+          <a class="navbar-brand" href="/">
+            <img 
+              src="/static/assets/images/logos/gt-icon.png"
+              alt="Garden Timekeeper Logo"
+              class="navbar-logo">
+          </a>
+        </div>
         <a class="navbar-brand fw-bold" href="/">Garden Timekeeper</a>
         <button
           class="navbar-toggler"
@@ -49,7 +63,6 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <!-- Login Navigation -->
-            <ul class="navbar-nav ms-auto">
               {% if user.is_authenticated %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'logout' %}">Logout</a>
@@ -62,7 +75,6 @@
                 <a class="nav-link" href="{% url 'register' %}">Register</a>
               </li>
               {% endif %}
-            </ul>
             <!-- Page Navigation -->
             <li class="nav-item">
               <a class="nav-link" href="/">Home</a>
