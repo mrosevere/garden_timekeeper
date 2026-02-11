@@ -168,3 +168,6 @@ LOGIN_REDIRECT_URL = "dashboard"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = os.getenv(
     "SESSION_EXPIRE_AT_BROWSER_CLOSE", "True"
     ) == "True"
+
+# Required for Django 5.x to silence warnings about primary key
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

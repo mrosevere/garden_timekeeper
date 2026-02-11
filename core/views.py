@@ -417,11 +417,12 @@ def task_create(request, plant_id):
             task.plant = plant
             task.next_due = task.calculate_next_due()
             task.save()
-            return redirect("plant_detail", plant_id=plant.id)
+            return redirect("plant_detail", pk=plant.id)
+
     else:
         form = PlantTaskForm()
 
-    return render(request, "tasks/task_form.html", {
+    return render(request, "core/tasks/task_form.html", {
         "form": form,
         "plant": plant,
         "title": "Create Task"
@@ -436,7 +437,7 @@ def task_mark_done(request, task_id):
     task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
     task.mark_done()
     task.save()
-    return redirect("plant_detail", plant_id=task.plant.id)
+    return redirect("plant_detail", pk=task.plant.id)
 
 
 @login_required
@@ -450,7 +451,7 @@ def task_skip(request, task_id):
     task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
     task.skip()
     task.save()
-    return redirect("plant_detail", plant_id=task.plant.id)
+    return redirect("plant_detail", pk=task.plant.id)
 
 
 @login_required
@@ -468,11 +469,11 @@ def task_update(request, task_id):
             task.next_due = task.calculate_next_due()
             task.save()
             messages.success(request, "Task updated successfully.")
-            return redirect("plant_detail", plant_id=task.plant.id)
+            return redirect("plant_detail", pk=task.plant.id)
     else:
         form = PlantTaskForm(instance=task)
 
-    return render(request, "tasks/task_form.html", {
+    return render(request, "core/tasks/task_form.html", {
         "form": form,
         "task": task,
         "plant": task.plant,

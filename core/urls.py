@@ -18,7 +18,10 @@ from .views import (
     PlantCreateView,
     PlantUpdateView,
     plant_delete,
-
+    task_create,
+    task_update,
+    task_mark_done,
+    task_skip
 )
 
 urlpatterns = [
@@ -49,11 +52,11 @@ urlpatterns = [
 
     # Tasks (Function based views)
     path("plants/<int:plant_id>/tasks/create/",
-         views.task_create, name="task_create"),
+         task_create, name="task_create"),
     path("tasks/<int:task_id>/edit/",
-         views.task_update, name="task_update"),
+         task_update, name="task_update"),
     path("tasks/<int:task_id>/done/",
-         views.task_mark_done, name="task_mark_done"),
+         task_mark_done, name="task_mark_done"),
     path("tasks/<int:task_id>/skip/",
-         views.task_skip, name="task_skip"),
+         task_skip, name="task_skip"),
 ]
