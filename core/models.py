@@ -363,3 +363,15 @@ class PlantTask(models.Model):
         self.next_due = next_date
 
         return self
+
+    def is_overdue(self):
+        """
+        Returns True if the task is overdue.
+        """
+        return self.next_due and self.next_due < date.today()
+
+    def days_until_due(self):
+        """
+        Returns number of days until the task is next due
+        """
+        return (self.next_due - date.today()).days if self.next_due else None
