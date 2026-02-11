@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-3">{{ title }} for {{ plant.name }}</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+
+                <div class="mt-3 d-flex justify-content-between">
+                    <a href="{% url 'plant_detail' plant.id %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Save Task
+                    </button>
+                    
+                    <!-- Delete button only shows if we're editing an existing task, not creating a new one -->
+                     <!-- This still needs proper implementation -->
+                    {% if task %}
+                    <a href="#" class="btn btn-danger">Delete Task</a>
+                    {% endif %}
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

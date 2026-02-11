@@ -1,5 +1,5 @@
 from django import forms
-from .models import GardenBed, Plant
+from .models import GardenBed, Plant, PlantTask
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, HTML
 
@@ -124,3 +124,24 @@ class PlantForm(forms.ModelForm):
 
         # Apply queryset filtering
         self.fields["bed"].queryset = GardenBed.objects.filter(owner=user)
+
+
+class PlantTaskForm(forms.ModelForm):
+    """
+    A ModelForm for creating and editing Plant Tasks.
+
+    This form includes fields for task information,
+    including name, notes, dates task needs to be performed
+
+    """
+    class Meta:
+        model = PlantTask
+        fields = [
+            "name",
+            "all_year",
+            "seasonal_start_month",
+            "seasonal_end_month",
+            "frequency",
+            "repeat",
+            "notes",
+        ]

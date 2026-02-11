@@ -95,7 +95,6 @@ If there are conflicts:
 - Resolve the conflicts in your branch
 - Test that the site still works as expected
 
-See [How to Resolve Merge Conflicts in VS Code](#how-to-resolve-merge-conflicts-in-vs-code)
 
 ### Stage your merged changes again
 
@@ -213,7 +212,7 @@ Your branch is now clean and ready for review.
 
 ---
 
-## 🗺️ Git Workflow Diagram (Text Version)
+## Git Workflow Diagram (Text Version)
 
 ```
 main branch
@@ -238,7 +237,7 @@ main branch
 
 ---
 
-## 📝 How to Write a Good Pull Request
+## How to Write a Good Pull Request
 
 A high‑quality PR makes review faster and reduces mistakes.
 
@@ -252,7 +251,7 @@ A high‑quality PR makes review faster and reduces mistakes.
 - **Confirmation that the branch is up to date with `main`**
 - **Confirmation that the project still runs without errors**
 
-## 🌿 Branch Naming Conventions
+## Branch Naming Conventions
 
 Consistent branch names make the repo easier to navigate.
 
