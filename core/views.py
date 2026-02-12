@@ -128,12 +128,21 @@ def dashboard(request):
     )
 
     # -----------------------------
+    # 4b. Hide overdue tasks checkbox
+    # -----------------------------
+    hide_overdue = request.GET.get("hide_overdue") == "1"
+    if hide_overdue:
+        tasks = tasks.filter(next_due__gte=start_of_month)
+
+    # -----------------------------
     # 5. CONTEXT
     # -----------------------------
     context = {
         "tasks": tasks,
         "view_mode": view_mode,
         "month_label": month_label,
+        "hide_overdue": hide_overdue,
+
 
         # navigation
         "today": today,

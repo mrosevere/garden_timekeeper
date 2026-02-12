@@ -20,46 +20,6 @@
   </div>
 </div>
 
-<div class="container">
-  <!-- FILTERS ROW -->
-<div class="d-flex gap-2 mb-4">
-
-    <!-- Bed Filter -->
-    <div class="btn-group">
-        <button type="button"
-                class="btn btn-outline-secondary dropdown-toggle"
-                data-bs-toggle="dropdown">
-            Bed Filter
-        </button>
-        <ul class="dropdown-menu">
-            <li><button class="dropdown-item">All Beds</button></li>
-            <li><button class="dropdown-item">Front Garden</button></li>
-            <li><button class="dropdown-item">Greenhouse</button></li>
-        </ul>
-    </div>
-
-    <!-- Plant Filter -->
-    <div class="btn-group">
-        <button type="button"
-                class="btn btn-outline-secondary dropdown-toggle"
-                data-bs-toggle="dropdown">
-            Plant Filter
-        </button>
-        <ul class="dropdown-menu">
-            <li><button class="dropdown-item">All Plants</button></li>
-            <li><button class="dropdown-item">Tomatoes</button></li>
-            <li><button class="dropdown-item">Lavender</button></li>
-        </ul>
-    </div>
-
-    <!-- Reset Filters -->
-    <button type="button" class="btn btn-outline-danger">
-        Reset
-    </button>
-  </div>
-</div>
-
-
 <div class="container mb-4">
 
     <div class="d-flex justify-content-between align-items-center">
@@ -75,7 +35,8 @@
         <div class="btn-group">
 
             <!-- Today Button -->
-            <a href="?view=month&sort={{ current_sort }}&direction={{ current_direction }}"
+            <a href="?view=month&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:"1," }}
+"
                class="btn btn-outline-secondary">
                 Today
             </a>
@@ -87,7 +48,8 @@
             </button>
 
             <!-- Next Month -->
-            <a href="?view=month&year={{ next_year }}&month={{ next_month }}&sort={{ current_sort }}&direction={{ current_direction }}"
+            <a href="?view=month&year={{ next_year }}&month={{ next_month }}&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:"1," }}
+"
             class="btn btn-outline-secondary">
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
@@ -141,6 +103,28 @@
 
 </div>
 
+<!-- Checkbox to hide overdue tasks -->
+<form method="get" class="d-inline">
+    <input type="hidden" name="view" value="month">
+    <input type="hidden" name="year" value="{{ selected_year }}">
+    <input type="hidden" name="month" value="{{ selected_month }}">
+    <input type="hidden" name="sort" value="{{ current_sort }}">
+    <input type="hidden" name="direction" value="{{ current_direction }}">
+
+    <div class="form-check d-inline-block ms-3">
+        <input class="form-check-input"
+               type="checkbox"
+               name="hide_overdue"
+               value="1"
+               id="hideOverdueCheck"
+               {% if hide_overdue %}checked{% endif %}
+               onchange="this.form.submit()">
+
+        <label class="form-check-label" for="hideOverdueCheck">
+            Hide overdue tasks
+        </label>
+    </div>
+</form>
 
 <!-- Table of tasks -->
 <div class="container">
