@@ -18,6 +18,8 @@ from django.urls import reverse_lazy
 from django.db import IntegrityError
 from django.contrib import messages
 
+from datetime import date
+
 from .models import GardenBed, Plant, PlantLifespan, PlantType, PlantTask
 from .forms import GardenBedForm, PlantForm, PlantTaskForm
 
@@ -273,7 +275,33 @@ class PlantDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "plant"
 
     def get_queryset(self):
+        """
+        Returns query set
+        """
         return Plant.objects.filter(owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        """
+        Adds context data
+
+        The context data is used to check whether a task is in season.
+        """
+        context = super().get_context_data(**kwargs)
+        plant = context["plant"]
+
+        today = date.today()
+
+        # Precompute seasonal status for each task
+        task_info = []
+        for task in plant.tasks.all():
+            task_info.append({
+                "task": task,
+                "in_season": task.is_in_season(today),
+            })
+
+        context["task_info"] = task_info
+        context["today"] = today
+        return context
 
 
 class PlantCreateView(LoginRequiredMixin, CreateView):
