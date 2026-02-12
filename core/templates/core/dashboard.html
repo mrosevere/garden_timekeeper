@@ -1,5 +1,7 @@
 {% extends "core/base.html" %} 
+{% load month_filters %}
 {% block content %}
+
 
 <div class="container py-4">  
 
@@ -64,18 +66,20 @@
 
         <!-- Left: Selected Month -->
         <h2 class="h4 mb-0">
-            <!-- passed from the view context -->
-            {{ month_label|date:"F Y" }}
+            <!-- passed from the month_filters -->
+            {{ selected_month|month_name }} {{ selected_year }}
+
         </h2>
 
         <!-- Right: Navigation Buttons -->
         <div class="btn-group">
 
             <!-- Today Button -->
-            <a href="?view=month"
+            <a href="?view=month&sort={{ current_sort }}&direction={{ current_direction }}"
                class="btn btn-outline-secondary">
                 Today
             </a>
+
 
             <!-- Previous Month (disabled because we don't allow backwards nav) -->
             <button class="btn btn-outline-secondary" disabled>
@@ -83,10 +87,52 @@
             </button>
 
             <!-- Next Month -->
-           <a href="?view=month&year={{ next_year }}&month={{ next_month }}&sort={{ current_sort }}&direction={{ current_direction }}"
+            <a href="?view=month&year={{ next_year }}&month={{ next_month }}&sort={{ current_sort }}&direction={{ current_direction }}"
             class="btn btn-outline-secondary">
-            <i class="fa-solid fa-chevron-right"></i>
+                <i class="fa-solid fa-chevron-right"></i>
             </a>
+
+            <!-- Jump to Month to display the next 12 months (even if that rolls over the year) -->
+            <div class="btn-group ms-2">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    Jump to…
+                </button>
+
+                <ul class="dropdown-menu">
+
+                    <!-- Current Year -->
+                    <li><h6 class="dropdown-header">{{ today.year }}</h6></li>
+
+                    {% for m in today.month|to:12 %}
+                        <li>
+                            <a class="dropdown-item"
+                            href="?view=month&year={{ today.year }}&month={{ m }}&sort={{ current_sort }}&direction={{ current_direction }}">
+                                {{ m|month_name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <!-- Next Year -->
+                    <li><h6 class="dropdown-header">{{ today.year|add:"1" }}</h6></li>
+
+                    {% for m in 1|to:12 %}
+                        <li>
+                            <a class="dropdown-item"
+                            href="?view=month&year={{ today.year|add:'1' }}&month={{ m }}&sort={{ current_sort }}&direction={{ current_direction }}">
+                                {{ m|month_name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+
+
+
+
+
 
 
         </div>
@@ -182,7 +228,14 @@
     <!-- table body -->
     <tbody>
         {% for task in tasks %}
-        <tr>
+        <!-- Conditional logic for row highlighting based on due date -->
+        <tr
+        {% if task.next_due < start_of_month %}
+            class="table-danger"
+        {% elif task.next_due == today %}
+            class="table-warning"
+        {% endif %}
+
           <!-- Complete? -->
           <td>
                 <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
@@ -213,7 +266,14 @@
           </td>
 
           <!-- Due -->
-          <td>{{ task.next_due }}</td>
+          <td>
+            {% if task.next_due < start_of_month %}
+                <i class="fa-solid fa-circle-exclamation text-danger ms-2"></i>
+            {% elif task.next_due == today %}
+                <i class="fa-solid fa-circle-exclamation text-warning ms-2"></i>
+            {% endif %}
+            {{ task.next_due }}
+          </td>
            <td class="d-none d-md-table-cell">
               {{ task.get_frequency_display }}
           </td>
