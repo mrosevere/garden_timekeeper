@@ -487,12 +487,20 @@ def task_delete(request, task_id):
 @login_required
 def task_mark_done(request, task_id):
     """
-    Mark the task as done and save it.
+    Mark the task as done and return to the dashboard.
     """
-    task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
+    task = get_object_or_404(
+        PlantTask,
+        id=task_id,
+        plant__owner=request.user
+    )
+
     task.mark_done()
     task.save()
-    return redirect("plant_detail", pk=task.plant.id)
+
+    messages.success(request, f"Task '{task.name}' marked as done.")
+
+    return redirect("dashboard")
 
 
 @login_required
@@ -506,7 +514,7 @@ def task_skip(request, task_id):
     task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
     task.skip()
     task.save()
-    return redirect("plant_detail", pk=task.plant.id)
+    return redirect("plant_detail")
 
 
 @login_required
@@ -539,7 +547,10 @@ def task_update(request, task_id):
 class TaskDetailView(DetailView):
     """
     Task detail view to display the task information to the user
+
+    Does not need a return as it uses the Django DetailView
     """
     model = PlantTask
     template_name = "core/tasks/task_detail.html"
     context_object_name = "task"
+
