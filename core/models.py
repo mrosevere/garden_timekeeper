@@ -287,30 +287,44 @@ class PlantTask(models.Model):
         Calculates the next due date based on frequency and seasonal window.
         Does not save the model — just returns the calculated date.
         """
+        today = date.today()
 
-        # 1. Determine the starting point
-        if from_date:
-            current = from_date
-        elif self.last_done:
-            current = self.last_done
-        else:
-            current = date.today()
+        # --- 1. Handle NEW tasks (no last_done) ---
+        if self.last_done is None:
+            # Case A: Today is in season
+            if self.is_in_season(today):
+                return today
 
-        # 2. Get frequency delta
+            # Case B: Today is before the seasonal window
+            start_month = self.seasonal_start_month
+            end_month = self.seasonal_end_month
+
+            if today.month < start_month:
+                # Start of this year's season
+                return date(today.year, start_month, 1)
+
+            # Case C: Today is after the seasonal window
+            # → next year's season
+            return date(today.year + 1, start_month, 1)
+
+        # --- 2. Handle RECURRING tasks ---
+        # Determine starting point
+        current = from_date or self.last_done or today
+
+        # Apply frequency
         delta = self.get_frequency_delta()
 
-        # 3. Apply the frequency
         if delta["days"] > 0:
             next_date = current + timedelta(days=delta["days"])
         else:
             next_date = self.add_months(current, delta["months"])
 
-        # 4. Adjust for seasonal window
-        # If the calculated date is not in season, move forward day-by-day
+        # Move forward until in season
         while not self.is_in_season(next_date):
             next_date += timedelta(days=1)
 
         return next_date
+
 
     def mark_done(self, done_date=None):
         """

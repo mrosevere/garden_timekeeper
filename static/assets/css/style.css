@@ -29,3 +29,26 @@ main {
     max-height: 40px;
     width: auto;
 }
+
+
+/* mobile size media queries */
+@media (max-width: 576px) {
+
+    /* Make Summernote fully responsive on mobile */
+    .note-editor {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    .note-editor .note-editing-area,
+    .note-editor .note-editable {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        word-wrap: break-word;
+    }
+
+    .note-toolbar {
+        flex-wrap: wrap !important;
+    }
+}
