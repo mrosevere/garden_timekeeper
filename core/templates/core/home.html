@@ -5,4 +5,49 @@
 {% block content %}
 <h1 class="display-5 fw-bold">Welcome to Garden Timekeeper</h1>
 <p class="lead">Your garden, beautifully organised.</p>
+
+<div class="container">
+{% if user.is_authenticated %}
+    <div class="row">
+        <div class="col-md-12">
+            <h2>See What's Due This Week</h2>
+            <p>Get a quick overview of all the care tasks you need to do for your plants in the coming week.</p>
+        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">See what's due this week!</a>
+        </div>
+        <div class="col-md-12">
+            <h2>Manage Your Plants</h2>
+            <p>View and update your plant collection, track their care needs, and keep your garden thriving.</p>
+        <a href="{% url 'plant_list' %}" class="btn btn-primary btn-lg">View My Plants</a>
+        </div>
+        <div class="col-md-12">
+            <h2>Organise Your Garden Beds</h2>
+            <p>Group your plants by garden beds and easily manage their care schedules.</p>
+        <a href="{% url 'plant_create' %}" class="btn btn-success btn-lg ms-2">Add New Plant</a>
+        <div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Track Your Garden's Needs</h2>
+            <p>Keep tabs on watering, fertilizing, and other care tasks for each of your plants.</p>
+        </div>
+        <div class="col-md-6">
+            <h2>Organise Your Garden</h2>
+            <p>Group your plants by garden beds and easily manage their care schedules.</p>
+        </div>
+        <div>
+            <h2>already have an account?</h2>
+            <p>log in to continue your journey.</p>
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Log In</a>
+        </div>
+        <div>
+            <h2>Get Started Today</h2>
+            <p>Sign up for a free account and start organising your garden with Garden Timekeeper.</p>
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Sign Up Now</a>
+        </div>
+    </div>
+{% endif %}
+    
+</div>
+
 {% endblock %}
