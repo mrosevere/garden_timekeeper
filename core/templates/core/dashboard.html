@@ -80,10 +80,15 @@
     <tbody>
         {% for task in tasks %}
         <tr>
-            <td>{{ task.name }}</td>
-            <td>{{ task.plant.name }}</td>
+          <td> 
+            <a href="{% url 'task_detail' task.id %}">{{ task.name }}</a>
+          </td> 
+          <td>
+            <a href="{% url 'plant_detail' task.plant.id %}">{{ task.plant.name }}</a>
+            
+          </td>
 
-            <!-- Hide on mobile -->
+<!-- Hide on mobile -->
             <td class="d-none d-md-table-cell">{{ task.plant.bed.name }}</td>
 
             <td>{{ task.next_due }}</td>

@@ -45,7 +45,8 @@ def dashboard(request):
     Display the main dashboard for authenticated users.
     Shows all tasks ordered by next due date.
     """
-    tasks = PlantTask.objects.select_related("plant", "plant__bed").order_by("next_due")
+    tasks = PlantTask.objects.select_related(
+        "plant", "plant__bed").order_by("next_due")
 
     context = {"tasks": tasks, }
 
@@ -533,3 +534,12 @@ def task_update(request, task_id):
         "plant": task.plant,
         "title": "Edit Task"
     })
+
+
+class TaskDetailView(DetailView):
+    """
+    Task detail view to display the task information to the user
+    """
+    model = PlantTask
+    template_name = "core/tasks/task_detail.html"
+    context_object_name = "task"
