@@ -78,37 +78,69 @@
   </div>
 </div>
 
+<!-- Tasks for selected plant -->
 <h3 class="mt-4">Tasks</h3>
 
-{% if plant.tasks.all %}
-    <ul class="list-group">
+{% if task_info %}
+<table class="table table-striped align-middle mt-3">
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Next Due</th>
+      <th>Status</th>
+      <th>Season</th>
+      <th class="text-end">Actions</th>
+     </tr>
+  </thead>
+  <tbody>
+    {% for item in task_info %}
+    {% with task=item.task %}
+    <tr>
+      <!-- Task name -->
+      <td>
+        <strong>{{ task.name }}</strong>
+      </td>
 
-        {% for task in plant.tasks.all %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+      <!-- Next due date -->
+      <td>
+        {{ task.next_due }}
+      </td>
 
-                <div>
-                    <strong>{{ task.name }}</strong><br>
-                    <small>Next due: {{ task.next_due }}</small>
-                </div>
+      <!-- Due status -->
+      <td>
+        {% if task.is_overdue %}
+         <span class="badge bg-danger">Overdue</span>
+        {% elif task.days_until_due <= 3 %}
+          <span class="badge bg-warning text-dark">Due Soon</span>
+        {% else %}
+          <span class="badge bg-info text-dark">Scheduled</span>
+        {% endif %}
+      </td>
 
-                <div class="btn-group">
-                    <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-outline-secondary">
-                        Edit
-                    </a>
-                    <a href="{% url 'task_mark_done' task.id %}" class="btn btn-sm btn-success">
-                        Done
-                    </a>
-                    <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-warning">
-                        Skip
-                    </a>
-                </div>
+       <!-- Seasonal status -->
+      <td>
+        {% if item.in_season %}
+          <span class="badge bg-success">In Season</span>
+        {% else %}
+          <span class="badge bg-secondary">Out of Season</span>
+        {% endif %}
+        </td>
 
-            </li>
-        {% endfor %}
+      <!-- Action buttons -->
+      <td class="text-end">
+        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        <a href="{% url 'task_mark_done' task.id %}" class="btn btn-sm btn-success">Done</a>
+        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-warning">Skip</a>
+      </td>
+    </tr>
+  {% endwith %}
+  {% endfor %}
+  </tbody>
+</table>
 
-    </ul>
 {% else %}
-    <p>No tasks yet.</p>
+<p>No tasks yet.</p>
 {% endif %}
+
 
 {% endblock %}
