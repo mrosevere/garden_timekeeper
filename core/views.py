@@ -43,12 +43,36 @@ def home(request):
 def dashboard(request):
     """
     Display the main dashboard for authenticated users.
-    Shows all tasks ordered by next due date.
+    Shows all tasks ordered by next due date, with optional sorting.
     """
-    tasks = PlantTask.objects.select_related(
-        "plant", "plant__bed").order_by("next_due")
+    sort = request.GET.get("sort", "next_due")
+    direction = request.GET.get("direction", "asc")
 
-    context = {"tasks": tasks, }
+    # Map allowed sort fields to model fields
+    sort_options = {
+        "name": "name",
+        "plant": "plant__name",
+        "bed": "plant__bed__name",
+        "due": "next_due",
+        "frequency": "frequency",
+    }
+
+    sort_field = sort_options.get(sort, "next_due")
+
+    if direction == "desc":
+        sort_field = f"-{sort_field}"
+
+    tasks = (
+        PlantTask.objects
+        .select_related("plant", "plant__bed")
+        .order_by(sort_field)
+    )
+
+    context = {
+        "tasks": tasks,
+        "current_sort": sort,
+        "current_direction": direction,
+    }
 
     return render(request, "core/dashboard.html", context)
 
