@@ -135,7 +135,8 @@ def dashboard(request):
         "view_mode": view_mode,
         "month_label": month_label,
 
-        # Month navigation
+        # navigation
+        "today": today,
         "selected_year": year,
         "selected_month": month,
         "start_of_month": start_of_month,
