@@ -82,70 +82,113 @@
 <h3 class="mt-4">Tasks</h3>
 
 {% if task_info %}
-<table class="table table-striped align-middle mt-3">
-  <thead>
-    <tr>
-      <th>Task</th>
-      <th>Next Due</th>
-      <th>Status</th>
-      <th>Season</th>
-      <th class="text-end">Actions</th>
-     </tr>
-  </thead>
-  <tbody>
-    {% for item in task_info %}
-    {% with task=item.task %}
-    <!-- Add logic into the row class based on task status -->
-    <tr class="
-    {% if task.is_overdue %}
-        table-danger
-    {% elif task.days_until_due <= 3 %}
-        table-warning
-    {% elif not item.in_season %}
-        table-secondary
-    {% endif %}">
+  <table class="table table-striped align-middle mt-3">
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th>Next Due</th>
+        <th>Status</th>
+        <th>Season</th>
+        <th>Frequency</th>
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in task_info %}
+      {% with task=item.task %}
+      <!-- Add logic into the row class based on task status -->
+      <tr class="
+      {% if task.is_overdue %}
+          table-danger
+      {% elif task.days_until_due <= 3 %}
+          table-warning
+      {% elif not item.in_season %}
+          table-secondary
+      {% endif %}">
 
-      <!-- Task name -->
-      <td>
-        <strong>{{ task.name }}</strong>
-      </td>
-
-      <!-- Next due date -->
-      <td>
-        {{ task.next_due }}
-      </td>
-
-      <!-- Due status -->
-      <td>
-        {% if task.is_overdue %}
-         <span class="badge bg-danger">Overdue</span>
-        {% elif task.days_until_due <= 3 %}
-          <span class="badge bg-warning text-dark">Due Soon</span>
-        {% else %}
-          <span class="badge bg-info text-dark">Scheduled</span>
-        {% endif %}
-      </td>
-
-       <!-- Seasonal status -->
-      <td>
-        {% if item.in_season %}
-          <span class="badge bg-success">In Season</span>
-        {% else %}
-          <span class="badge bg-secondary">Out of Season</span>
-        {% endif %}
+        <!-- Task name -->
+        <td>
+          <strong>{{ task.name }}</strong>
         </td>
 
-      <!-- Action buttons -->
-      <td class="text-end">
-        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-        <a href="{% url 'task_mark_done' task.id %}" class="btn btn-sm btn-success">Done</a>
-        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-warning">Skip</a>
-      </td>
-    </tr>
-  {% endwith %}
-  {% endfor %}
-  </tbody>
-</table>
+        <!-- Next due date -->
+        <td>
+          {{ task.next_due }}
+        </td>
+
+        <!-- Due status -->
+        <td>
+          {% if task.is_overdue %}
+          <span class="badge bg-danger">Overdue</span>
+          {% elif task.days_until_due <= 3 %}
+            <span class="badge bg-warning text-dark">Due Soon</span>
+          {% else %}
+            <span class="badge bg-info text-dark">Scheduled</span>
+          {% endif %}
+        </td>
+
+        <!-- Seasonal status -->
+        <td>
+          {% if item.in_season %}
+            <span class="badge bg-success">In Season</span>
+          {% else %}
+            <span class="badge bg-secondary">Out of Season</span>
+          {% endif %}
+        </td>
+
+        <!-- Frequency -->
+        <td>
+          {{ task.get_frequency_display }}
+        </td>
+
+        <!-- Action buttons -->
+        <td class="text-end">
+          <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+          <a href="{% url 'task_mark_done' task.id %}" class="btn btn-sm btn-success">Done</a>
+          <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-warning">Skip</a>
+          <button 
+            class="btn btn-sm btn-outline-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteTaskModal{{ task.id }}">
+              Delete
+          </button>
+
+        </td>
+      </tr>
+    {% endwith %}
+    {% endfor %}
+    </tbody>
+  </table>
+
+  {% for item in task_info %}
+    {% with task=item.task %}
+    <div class="modal fade" id="deleteTaskModal{{ task.id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    Are you sure you want to delete the task:
+                    <strong>{{ task.name }}</strong>?
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" action="{% url 'task_delete' task.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endwith %}
+{% endfor %}
 
 {% else %}
 <p>No tasks yet.</p>
