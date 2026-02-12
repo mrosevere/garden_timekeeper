@@ -171,3 +171,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = os.getenv(
 
 # Required for Django 5.x to silence warnings about primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Disable summernote iframe so I can use standard CSS styling
+SUMMERNOTE_CONFIG = {
+    'iframe': False,
+    }

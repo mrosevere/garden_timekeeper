@@ -2,7 +2,7 @@ from django import forms
 from .models import GardenBed, Plant, PlantTask
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, HTML
-from django_summernote.widgets import SummernoteWidget
+from django_summernote.widgets import SummernoteInplaceWidget
 
 
 class GardenBedForm(forms.ModelForm):
@@ -139,5 +139,5 @@ class PlantTaskForm(forms.ModelForm):
         model = PlantTask
         fields = "__all__"
         widgets = {
-            "notes": SummernoteWidget(),
+            "notes": SummernoteInplaceWidget(),
         }
