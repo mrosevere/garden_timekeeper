@@ -33,7 +33,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 # Local hosts permitted
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "https://garden-timekeeper-588fc83d2eb9.herokuapp.com/"]
+ALLOWED_HOSTS = [".herokuapp.com", "localhost", "127.0.0.1", "https://garden-timekeeper-588fc83d2eb9.herokuapp.com/"]
 
 
 # Application definition
