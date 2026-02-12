@@ -294,13 +294,29 @@ class PlantDetailView(LoginRequiredMixin, DetailView):
         # Precompute seasonal status for each task
         task_info = []
         for task in plant.tasks.all():
+            overdue = task.is_overdue()
+            days_until = task.days_until_due()
+            due_soon = days_until is not None and days_until <= 3
+
             task_info.append({
                 "task": task,
                 "in_season": task.is_in_season(today),
+                "overdue": overdue,
+                "due_soon": due_soon,
             })
 
+
+        # Sort order:
+        # 1. Overdue
+        # 2. Due soon
+        # 3. Everything else
+        task_info.sort(
+            key=lambda x: (
+                not x["overdue"],  # overdue first
+                not x["due_soon"],  # then due soon
+                x["task"].next_due or date.max  # then by date
+                ))
         context["task_info"] = task_info
-        context["today"] = today
         return context
 
 
@@ -430,11 +446,6 @@ def plant_delete(request, pk):
 def task_create(request, plant_id):
     """
     Create a new task for the selected plant
-
-    Django's CreateView handles form display, validation, and saving.
-    The logged-in user is automatically assigned as the plant owner
-    before the object is saved. Duplicate names are caught and
-    surfaced as form errors.
     """
     plant = get_object_or_404(Plant, id=plant_id, owner=request.user)
 
@@ -455,6 +466,21 @@ def task_create(request, plant_id):
         "plant": plant,
         "title": "Create Task"
     })
+
+
+@login_required
+def task_delete(request, task_id):
+    """
+    Delete a task for the selected plant
+    """
+    task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
+
+    if request.method == "POST":
+        task.delete()
+        messages.success(request, "Task deleted successfully.")
+        return redirect("plant_detail", pk=task.plant.id)
+
+    return redirect("plant_detail", pk=task.plant.id)
 
 
 @login_required

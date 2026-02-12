@@ -144,7 +144,6 @@ class PlantTask(models.Model):
     name = models.CharField(max_length=100)
 
     # Seasonal Window
-
     # default is all year
     all_year = models.BooleanField(
         default=True,

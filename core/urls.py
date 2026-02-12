@@ -53,6 +53,7 @@ urlpatterns = [
     # Tasks (Function based views)
     path("plants/<int:plant_id>/tasks/create/",
          task_create, name="task_create"),
+    path("tasks/<int:task_id>/delete/", views.task_delete, name="task_delete"),
     path("tasks/<int:task_id>/edit/",
          task_update, name="task_update"),
     path("tasks/<int:task_id>/done/",
