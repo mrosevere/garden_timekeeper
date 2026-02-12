@@ -282,7 +282,7 @@ class PlantDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """
-        Adds context data
+        Adds context data for view logic
 
         The context data is used to check whether a task is in season.
         """
