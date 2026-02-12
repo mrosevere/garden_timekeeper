@@ -60,19 +60,84 @@
 <!-- Table of tasks -->
 <div class="container">
 <table class="table table-striped align-middle">
+    <!-- Table Header (sortable columns) -->
     <thead>
         <tr>
-            <th>Done?</th>
-            <th>Task</th>
-            <th>Plant</th>
 
-            <!-- Hide on mobile -->
-            <th class="d-none d-md-table-cell">Bed</th>
+            <!-- Task -->
+            <th>
+                <a href="?sort=name&direction={% if current_sort == 'name' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
+                    Task
 
-            <th>Due</th>
+                    {% if current_sort == "name" %}
+                        {% if current_direction == "asc" %}
+                            <i class="fa-solid fa-arrow-up ms-1"></i>
+                        {% else %}
+                            <i class="fa-solid fa-arrow-down ms-1"></i>
+                        {% endif %}
+                    {% endif %}
+                </a>
+            </th>
 
-            <!-- Hide on mobile -->
-            <th class="d-none d-md-table-cell">Frequency</th>
+            <!-- Plant -->
+            <th>
+                <a href="?sort=plant&direction={% if current_sort == 'plant' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
+                    Plant
+
+                    {% if current_sort == "plant" %}
+                        {% if current_direction == "asc" %}
+                            <i class="fa-solid fa-arrow-up ms-1"></i>
+                        {% else %}
+                            <i class="fa-solid fa-arrow-down ms-1"></i>
+                        {% endif %}
+                    {% endif %}
+                </a>
+            </th>
+
+            <!-- Bed (hidden on mobile) -->
+            <th class="d-none d-md-table-cell">
+                <a href="?sort=bed&direction={% if current_sort == 'bed' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
+                    Bed
+
+                    {% if current_sort == "bed" %}
+                        {% if current_direction == "asc" %}
+                            <i class="fa-solid fa-arrow-up ms-1"></i>
+                        {% else %}
+                            <i class="fa-solid fa-arrow-down ms-1"></i>
+                        {% endif %}
+                    {% endif %}
+                </a>
+            </th>
+
+            <!-- Due -->
+            <th>
+                <a href="?sort=due&direction={% if current_sort == 'due' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
+                    Due
+
+                    {% if current_sort == "due" %}
+                        {% if current_direction == "asc" %}
+                            <i class="fa-solid fa-arrow-up ms-1"></i>
+                        {% else %}
+                            <i class="fa-solid fa-arrow-down ms-1"></i>
+                        {% endif %}
+                    {% endif %}
+                </a>
+            </th>
+
+            <!-- Frequency (hidden on mobile) -->
+            <th>
+                <a href="?sort=frequency&direction={% if current_sort == 'frequency' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
+                    Frequency
+
+                    {% if current_sort == "frequency" %}
+                        {% if current_direction == "asc" %}
+                            <i class="fa-solid fa-arrow-up ms-1"></i>
+                        {% else %}
+                            <i class="fa-solid fa-arrow-down ms-1"></i>
+                        {% endif %}
+                    {% endif %}
+                </a>
+            </th>
 
             <th></th>
         </tr>
@@ -81,29 +146,38 @@
     <tbody>
         {% for task in tasks %}
         <tr>
-          <td>
-            <form method="post" action="{% url 'task_mark_done' task.id %}"> 
-              {% csrf_token %} 
-              <input type="checkbox" onchange="this.form.submit()">
-            </form>
-          </td>
-          <td> 
-            <a href="{% url 'task_detail' task.id %}">{{ task.name }}</a>
-          </td> 
-          <td>
-            <a href="{% url 'plant_detail' task.plant.id %}">{{ task.plant.name }}</a>
-            
-          </td>
+            <td>
+                <a href="{% url 'task_detail' task.id %}">
+                    {{ task.name }}
+                </a>
+            </td>
 
-<!-- Hide on mobile -->
-            <td class="d-none d-md-table-cell">{{ task.plant.bed.name }}</td>
+            <td>
+                <a href="{% url 'plant_detail' task.plant.id %}">
+                    {{ task.plant.name }}
+                </a>
+            </td>
 
-            <td>{{ task.next_due }}</td>
+            <td class="d-none d-md-table-cell">
+                <a href="{% url 'bed_detail' task.plant.bed.id %}">
+                    {{ task.plant.bed.name }}
+                </a>
+            </td>
 
-            <!-- Hide on mobile -->
-            <td class="d-none d-md-table-cell">{{ task.get_frequency_display }}</td>
+            <td>{{ task.next_due_date }}</td>
+
+            <td class="d-none d-md-table-cell">
+                {{ task.get_frequency_display }}
+            </td>
 
             <td class="text-end">
+
+                <!-- Mark done -->
+                <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="checkbox" onChange="this.form.submit()">
+                </form>
+
                 <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
                 <a href="{% url 'task_delete' task.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
             </td>
