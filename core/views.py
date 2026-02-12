@@ -19,6 +19,7 @@ from django.db import IntegrityError
 from django.contrib import messages
 
 from datetime import date
+from calendar import monthrange
 
 from .models import GardenBed, Plant, PlantLifespan, PlantType, PlantTask
 from .forms import GardenBedForm, PlantForm, PlantTaskForm
@@ -39,16 +40,70 @@ def home(request):
 
 # ================= Dashboard Views =======================
 
+
 @login_required
 def dashboard(request):
     """
-    Display the main dashboard for authenticated users.
-    Shows all tasks ordered by next due date, with optional sorting.
+    Dashboard: Month view (default).
+    Shows all tasks with next_due <= end_of_selected_month.
+    Overdue tasks are those with next_due < start_of_selected_month.
+    Supports sorting and forward-only month navigation.
     """
-    sort = request.GET.get("sort", "next_due")
+
+    today = date.today()
+
+    # -----------------------------
+    # 1. VIEW MODE (month only for now)
+    # -----------------------------
+    view_mode = request.GET.get("view", "month")
+
+    # -----------------------------
+    # 2. SELECTED MONTH
+    # -----------------------------
+    selected_year = request.GET.get("year")
+    selected_month = request.GET.get("month")
+
+    if selected_year and selected_month:
+        try:
+            year = int(selected_year)
+            month = int(selected_month)
+        except ValueError:
+            year, month = today.year, today.month
+    else:
+        year, month = today.year, today.month
+
+    # Prevent navigating backwards
+    if (year, month) < (today.year, today.month):
+        year, month = today.year, today.month
+
+    # -----------------------------
+    # 2b. MONTH BOUNDARIES
+    # -----------------------------
+    start_of_month = date(year, month, 1)
+    last_day = monthrange(year, month)[1]
+    end_of_month = date(year, month, last_day)
+
+    # -----------------------------
+    # 2c. MONTH LABEL (THIS is where it belongs)
+    # -----------------------------
+    month_label = date(year, month, 1)
+
+    # -----------------------------
+    # 2d. NEXT MONTH / NEXT YEAR (INSERT HERE)
+    # -----------------------------
+    if month == 12:
+        next_month = 1
+        next_year = year + 1
+    else:
+        next_month = month + 1
+        next_year = year
+
+    # -----------------------------
+    # 3. SORTING
+    # -----------------------------
+    sort = request.GET.get("sort", "due")
     direction = request.GET.get("direction", "asc")
 
-    # Map allowed sort fields to model fields
     sort_options = {
         "name": "name",
         "plant": "plant__name",
@@ -62,14 +117,33 @@ def dashboard(request):
     if direction == "desc":
         sort_field = f"-{sort_field}"
 
+    # -----------------------------
+    # 4. QUERYSET
+    # -----------------------------
     tasks = (
         PlantTask.objects
         .select_related("plant", "plant__bed")
+        .filter(next_due__lte=end_of_month)
         .order_by(sort_field)
     )
 
+    # -----------------------------
+    # 5. CONTEXT
+    # -----------------------------
     context = {
         "tasks": tasks,
+        "view_mode": view_mode,
+        "month_label": month_label,
+
+        # Month navigation
+        "selected_year": year,
+        "selected_month": month,
+        "start_of_month": start_of_month,
+        "end_of_month": end_of_month,
+        "next_month": next_month,
+        "next_year": next_year,
+
+        # Sorting
         "current_sort": sort,
         "current_direction": direction,
     }
@@ -577,4 +651,3 @@ class TaskDetailView(DetailView):
     model = PlantTask
     template_name = "core/tasks/task_detail.html"
     context_object_name = "task"
-
