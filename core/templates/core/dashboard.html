@@ -57,6 +57,45 @@
   </div>
 </div>
 
+
+<div class="container mb-4">
+
+    <div class="d-flex justify-content-between align-items-center">
+
+        <!-- Left: Selected Month -->
+        <h2 class="h4 mb-0">
+            <!-- passed from the view context -->
+            {{ month_label|date:"F Y" }}
+        </h2>
+
+        <!-- Right: Navigation Buttons -->
+        <div class="btn-group">
+
+            <!-- Today Button -->
+            <a href="?view=month"
+               class="btn btn-outline-secondary">
+                Today
+            </a>
+
+            <!-- Previous Month (disabled because we don't allow backwards nav) -->
+            <button class="btn btn-outline-secondary" disabled>
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <!-- Next Month -->
+           <a href="?view=month&year={{ next_year }}&month={{ next_month }}&sort={{ current_sort }}&direction={{ current_direction }}"
+            class="btn btn-outline-secondary">
+            <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <!-- Table of tasks -->
 <div class="container">
 <table class="table table-striped align-middle">
@@ -188,7 +227,7 @@
         {% empty %}
         <tr>
             <td colspan="6" class="text-center text-muted py-4">
-                No tasks yet. Add a plant or bed to get started.
+                Congratulations! You don't have any tasks due with your current filters!
             </td>
         </tr>
         {% endfor %}
