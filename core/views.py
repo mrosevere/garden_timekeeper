@@ -43,12 +43,13 @@ def home(request):
 def dashboard(request):
     """
     Display the main dashboard for authenticated users.
-
-    This view will eventually summarise the user's garden activity,
-    including garden beds, plants, and upcoming tasks. For now, it
-    simply renders the dashboard template.
+    Shows all tasks ordered by next due date.
     """
-    return render(request, "core/dashboard.html")
+    tasks = PlantTask.objects.select_related("plant", "plant__bed").order_by("next_due")
+
+    context = {"tasks": tasks, }
+
+    return render(request, "core/dashboard.html", context)
 
 
 # ================= Garden Bed Views =======================
@@ -304,7 +305,6 @@ class PlantDetailView(LoginRequiredMixin, DetailView):
                 "overdue": overdue,
                 "due_soon": due_soon,
             })
-
 
         # Sort order:
         # 1. Overdue

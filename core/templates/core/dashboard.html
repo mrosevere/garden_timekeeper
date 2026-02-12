@@ -1,12 +1,111 @@
-{% extends "core/base.html" %} {% block content %}
-<div class="container py-4">
-  <h1 class="mb-3">Dashboard</h1>
+{% extends "core/base.html" %} 
+{% block content %}
 
-  <!-- top controls -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    di
+<div class="container py-4">  
 
+  <!-- DASHBOARD TOP CONTROLS -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+      
+      <!-- Left: Page Title -->
+      <h1 class="h3 mb-0 px-3">Dashboard</h1>
 
+      <!-- Right: Action Buttons -->
+       <div class="but-group">
+          <a href="{% url 'plant_create' %}" class="btn btn-outline-primary">Add Plant</a>
+          <a href="{% url 'bed_create' %}" class="btn btn-outline-primary">Add Bed</a>
+       </div>
+      
   </div>
 </div>
+
+<div class="container">
+  <!-- FILTERS ROW -->
+<div class="d-flex gap-2 mb-4">
+
+    <!-- Bed Filter -->
+    <div class="btn-group">
+        <button type="button"
+                class="btn btn-outline-secondary dropdown-toggle"
+                data-bs-toggle="dropdown">
+            Bed Filter
+        </button>
+        <ul class="dropdown-menu">
+            <li><button class="dropdown-item">All Beds</button></li>
+            <li><button class="dropdown-item">Front Garden</button></li>
+            <li><button class="dropdown-item">Greenhouse</button></li>
+        </ul>
+    </div>
+
+    <!-- Plant Filter -->
+    <div class="btn-group">
+        <button type="button"
+                class="btn btn-outline-secondary dropdown-toggle"
+                data-bs-toggle="dropdown">
+            Plant Filter
+        </button>
+        <ul class="dropdown-menu">
+            <li><button class="dropdown-item">All Plants</button></li>
+            <li><button class="dropdown-item">Tomatoes</button></li>
+            <li><button class="dropdown-item">Lavender</button></li>
+        </ul>
+    </div>
+
+    <!-- Reset Filters -->
+    <button type="button" class="btn btn-outline-danger">
+        Reset
+    </button>
+  </div>
+</div>
+
+<!-- Table of tasks -->
+<div class="container">
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Task</th>
+            <th>Plant</th>
+
+            <!-- Hide on mobile -->
+            <th class="d-none d-md-table-cell">Bed</th>
+
+            <th>Due</th>
+
+            <!-- Hide on mobile -->
+            <th class="d-none d-md-table-cell">Frequency</th>
+
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.name }}</td>
+            <td>{{ task.plant.name }}</td>
+
+            <!-- Hide on mobile -->
+            <td class="d-none d-md-table-cell">{{ task.plant.bed.name }}</td>
+
+            <td>{{ task.next_due }}</td>
+
+            <!-- Hide on mobile -->
+            <td class="d-none d-md-table-cell">{{ task.get_frequency_display }}</td>
+
+            <td class="text-end">
+                <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a href="{% url 'task_delete' task.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+                No tasks yet. Add a plant or bed to get started.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+
 {% endblock %}
