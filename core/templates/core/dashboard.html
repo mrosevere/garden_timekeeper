@@ -62,6 +62,7 @@
 <table class="table table-striped align-middle">
     <thead>
         <tr>
+            <th>Done?</th>
             <th>Task</th>
             <th>Plant</th>
 
@@ -80,6 +81,12 @@
     <tbody>
         {% for task in tasks %}
         <tr>
+          <td>
+            <form method="post" action="{% url 'task_mark_done' task.id %}"> 
+              {% csrf_token %} 
+              <input type="checkbox" onchange="this.form.submit()">
+            </form>
+          </td>
           <td> 
             <a href="{% url 'task_detail' task.id %}">{{ task.name }}</a>
           </td> 
