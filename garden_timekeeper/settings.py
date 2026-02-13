@@ -33,7 +33,12 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 # Local hosts permitted
-ALLOWED_HOSTS = [".herokuapp.com", "localhost", "127.0.0.1", "https://garden-timekeeper-588fc83d2eb9.herokuapp.com/"]
+ALLOWED_HOSTS = [
+    ".herokuapp.com",
+    "localhost",
+    "127.0.0.1",
+    "https://garden-timekeeper-588fc83d2eb9.herokuapp.com/"
+]
 
 
 # Application definition
@@ -173,7 +178,37 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = os.getenv(
 # Required for Django 5.x to silence warnings about primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Disable summernote iframe so I can use standard CSS styling
+
 SUMMERNOTE_CONFIG = {
+    # Use the in-place editor
+    # (disable iframe so I can use standard CSS styling)
     'iframe': False,
-    }
+
+    # Set the toolbar layout
+    'toolbar': [
+        ['style', ['bold', 'italic', 'underline', 'clear']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        # removed 'picture' see issue-123
+        ['insert', ['link']],
+        ['view', ['fullscreen']],
+    ],
+
+    # Disable file uploads (local images)
+    'disable_upload': True,
+
+    # Optional: restrict allowed tags for safety
+    'allowed_tags': [
+        'p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'a',
+    ],
+
+    # Optional: restrict attributes
+    'allowed_attributes': {
+        'a': ['href', 'target', 'title'],
+    },
+
+    # Editor size
+    'summernote': {
+        'width': '100%',
+        'height': '200px',
+    },
+}
