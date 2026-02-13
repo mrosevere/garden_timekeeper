@@ -41,14 +41,14 @@ Follow these steps to ensure a smooth, conflict‑free workflow for the whole te
 
 ---
 
-## 2. Keeping Your Local Main Branch Up to Date
+## 2. Always start from MAIN
 
 Before starting any new work:
 
     git checkout main
     git pull origin main
 
-This ensures your work starts from the most recent version of the project.
+This ensures your base is clean and up to date.
 
 If you get messages about untracked files such as:
  - accounts/__pycache__/...
@@ -61,7 +61,7 @@ Run:
 
 ---
 
-## 3. Creating a Feature/bug Branch
+## 3. Create a Feature/bug Branch
 
 To create a feature branch:
 
@@ -71,11 +71,13 @@ To create a bug fix branch:
 
     git checkout -b bug/<issue-number>
 
+The key is: one issue = one branch
+
 ---
 
-## 4. Making Changes, Committing, and Pushing
+## 4. Make small, atomic commits
 
-After editing files:
+After each logical change:
 
 ### Stage your changes
 
@@ -109,18 +111,37 @@ If there are conflicts:
     git commit -m "Merged main into my branch and resolved conflicts"
 
 ### Push your branch to GitHub
+Before pushing, ALWAYS check your branch:
 
-    git push -u origin <issue-number>-<your-name>
+    git branch
+
+You should see:
+
+    * bug/issue-118
+    main
+
+If you're not on the correct branch:
+
+    git checkout bug/issue-118
+
+Push to the correct branch
+
+    git push -u origin <branchname>
+
+After the first push, future pushes are simply:
+
+    git push
 
 ---
 
-## 5. Opening a Pull Request (PR)
+## 5. Open a Pull Request (PR)
 
 1. Go to the GitHub repository
-2. Click "Compare & pull request"
-3. Fill in the PR template
-4. Ensure the PR title and description match the Issue
-5. Submit the PR for review
+2. Click "Compare & pull request" (or Compare: <branch -> main)
+3. Review the diff
+4. Fill in the PR template
+5. Ensure the PR title and description match the Issue
+6. Submit the PR for review
 
 ---
 
