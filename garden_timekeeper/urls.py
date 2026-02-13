@@ -19,10 +19,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from core.views import CustomLoginView
+
 
 urlpatterns = [
     path('', include('core.urls')),
     path('accounts/', include('accounts.urls')),
+    path("accounts/login/", CustomLoginView.as_view(), name="login"),
     path('admin/', admin.site.urls),
 
     path('summernote/', include('django_summernote.urls')),

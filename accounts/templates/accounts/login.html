@@ -15,7 +15,7 @@
  
 <h2 class="mb-4">Login</h2>
 
-<form method="POST">
+<form method="POST" action="{% url 'login' %}">
     {% csrf_token %}
 
     {# Username field #}

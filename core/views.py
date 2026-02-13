@@ -9,6 +9,7 @@ privacy and personalised garden management.
 
 # Django
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView
 )
@@ -109,7 +110,7 @@ def dashboard(request):
     # -----------------------------
     if (year, month) < (today.year, today.month):
         year, month = today.year, today.month
-        
+
     # -----------------------------
     # 3. SORTING
     # -----------------------------
@@ -680,3 +681,35 @@ class TaskDetailView(DetailView):
     model = PlantTask
     template_name = "core/tasks/task_detail.html"
     context_object_name = "task"
+
+
+class CustomLoginView(LoginView):
+    """
+    Custom login view that adds support for a 'Remember me' option.
+
+    Django's default authentication keeps users logged in even after the
+    browser is closed, because session cookies persist until their expiry
+    date. This view overrides that behaviour so that:
+
+    - If the user does NOT tick 'Remember me':
+        The session expires when the browser is closed
+        (session expiry = 0).
+
+    - If the user DOES tick 'Remember me':
+        The session persists for Django's default duration
+        (2 weeks unless configured otherwise).
+
+    This ensures the login behaviour matches user expectations and the
+    semantics of the 'Remember me' checkbox on the login form.
+    """
+    def form_valid(self, form):
+        remember_me = self.request.POST.get('remember_me')
+
+        if not remember_me:
+            # Expire session when browser closes
+            self.request.session.set_expiry(0)
+        else:
+            # Keep session for the default duration (2 weeks)
+            self.request.session.set_expiry(1209600)
+
+        return super().form_valid(form)
