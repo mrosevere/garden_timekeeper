@@ -212,3 +212,8 @@ SUMMERNOTE_CONFIG = {
         'height': '200px',
     },
 }
+
+# Allow usernames to be case insensitive
+AUTHENTICATION_BACKENDS = [
+    'core.auth_backends.CaseInsensitiveUsernameBackend',
+]
