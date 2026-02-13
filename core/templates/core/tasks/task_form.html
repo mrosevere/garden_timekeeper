@@ -12,21 +12,18 @@
             <form method="post">
                 {% csrf_token %}
 
-                <!--  ---------------------------------------------------  
-                1. Render all NON-seasonal fields using crispy 
-                ---------------------------------------------------------
-                form.name|as_crispy_field
-                form.notes|as_crispy_field
-                form.frequency|as_crispy_field
-                form.repeat|as_crispy_field
+                <!-- ---------------------------------------------------
+                     1. Render all NON-seasonal fields using crispy
+                   --------------------------------------------------- -->
+                {{ form.name|as_crispy_field }}
+                {{ form.notes|as_crispy_field }}
 
-                ---------------------------------------------------------
-                2. Seasonal Window Section (custom Bootstrap layout)
-                ---------------------------------------------------------
-                -->
+                <!-- ---------------------------------------------------
+                     2. Scheduling Section (Seasonal + Frequency)
+                   --------------------------------------------------- -->
                 <div class="card mb-3">
                     <div class="card-header">
-                        Seasonal Window
+                        Task Scheduling
                     </div>
                     <div class="card-body">
 
@@ -46,12 +43,21 @@
                             </div>
                         </div>
 
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.frequency|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.repeat|as_crispy_field }}
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                {# --------------------------------------------------------- #}
-                {# 3. Submit / Cancel Buttons                                #}
-                {# --------------------------------------------------------- #}
+                <!-- ---------------------------------------------------
+                     3. Submit / Cancel Buttons
+                   --------------------------------------------------- -->
                 <div class="mt-3 d-flex justify-content-between">
                     <a href="{% url 'plant_detail' plant.id %}" class="btn btn-secondary">
                         Cancel
@@ -74,5 +80,4 @@
     </div>
 
 </div>
-
 {% endblock %}
