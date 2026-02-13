@@ -61,11 +61,15 @@ Run:
 
 ---
 
-## 3. Creating a Feature Branch
+## 3. Creating a Feature/bug Branch
 
-To create your branch:
+To create a feature branch:
 
     git checkout -b feature/<feature-name>
+
+To create a bug fix branch:
+
+    git checkout -b bug/<issue-number>
 
 ---
 
