@@ -133,6 +133,12 @@ class PlantTask(models.Model):
     class Meta:
         ordering = ["next_due", "last_done", "name"]
 
+    # link to User
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name="tasks"
+        )
+
     # link to Plant
     plant = models.ForeignKey(
         "core.Plant",
