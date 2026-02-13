@@ -119,10 +119,13 @@ def dashboard(request):
 
     # -----------------------------
     # 4. QUERYSET
+    # Filter by user
     # -----------------------------
     tasks = (
         PlantTask.objects
         .select_related("plant", "plant__bed")
+        # required to fix issue-118
+        .filter(plant__owner=request.user)
         .filter(next_due__lte=end_of_month)
         .order_by(sort_field)
     )
@@ -554,7 +557,8 @@ def plant_delete(request, pk):
 @login_required
 def task_create(request, plant_id):
     """
-    Create a new task for the selected plant
+    Create a new task for the selected plant.
+    Ensures the task belongs to the logged-in user.
     """
     plant = get_object_or_404(Plant, id=plant_id, owner=request.user)
 
@@ -563,10 +567,11 @@ def task_create(request, plant_id):
         if form.is_valid():
             task = form.save(commit=False)
             task.plant = plant
+            # REQUIRED for per-user ownership (issue-118)
+            task.user = request.user
             task.next_due = task.calculate_next_due()
             task.save()
             return redirect("plant_detail", pk=plant.id)
-
     else:
         form = PlantTaskForm()
 

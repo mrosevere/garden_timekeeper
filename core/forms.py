@@ -5,6 +5,9 @@ from crispy_forms.layout import Layout, HTML
 from django_summernote.widgets import SummernoteInplaceWidget
 
 
+# -----------------------------------------------------
+#       Garden Bed Form
+# -----------------------------------------------------
 class GardenBedForm(forms.ModelForm):
     """
     A ModelForm for creating and editing GardenBed instances.
@@ -28,6 +31,9 @@ class GardenBedForm(forms.ModelForm):
         }
 
 
+# -----------------------------------------------------
+#       Plant Form
+# -----------------------------------------------------
 class PlantForm(forms.ModelForm):
     """
     A ModelForm for creating and editing Plant instances.
@@ -127,6 +133,9 @@ class PlantForm(forms.ModelForm):
         self.fields["bed"].queryset = GardenBed.objects.filter(owner=user)
 
 
+# -----------------------------------------------------
+#       Task Form
+# -----------------------------------------------------
 class PlantTaskForm(forms.ModelForm):
     """
     A ModelForm for creating and editing Plant Tasks.
@@ -137,6 +146,8 @@ class PlantTaskForm(forms.ModelForm):
     """
     class Meta:
         model = PlantTask
+        # fix bug 109
+        exclude = ["plant", "user", "last_done", "next_due"]
         fields = "__all__"
         widgets = {
             "notes": SummernoteInplaceWidget(),
