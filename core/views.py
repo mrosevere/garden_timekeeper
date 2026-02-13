@@ -72,10 +72,6 @@ def dashboard(request):
     else:
         year, month = today.year, today.month
 
-    # Prevent navigating backwards
-    if (year, month) < (today.year, today.month):
-        year, month = today.year, today.month
-
     # -----------------------------
     # 2b. MONTH BOUNDARIES
     # -----------------------------
@@ -84,12 +80,12 @@ def dashboard(request):
     end_of_month = date(year, month, last_day)
 
     # -----------------------------
-    # 2c. MONTH LABEL (THIS is where it belongs)
+    # 2c. MONTH LABEL
     # -----------------------------
     month_label = date(year, month, 1)
 
     # -----------------------------
-    # 2d. NEXT MONTH / NEXT YEAR (INSERT HERE)
+    # 2d. NEXT MONTH / NEXT YEAR
     # -----------------------------
     if month == 12:
         next_month = 1
@@ -98,6 +94,22 @@ def dashboard(request):
         next_month = month + 1
         next_year = year
 
+    # -----------------------------
+    # 2e. PREVIOUS MONTH / NEXT YEAR
+    # -----------------------------
+    if month == 1:
+        previous_month = 12
+        previous_year = year - 1
+    else:
+        previous_month = month - 1
+        previous_year = year
+
+    # -----------------------------
+    # 2f. Prevent navigating backwards
+    # -----------------------------
+    if (year, month) < (today.year, today.month):
+        year, month = today.year, today.month
+        
     # -----------------------------
     # 3. SORTING
     # -----------------------------
@@ -155,6 +167,8 @@ def dashboard(request):
         "end_of_month": end_of_month,
         "next_month": next_month,
         "next_year": next_year,
+        "previous_month": previous_month,
+        "previous_year": previous_year,
 
         # Sorting
         "current_sort": sort,
