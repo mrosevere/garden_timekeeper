@@ -148,6 +148,9 @@ class PlantTaskForm(forms.ModelForm):
         model = PlantTask
         # fix bug 109
         exclude = ["plant", "user", "last_done", "next_due"]
+        labels = {
+            "name": "Task Name",
+        }
         fields = "__all__"
         widgets = {
             "notes": SummernoteInplaceWidget(),

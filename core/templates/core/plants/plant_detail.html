@@ -110,7 +110,7 @@
 
           <!-- Task name -->
           <td>
-            <strong>{{ task.name }}</strong>
+            <a href="{% url 'task_update' task.id %}"> {{ task.name }} </a>
           </td>
 
           <!-- Next due date -->
