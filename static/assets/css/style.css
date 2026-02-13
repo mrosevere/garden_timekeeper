@@ -30,6 +30,13 @@ main {
     width: auto;
 }
 
+/* Remove Safari/Chrome mobile password icons */
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+
 
 /* mobile size media queries */
 @media (max-width: 576px) {
