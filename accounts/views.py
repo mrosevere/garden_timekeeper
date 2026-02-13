@@ -12,47 +12,57 @@ their Garden Timekeeper accounts.
 """
 
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib import messages
-from .forms import RegistrationForm
+from .forms import RegistrationForm, LoginForm
 
 
 def login_view(request):
     """
-    Handle user login.
+    Handle user login using the custom LoginForm.
 
     Workflow:
-    - GET request: display the login form
+    - GET request: display a blank login form
     - POST request:
-        * Extract username and password
-        * Authenticate using Django's built-in system
-        * On success: log the user in and redirect to home
-        * On failure: re-render the login page with an error message
+        * Bind submitted data to LoginForm
+        * Validate credentials using Django's authentication backend
+        * On success:
+           - log the user in,
+           -  apply remember-me logic,
+           -  redirect to dashboard
+        * On failure: re-render the form with field-level and general errors
 
-    This view does not use a Django form class because the login
-    process is simple and handled by Django's authentication backend.
+    The LoginForm handles:
+    - Username/password validation
+    - Bootstrap styling via __init__
+    - Field-level error messages
+
+    The view focuses solely on flow control and user feedback.
     """
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        remember_me = request.POST.get("remember_me")
+        form = LoginForm(request, data=request.POST)
 
-        user = authenticate(request, username=username, password=password)
+        if form.is_valid():
+            user = form.get_user()
+            remember_me = request.POST.get("remember_me")
 
-        if user is not None:
             login(request, user)
+
+            # Session expiry logic
             if not remember_me:
-                # Session ends when browser closes
-                request.session.set_expiry(0)
+                request.session.set_expiry(0)  # Ends when browser closes
             else:
-                # 2 weeks (Django default)
-                request.session.set_expiry(1209600)
-            messages.success(request, "Welcome back!")
+                request.session.set_expiry(1209600)  # 2 weeks
+
+            messages.success(request, f"Welcome back {user.username}!")
             return redirect("dashboard")
 
         messages.error(request, "Invalid username or password")
 
-    return render(request, "accounts/login.html")
+    else:
+        form = LoginForm()
+
+    return render(request, "accounts/login.html", {"form": form})
 
 
 def logout_view(request):
@@ -61,6 +71,9 @@ def logout_view(request):
 
     Ends the user's authenticated session, displays a confirmation
     message, and redirects them to the login page.
+
+    This view performs no validation or form handling — it simply
+    terminates the session and provides user feedback.
     """
     logout(request)
     messages.info(request, "You have been logged out.")
