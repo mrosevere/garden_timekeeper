@@ -21,7 +21,8 @@ from .views import (
     task_create,
     task_update,
     task_mark_done,
-    task_skip
+    task_skip,
+    TaskDetailView
 )
 
 urlpatterns = [
@@ -36,9 +37,10 @@ urlpatterns = [
     path("beds/<int:pk>/", BedDetailView.as_view(), name="bed_detail"),
     path("beds/create/", BedCreateView.as_view(), name="bed_create"),
     path("beds/<int:pk>/edit/", BedUpdateView.as_view(), name="bed_edit"),
+    # Garden bed delete (Function based views due to modal workflow)
     path("beds/<int:pk>/delete/", bed_delete, name="bed_delete"),
 
-    # Garden bed delete (Function based views due to modal workflow)
+    # Plants URLs
     path("plants/",
          PlantListView.as_view(), name="plant_list"),
     path("plants/create/",
@@ -53,11 +55,14 @@ urlpatterns = [
     # Tasks (Function based views)
     path("plants/<int:plant_id>/tasks/create/",
          task_create, name="task_create"),
-    path("tasks/<int:task_id>/delete/", views.task_delete, name="task_delete"),
+    path("tasks/<int:task_id>/delete/",
+         views.task_delete, name="task_delete"),
     path("tasks/<int:task_id>/edit/",
          task_update, name="task_update"),
     path("tasks/<int:task_id>/done/",
          task_mark_done, name="task_mark_done"),
     path("tasks/<int:task_id>/skip/",
          task_skip, name="task_skip"),
+    path("tasks/<int:pk>/",
+         TaskDetailView.as_view(), name="task_detail"),
 ]

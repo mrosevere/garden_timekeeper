@@ -325,7 +325,6 @@ class PlantTask(models.Model):
 
         return next_date
 
-
     def mark_done(self, done_date=None):
         """
         Marks the task as completed.

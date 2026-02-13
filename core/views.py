@@ -19,6 +19,7 @@ from django.db import IntegrityError
 from django.contrib import messages
 
 from datetime import date
+from calendar import monthrange
 
 from .models import GardenBed, Plant, PlantLifespan, PlantType, PlantTask
 from .forms import GardenBedForm, PlantForm, PlantTaskForm
@@ -39,16 +40,125 @@ def home(request):
 
 # ================= Dashboard Views =======================
 
+
 @login_required
 def dashboard(request):
     """
-    Display the main dashboard for authenticated users.
-
-    This view will eventually summarise the user's garden activity,
-    including garden beds, plants, and upcoming tasks. For now, it
-    simply renders the dashboard template.
+    Dashboard: Month view (default).
+    Shows all tasks with next_due <= end_of_selected_month.
+    Overdue tasks are those with next_due < start_of_selected_month.
+    Supports sorting and forward-only month navigation.
     """
-    return render(request, "core/dashboard.html")
+
+    today = date.today()
+
+    # -----------------------------
+    # 1. VIEW MODE (month only for now)
+    # -----------------------------
+    view_mode = request.GET.get("view", "month")
+
+    # -----------------------------
+    # 2. SELECTED MONTH
+    # -----------------------------
+    selected_year = request.GET.get("year")
+    selected_month = request.GET.get("month")
+
+    if selected_year and selected_month:
+        try:
+            year = int(selected_year)
+            month = int(selected_month)
+        except ValueError:
+            year, month = today.year, today.month
+    else:
+        year, month = today.year, today.month
+
+    # Prevent navigating backwards
+    if (year, month) < (today.year, today.month):
+        year, month = today.year, today.month
+
+    # -----------------------------
+    # 2b. MONTH BOUNDARIES
+    # -----------------------------
+    start_of_month = date(year, month, 1)
+    last_day = monthrange(year, month)[1]
+    end_of_month = date(year, month, last_day)
+
+    # -----------------------------
+    # 2c. MONTH LABEL (THIS is where it belongs)
+    # -----------------------------
+    month_label = date(year, month, 1)
+
+    # -----------------------------
+    # 2d. NEXT MONTH / NEXT YEAR (INSERT HERE)
+    # -----------------------------
+    if month == 12:
+        next_month = 1
+        next_year = year + 1
+    else:
+        next_month = month + 1
+        next_year = year
+
+    # -----------------------------
+    # 3. SORTING
+    # -----------------------------
+    sort = request.GET.get("sort", "due")
+    direction = request.GET.get("direction", "asc")
+
+    sort_options = {
+        "name": "name",
+        "plant": "plant__name",
+        "bed": "plant__bed__name",
+        "due": "next_due",
+        "frequency": "frequency",
+    }
+
+    sort_field = sort_options.get(sort, "next_due")
+
+    if direction == "desc":
+        sort_field = f"-{sort_field}"
+
+    # -----------------------------
+    # 4. QUERYSET
+    # -----------------------------
+    tasks = (
+        PlantTask.objects
+        .select_related("plant", "plant__bed")
+        .filter(next_due__lte=end_of_month)
+        .order_by(sort_field)
+    )
+
+    # -----------------------------
+    # 4b. Hide overdue tasks checkbox
+    # -----------------------------
+    hide_overdue = request.GET.get("hide_overdue") == "1"
+    if hide_overdue:
+        tasks = tasks.filter(next_due__gte=start_of_month)
+
+    # -----------------------------
+    # 5. CONTEXT
+    # -----------------------------
+    context = {
+        "tasks": tasks,
+        "view_mode": view_mode,
+        "month_label": month_label,
+        "hide_overdue": hide_overdue,
+
+
+        # navigation
+        "today": today,
+        "selected_year": year,
+        "selected_month": month,
+        "start_of_month": start_of_month,
+        "end_of_month": end_of_month,
+        "next_month": next_month,
+        "next_year": next_year,
+
+        # Sorting
+        "current_sort": sort,
+        "current_direction": direction,
+    }
+
+    return render(request, "core/dashboard.html", context)
 
 
 # ================= Garden Bed Views =======================
@@ -305,7 +415,6 @@ class PlantDetailView(LoginRequiredMixin, DetailView):
                 "due_soon": due_soon,
             })
 
-
         # Sort order:
         # 1. Overdue
         # 2. Due soon
@@ -486,12 +595,20 @@ def task_delete(request, task_id):
 @login_required
 def task_mark_done(request, task_id):
     """
-    Mark the task as done and save it.
+    Mark the task as done and return to the dashboard.
     """
-    task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
+    task = get_object_or_404(
+        PlantTask,
+        id=task_id,
+        plant__owner=request.user
+    )
+
     task.mark_done()
     task.save()
-    return redirect("plant_detail", pk=task.plant.id)
+
+    messages.success(request, f"Task '{task.name}' marked as done.")
+
+    return redirect("dashboard")
 
 
 @login_required
@@ -505,7 +622,7 @@ def task_skip(request, task_id):
     task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
     task.skip()
     task.save()
-    return redirect("plant_detail", pk=task.plant.id)
+    return redirect("plant_detail")
 
 
 @login_required
@@ -533,3 +650,14 @@ def task_update(request, task_id):
         "plant": task.plant,
         "title": "Edit Task"
     })
+
+
+class TaskDetailView(DetailView):
+    """
+    Task detail view to display the task information to the user
+
+    Does not need a return as it uses the Django DetailView
+    """
+    model = PlantTask
+    template_name = "core/tasks/task_detail.html"
+    context_object_name = "task"
