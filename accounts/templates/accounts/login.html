@@ -1,43 +1,56 @@
-<!--  
-Login page.
-Provides the login form and handles error display for invalid credentials.
-Accessible to anonymous users only. 
--->
-
-
 {% extends "core/base.html" %}
 
 {% block title %}Login{% endblock %}
 
+
 {% block content %}
+
+<!-- Login page for Garden Timekeeper. 
+ Renders the LoginForm with Bootstrap styling and provides: 
+ - Username and password fields 
+ - Remember-me checkbox 
+ - Field-level error display 
+ - Link to registration page 
+ Accessible to anonymous users only. -->
+ 
 <h2 class="mb-4">Login</h2>
 
-<!-- Login form: posts credentials to the login view -->
 <form method="POST">
     {% csrf_token %}
-    <!-- Username field -->
+
+    {# Username field #}
     <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input type="text" name="username" class="form-control" autocomplete="username">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {% if form.username.errors %}
+            <div class="text-danger small">{{ form.username.errors.0 }}</div>
+        {% endif %}
     </div>
-    <!-- Password field -->
+
+    {# Password field #}
     <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input type="password" name="password" class="form-control" autocomplete="current-password">
+        {{ form.password.label_tag }}
+        {{ form.password }}
+        {% if form.password.errors %}
+            <div class="text-danger small">{{ form.password.errors.0 }}</div>
+        {% endif %}
     </div>
-    <!-- Remember me checkbox for user convenience -->
+
+    {# Remember me checkbox #}
     <div class="form-check mb-3">
         <input class="form-check-input" type="checkbox" name="remember_me" id="rememberMe">
         <label class="form-check-label" for="rememberMe">
             Remember me
         </label>
     </div>
-    <!-- Submit button -->
+
+    {# Submit button #}
     <button class="btn btn-primary">Login</button>
 </form>
 
-<!-- Registration link -->
+{# Registration link #}
 <p class="mt-3">
-    Don’t have an account? <a href="{% url 'register' %}">Register here</a>.
+    Don’t have an account?
+    <a href="{% url 'register' %}">Register here</a>.
 </p>
 {% endblock %}
