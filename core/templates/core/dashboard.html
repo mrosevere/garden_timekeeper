@@ -42,10 +42,20 @@
             </a>
 
 
-            <!-- Previous Month (disabled because we don't allow backwards nav) -->
-            <button class="btn btn-outline-secondary" disabled>
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
+            <!-- Previous Month (disabled only if we are in the current month, to stop backwards nav) -->
+            {% if selected_year == today.year and selected_month == today.month %}
+                <!-- At current month: disable -->
+                <button class="btn btn-outline-secondary" disabled>
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+            {% else %}
+                <!-- Otherwise: allow navigation -->
+                <a href="?view=month&year={{ previous_year }}&month={{ previous_month }}&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:"1," }}"
+                class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+            {% endif %}
+
 
             <!-- Next Month -->
             <a href="?view=month&year={{ next_year }}&month={{ next_month }}&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:"1," }}
