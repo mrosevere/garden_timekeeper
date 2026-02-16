@@ -82,6 +82,9 @@
     <thead>
   <tr>
 
+    <!-- Image -->
+    <th style="width: 110px;">Image</th>
+
     <!-- Name -->
     <th>
       <a href="?sort={% if request.GET.sort == 'name' or not request.GET.sort %}-name{% else %}name{% endif %}{% if request.GET %}&{{ request.GET.urlencode|cut:'sort=' }}{% endif %}">
@@ -152,6 +155,21 @@
     <tbody>
       {% for plant in object_list %}
       <tr>
+          <!-- Image Thumbnail (Only if populated) -->
+          <td>
+          {% if plant.image %}
+            <img src="{{ plant.image.url }}"
+                alt="{{ plant.name }}"
+                class="img-thumbnail"
+                style="height: 80px; width: 80px; object-fit: cover;">
+          {% else %}
+            <div class="bg-light border rounded d-flex align-items-center justify-content-center"
+                style="height: 80px; width: 80px;">
+              <span class="text-muted small">No image</span>
+            </div>
+          {% endif %}
+        </td>
+
         <td><a href="{% url 'plant_detail' plant.pk %}">{{ plant.name }}</a></td>
         <td>{{ plant.bed|default:"—" }}</td>
         <td>{{ plant.planting_date|date:"Y-m-d" }}</td>
