@@ -155,3 +155,5 @@ def account_settings(request):
     Allows the user to delete their account or reset their password.
     """
     return render(request, "accounts/account_settings.html")
+
+
