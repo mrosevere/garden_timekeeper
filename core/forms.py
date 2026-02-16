@@ -51,6 +51,7 @@ class PlantForm(forms.ModelForm):
         fields = [
             "name",
             "latin_name",
+            "image",
             "bed",
             "lifespan",
             "type",

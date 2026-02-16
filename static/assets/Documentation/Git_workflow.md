@@ -96,6 +96,25 @@ Pull the latest "Main" branch down into your feature branch again so you can res
     git checkout your-branch-name
     git pull origin main
 
+### To stop the .env file from being deleted every time you pull from MAIN (as it is not stored in the repo)
+1. Temporarily add ".env" to the index
+ - This does not commit it. It just tells Git “this file exists”.
+
+    git add .env
+
+2. Mark it "assume-unchanged
+ - Git will now permanently ignore changes to .env.
+
+    git update-index --assume-unchanged .env
+
+3. Remove it from the staging area (so it does not get committed)
+ - This removes it from the staged changes, but keeps the assume‑unchanged flag.
+
+    git reset HEAD .env
+
+
+
+
 ### Resolve any merge conflicts
 If there are conflicts:
 - VS Code will highlight them
