@@ -14,9 +14,9 @@
                     <p class="mb-1"><strong>Username:</strong> {{ request.user.username }}</p>
                     <p class="mb-3"><strong>Email:</strong> {{ request.user.email }}</p>
 
-                    <!-- Placeholder for future features -->
+                    <!-- Update account details link -->
                     <p class="text-muted small">
-                        More account options coming soon.
+                        <a href="{% url 'update_account' %}">Update account details</a>
                     </p>
                 </div>
             </div>

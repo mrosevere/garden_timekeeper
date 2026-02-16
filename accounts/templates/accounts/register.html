@@ -23,8 +23,27 @@ Registration page for Garden Timekeeper.
     <div class="mb-3">
         {{ form.username.label_tag }}
         {{ form.username }}
+        <div class="form-text">No spaces allowed in your username.</div>
         {% if form.username.errors %}
             <div class="text-danger small">{{ form.username.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    {# First name #}
+    <div class="mb-3">
+        {{ form.first_name.label_tag }}
+        {{ form.first_name }}
+        {% if form.first_name.errors %}
+            <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    {# Last name #}
+    <div class="mb-3">
+        {{ form.last_name.label_tag }}
+        {{ form.last_name }}
+        {% if form.last_name.errors %}
+            <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
         {% endif %}
     </div>
 
