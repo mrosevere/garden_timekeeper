@@ -14,8 +14,8 @@ their Garden Timekeeper accounts.
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib import messages
-from .forms import RegistrationForm, LoginForm
 from django.contrib.auth.decorators import login_required
+from .forms import RegistrationForm, LoginForm, AccountUpdateForm
 
 
 def login_view(request):
@@ -108,7 +108,10 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, "Account created successfully!")
+            messages.success(
+                request,
+                f"Account created successfully for: '{user.username}'!"
+            )
             return redirect("home")
 
         # Form is invalid — custom messages are already handled by the form
@@ -157,3 +160,29 @@ def account_settings(request):
     return render(request, "accounts/account_settings.html")
 
 
+@login_required
+def update_account(request):
+    """
+    Allow the logged-in user to update their account details.
+
+    Currently supports:
+    - Updating email address
+
+    Future-ready for:
+    - First name
+    - Last name
+    - Additional profile fields
+    """
+    if request.method == "POST":
+        form = AccountUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                "Your account details have been updated."
+            )
+            return redirect("account_settings")
+    else:
+        form = AccountUpdateForm(instance=request.user)
+
+    return render(request, "accounts/account_edit.html", {"form": form})
