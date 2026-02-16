@@ -59,6 +59,7 @@ Run:
 
     git clean -fd
 
+And update your .gitignore folder with the files that should be ignored.
 ---
 
 ## 3. Create a Feature/bug Branch
