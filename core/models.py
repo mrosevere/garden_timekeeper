@@ -112,6 +112,8 @@ class Plant(models.Model):
     )
     notes = models.TextField(blank=True)
 
+    image = models.ImageField(upload_to="plant_images/", blank=True, null=True)
+
     def __str__(self):
         return self.name
 

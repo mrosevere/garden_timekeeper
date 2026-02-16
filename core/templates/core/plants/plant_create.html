@@ -9,7 +9,7 @@
 
             <h1 class="mb-3">Add a New Garden Plant</h1>
 
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
                 <!-- Name -->
@@ -17,6 +17,9 @@
 
                 <!-- Latin Name -->
                 {{ form.latin_name|as_crispy_field }}
+
+                <!-- Image --> 
+                 {{ form.image|as_crispy_field }}
 
                 <!-- Bed + Add New Bed Button -->
                 <div class="mb-3">
