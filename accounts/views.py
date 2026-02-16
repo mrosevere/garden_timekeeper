@@ -15,6 +15,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from .forms import RegistrationForm, LoginForm
+from django.contrib.auth.decorators import login_required
 
 
 def login_view(request):
@@ -116,3 +117,41 @@ def register_view(request):
         form = RegistrationForm()
 
     return render(request, "accounts/register.html", {"form": form})
+
+
+# account Settings & Delete
+
+@login_required
+def delete_account(request):
+    """
+    Delete the user account.
+
+    Deletes the user account and all associated data:
+    plants, tasks and beds.
+    """
+
+    # Prevent superusers from deleting themselves via the user-facing UI
+    if request.user.is_superuser:
+        messages.error(
+            request,
+            "Admin accounts cannot be deleted from this page."
+        )
+        return redirect("account_settings")
+
+    if request.method == "POST":
+        user = request.user
+        logout(request)        # end session cleanly
+        user.delete()          # cascades through all related models
+        return redirect("login")
+
+    return render(request, "accounts/delete_account.html")
+
+
+@login_required
+def account_settings(request):
+    """
+    Account settings view.
+
+    Allows the user to delete their account or reset their password.
+    """
+    return render(request, "accounts/account_settings.html")
