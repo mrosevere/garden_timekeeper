@@ -1,7 +1,6 @@
 from django import forms
 from .models import GardenBed, Plant, PlantTask
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, HTML
 from django_summernote.widgets import SummernoteInplaceWidget
 
 
@@ -41,8 +40,10 @@ class PlantForm(forms.ModelForm):
     This form includes fields for botanical and lifecycle information,
     including name, Latin name, lifespan classification, plant type,
     planting date, and optional notes.
-    Bootstrap compatible widgets are applied to ensure a clean and
-    consistent user experience.
+
+    Bootstrap-compatible widgets are applied to ensure a clean and
+    consistent user experience. Layout is handled in the template
+    (for consistency with the Task form).
     """
 
     class Meta:
@@ -54,82 +55,41 @@ class PlantForm(forms.ModelForm):
             "lifespan",
             "type",
             "planting_date",
-            "notes"
-            ]
+            "notes",
+        ]
+
         widgets = {
-            "name": forms.TextInput(
-                attrs={"class": "form-control"}),
-            "latin_name": forms.TextInput(
-                attrs={"class": "form-control"}),
-            "lifespan": forms.Select(
-                attrs={"class": "form-select"}),
-            "type": forms.Select(
-                attrs={"class": "form-select"}),
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "latin_name": forms.TextInput(attrs={"class": "form-control"}),
+            "lifespan": forms.Select(attrs={"class": "form-select"}),
+            "type": forms.Select(attrs={"class": "form-select"}),
             "planting_date": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}),
-            "bed": forms.Select(
-                attrs={"class": "form-select"}),
-            "notes": forms.Textarea(
-                attrs={"class": "form-control"})
+                attrs={"class": "form-control", "type": "date"}
+            ),
+            "bed": forms.Select(attrs={"class": "form-select"}),
+            "notes": SummernoteInplaceWidget(),
         }
 
     def __init__(self, *args, **kwargs):
         """
-        Initialise the PlantForm with user specific context.
+        Initialise the PlantForm with user-specific context.
 
-        This override extracts the logged in user from the form kwargs and
-        restricts the 'bed' field queryset to only the GardenBed instances
-        owned by that user. This ensures users can assign plants only to
-        their own beds and prevents cross user data exposure.
-        kwargs = keyword arguments
-        *args = collects positional arguments into a tuple
-        **kwargs = collects keyword arguments into a dictionary
+        This override extracts the logged-in user from kwargs and
+        restricts the 'bed' field queryset to only the GardenBed
+        instances owned by that user. This ensures users can assign
+        plants only to their own beds and prevents cross-user data
+        exposure.
         """
-        # remove user from kwargs dictionary,
-        # because ModelForm.__init__ does not expect a user
         user = kwargs.pop("user")
         super().__init__(*args, **kwargs)
 
-        # Crispy layout override
+        # Crispy helper (minimal setup for consistency with Task form)
         self.helper = FormHelper()
-        # prevents crispy from wrapping the form
         self.helper.form_tag = False
-        # crispy won’t inject hidden fields
         self.helper.disable_csrf = True
-        # prevents crispy from injecting extra fields
         self.helper.include_media = False
-        # prevents auto rendering of beds
-        self.helper.render_unmentioned_fields = False
 
-        # Define the layout to set position of custom bed field.
-        self.helper.layout = Layout(
-            "name",
-            "latin_name",
-
-            HTML("""
-                <div class="mb-3">
-                    {{ form.bed.label_tag }}
-                    <div class="d-flex align-items-center gap-2">
-                    {{ form.bed }}
-                    <a
-                        href="{% url 'bed_create' %}"
-                        data-bs-toggle="modal"
-                        data-bs-target="#createBedModal"
-                        class="btn btn-outline-secondary btn-sm"
-                    >
-                        + Add new bed
-                    </a>
-                    </div>
-                </div>
-            """),
-
-            "lifespan",
-            "type",
-            "planting_date",
-            "notes",
-        )
-
-        # Apply queryset filtering
+        # Restrict beds to the current user
         self.fields["bed"].queryset = GardenBed.objects.filter(owner=user)
 
 
