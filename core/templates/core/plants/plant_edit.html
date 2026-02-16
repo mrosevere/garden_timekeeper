@@ -1,72 +1,91 @@
-{% extends "core/base.html" %} 
-{% block content %}
+{% extends "core/base.html" %}
 {% load crispy_forms_tags %}
+{% block content %}
 
 <div class="container py-4">
-  <h1 class="mb-3">Edit: "{{ plant.name }}"</h1>
+    <div class="card shadow-sm">
+        <div class="card-body">
 
-<form method="post">
-  {% csrf_token %}
+        <h1 class="mb-3">Edit: "{{ plant.name }}"</h1>
 
-  <!-- Create Plant Crispy Form -->
-  <form method="post">
-    {% csrf_token %}
-    {% crispy form %}
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-  </form>
+        <form method="post">
+            {% csrf_token %}
 
-  <!-- Create Bed Modal for inline bed creation -->
-  <div
-    class="modal fade"
-    id="createBedModal"
-    tabindex="-1"
-    aria-labelledby="createBedModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="createBedModalLabel">
-            Create a New Garden Bed
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+            <!-- Name -->
+            {{ form.name|as_crispy_field }}
+
+            <!-- Latin Name -->
+            {{ form.latin_name|as_crispy_field }}
+
+            <!-- Bed + Add New Bed Button -->
+            <div class="mb-3">
+                {{ form.bed.label_tag }}
+                <div class="d-flex align-items-center gap-2">
+                    {{ form.bed }}
+                    <a
+                        href="{% url 'bed_create' %}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createBedModal"
+                        class="btn btn-outline-secondary btn-sm"
+                    >
+                        + Add new bed
+                    </a>
+                </div>
+            </div>
+
+            <!-- Lifespan -->
+            {{ form.lifespan|as_crispy_field }}
+
+            <!-- Type -->
+            {{ form.type|as_crispy_field }}
+
+            <!-- Planting Date -->
+            {{ form.planting_date|as_crispy_field }}
+
+            <!-- Notes (Summernote) -->
+            {{ form.notes|as_crispy_field }}
+
+            <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+            <a href="{% url 'plant_list' %}" class="btn btn-secondary mt-3">Cancel</a>
+        </form>
+
+
+        <!-- Create Bed Modal -->
+        <div class="modal fade" id="createBedModal" tabindex="-1" aria-labelledby="createBedModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createBedModalLabel">Create a New Garden Bed</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form method="post" action="{% url 'bed_create' %}">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            {{ bed_form|crispy }}
+                            <input type="hidden" name="next" value="{% url 'plant_edit' plant.id %}">
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Create Bed</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
         </div>
 
-        <form method="post" action="{% url 'bed_create' %}">
-          {% csrf_token %}
-          <div class="modal-body">{{ bed_form|crispy }}</div>
-            <!-- Hidden field to redirect back to plant creation after bed creation -->
-            <input type="hidden" name="next" value="{% url 'plant_edit' plant.id %}">
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary">Create Bed</button>
-          </div>
-        </form>
-      </div>
+        {% if plant %}
+            <a href="{% url 'task_create' plant.id %}" class="btn btn-outline-primary btn-sm mt-3">
+                Add Task for {{ plant.name }}
+            </a>
+        {% endif %}
+
+        </div>
     </div>
-  </div>
-
-  <a href="{% url 'plant_list' %}" class="btn btn-secondary mt-3"
-    >cancel</a
-  >
-
-    <!-- Add Task Button -->
-  {% if plant %}
-    <a href="{% url 'task_create' plant.id %}" class="btn btn-outline-primary btn-sm">
-        Add Task for {{ plant.name }}
-    </a>
-  {% endif %}
-  
 </div>
+
+
 {% endblock %}

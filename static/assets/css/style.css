@@ -37,6 +37,9 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 }
 
 
+/* ============================================================== */
+/* ==              Media Queries                               == */
+/* ============================================================== */
 
 /* mobile size media queries */
 @media (max-width: 576px) {
