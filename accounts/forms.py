@@ -28,6 +28,8 @@ class RegistrationForm(UserCreationForm):
     """
 
     email = forms.EmailField(required=True)
+    first_name = forms.CharField(required=False)
+    last_name = forms.CharField(required=False)
 
     # Override default password mismatch message
     error_messages = {
@@ -36,7 +38,13 @@ class RegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ["username", "email", "password1", "password2"]
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "password1",
+            "password2"]
 
         # Custom error messages for specific fields
         error_messages = {
@@ -78,3 +86,56 @@ class LoginForm(AuthenticationForm):
         self.fields["password"].widget.attrs.update({
             "class": "form-control",
         })
+
+
+class AccountUpdateForm(forms.ModelForm):
+    """
+    Form used to update the logged-in user's account details.
+
+    Currently supports:
+    - Username (cannot be edited)
+    - First name
+    - Last name
+    - Email address
+
+    Future-ready for additional profile fields.
+    """
+
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Apply Bootstrap styling
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                "class": "form-control",
+            })
+
+        # Optional placeholders for nicer UX
+        self.fields["first_name"].widget.attrs.update({
+            "placeholder": "First name",
+        })
+        self.fields["last_name"].widget.attrs.update({
+            "placeholder": "Last name",
+        })
+        self.fields["email"].widget.attrs.update({
+            "placeholder": "Email address",
+        })
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+
+        # Prevent duplicate emails (excluding the current user)
+        if (
+            User.objects.filter(email=email)
+            .exclude(pk=self.instance.pk)
+            .exists()
+        ):
+            raise forms.ValidationError(
+                "This email address is already in use."
+            )
+
+        return email
