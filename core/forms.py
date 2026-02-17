@@ -87,6 +87,7 @@ class PlantForm(forms.ModelForm):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
+        # Restrict beds to the current user
         if user is not None:
             self.fields["bed"].queryset = GardenBed.objects.filter(owner=user)
         else:
@@ -95,11 +96,7 @@ class PlantForm(forms.ModelForm):
         # Crispy helper (minimal setup for consistency with Task form)
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.disable_csrf = True
         self.helper.include_media = False
-
-        # Restrict beds to the current user
-        self.fields["bed"].queryset = GardenBed.objects.filter(owner=user)
 
 
 # -----------------------------------------------------
