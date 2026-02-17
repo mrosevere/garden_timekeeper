@@ -10,14 +10,16 @@ privacy and personalised garden management.
 # Django
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView
 )
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.db import IntegrityError
-from django.contrib import messages
+from django.http import JsonResponse
+
 
 from datetime import date
 from calendar import monthrange
@@ -184,33 +186,70 @@ def dashboard(request):
 
 class BedListView(LoginRequiredMixin, ListView):
     """
-    Display a list of garden beds belonging to the logged-in user.
+    Displays all GardenBed objects belonging to the logged‑in user.
 
-    This view uses Django's ListView to retrieve and render only the
-    beds owned by the current user, ensuring per-user data isolation.
+    This view powers the main "Your Garden Beds" page and supports:
+      - Per‑user data isolation
+      - Searching
+      - Filtering
+      - Sorting
+      - Pagination
+
+    It uses Django's ListView, but overrides get_queryset() to apply
+    user‑specific filtering and dynamic query modifications based on
+    GET parameters.
+
+    This keeps the view clean, predictable, and easy to extend.
     """
+
     model = GardenBed
     template_name = "core/beds/bed_list.html"
-    paginate_by = 3
+    paginate_by = 3  # Small page size for mobile‑friendly UX
 
     def get_queryset(self):
+        """
+        Build the queryset dynamically based on user input.
+
+        The order of operations is intentional:
+
+        1. Start with only the beds owned by the logged‑in user.
+        2. Apply a default sort (alphabetical by name).
+        3. Apply optional filters:
+             - search by partial name match
+             - filter by exact location
+        4. Apply optional sorting, but only if the requested sort
+           field is in the allowed list (prevents unsafe ordering).
+
+        This pattern ensures:
+          - predictable behaviour
+          - no cross‑user data leakage
+          - safe, validated sorting
+          - clean, readable logic
+        """
+
+        # Step 1: User‑scoped base queryset
         qs = GardenBed.objects.filter(owner=self.request.user)
 
-        # Default sort
+        # Step 2: Default ordering
         qs = qs.order_by("name")
 
-        # == Filtering ==
-        # Search by name (partial match)
+        # -------------------------
+        # Filtering: Search by name
+        # -------------------------
         search = self.request.GET.get("search")
         if search:
             qs = qs.filter(name__icontains=search)
 
-        # Filter by location
+        # -------------------------
+        # Filtering: Location
+        # -------------------------
         location = self.request.GET.get("location")
         if location:
             qs = qs.filter(location=location)
 
-        # Sorting
+        # -------------------------
+        # Sorting (validated)
+        # -------------------------
         allowed_sorts = [
             "name", "-name",
             "location", "-location",
@@ -226,61 +265,130 @@ class BedListView(LoginRequiredMixin, ListView):
 
 class BedDetailView(LoginRequiredMixin, DetailView):
     """
-    Display detailed information for a single garden bed.
+    Displays detailed information for a single GardenBed.
 
-    The view restricts access to beds owned by the logged-in user,
-    raising a 404 if the requested bed does not belong to them.
+    This view uses Django's DetailView, but with an important security
+    constraint: users may ONLY view beds that they personally own:
+      - Garden beds are user‑specific data.
+      - Without scoping the queryset, a user could guess another bed's ID
+        (e.g., /beds/5/) and access someone else's data.
+      - By overriding get_queryset(), we enforce per‑user isolation at
+        the database level, not just in the template.
+
+    If the requested bed does not belong to the logged‑in user, Django
+    automatically raises a 404 — not a permission error — which avoids
+    leaking the existence of other users' beds.
     """
+
     model = GardenBed
     template_name = "core/beds/bed_detail.html"
-    # Set context rather than using default object_list / gardenbed_list
+
+    # Use a clear, explicit context name instead of the default "object"
     context_object_name = "bed"
 
     def get_queryset(self):
+        """
+        Restrict the queryset to only the beds owned by the current user.
+
+        This ensures:
+          - No cross‑user data exposure
+          - DetailView will 404 automatically if the bed is not found
+            *within this restricted queryset*
+          - The logic stays consistent with BedListView and BedUpdateView
+
+        """
         return GardenBed.objects.filter(owner=self.request.user)
 
 
 class BedCreateView(LoginRequiredMixin, CreateView):
     """
-    Create a new garden bed for the logged-in user.
+    Handles creation of a new GardenBed.
 
-    Django's CreateView handles form display, validation, and saving.
-    The logged-in user is automatically assigned as the bed owner
-    before the object is saved. Duplicate names are caught and
-    surfaced as form errors.
+    This view supports TWO workflows:
+
+    1. **AJAX modal submission**
+       - Triggered when the user clicks “Add new bed”
+        inside the Plant Create/Edit pages.
+       - The modal form submits via fetch() with the header:
+             X-Requested-With: XMLHttpRequest
+       - Instead of redirecting, we return JSON so the page does NOT reload.
+       - The JS then updates the bed dropdown and closes the modal.
+
+    2. **Normal page submission**
+       - Triggered when the user visits /beds/create/ directly.
+       - The form behaves like a standard Django CreateView.
+       - After saving, the user is redirected to the Beds List page.
+
+    This dual behaviour allows the same view to power both:
+       - Inline modal creation
+       - Full-page creation
+    without duplicating logic.
     """
+
     model = GardenBed
     form_class = GardenBedForm
-    template_name = "core/beds/bed_create.html"
-    success_url = reverse_lazy("bed_list")
+    template_name = "core/bed_create.html"
+    success_url = reverse_lazy("bed_list")  # Used ONLY for non-AJAX fallback
 
     def form_valid(self, form):
+        """
+        Called when the form is valid.
+
+        We attach the logged-in user as the bed owner, then decide whether
+        to return JSON (AJAX modal) or redirect (normal form).
+        """
         form.instance.owner = self.request.user
+        self.object = form.save()
 
-        try:
-            response = super().form_valid(form)
-        except IntegrityError:
-            form.add_error("name", "You already have a bed with this name.")
-            return self.form_invalid(form)
+        # Detect AJAX request from the modal workflow
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            # Return JSON so the page does NOT reload
+            return JsonResponse({
+                "success": True,
+                "id": self.object.id,
+                "name": self.object.name,
+            })
 
-        # Success message (for creating via modal)
+        # Fallback: normal form submission (full page)
         messages.success(self.request, "New bed created successfully.")
+        return redirect(self.success_url)
 
-        # next for inline modal creation
-        next_url = self.request.POST.get("next")
-        if next_url:
-            return redirect(next_url)
+    def form_invalid(self, form):
+        """
+        Handles invalid form submissions.
 
-        return response
+        AJAX:
+            - Return JSON with errors so the modal can display them
+              without reloading the page.
+
+        Normal:
+            - Render the template with errors as usual.
+        """
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({
+                "success": False,
+                "errors": form.errors,
+            }, status=400)
+
+        return super().form_invalid(form)
 
 
 class BedUpdateView(LoginRequiredMixin, UpdateView):
     """
-    Edit an existing garden bed belonging to the logged-in user.
+    Allows the logged‑in user to edit one of their existing GardenBeds.
 
-    This view reuses Django's UpdateView to handle form rendering and
-    validation. Duplicate names are caught and surfaced as form errors.
+    This view uses Django's UpdateView to handle:
+      - form rendering
+      - validation
+      - saving changes
+
+      • The queryset is restricted to the current user's beds to prevent
+        cross‑user access (same pattern as BedDetailView and BedListView).
+      • Duplicate bed names are caught at the database level (IntegrityError)
+        and surfaced as a user‑friendly form error.
+      • On success, the user is redirected back to the bed list.
     """
+
     model = GardenBed
     form_class = GardenBedForm
     template_name = "core/beds/bed_edit.html"
@@ -288,12 +396,32 @@ class BedUpdateView(LoginRequiredMixin, UpdateView):
     context_object_name = "bed"
 
     def get_queryset(self):
+        """
+        Restrict the queryset to beds owned by the logged‑in user.
+
+        This ensures:
+          - Users cannot edit beds they do not own.
+          - If a user tries to access /beds/<id>/edit/ for a bed that
+            isn't theirs, Django will automatically raise a 404.
+        """
         return GardenBed.objects.filter(owner=self.request.user)
 
     def form_valid(self, form):
+        """
+        Attempt to save the updated bed.
+
+        If the user tries to rename a bed to a name they already use,
+        the database will raise an IntegrityError (due to a unique
+        constraint on name + owner). We catch that and convert it into
+        a clean form error instead of crashing.
+
+        This keeps the UX smooth and avoids exposing internal errors.
+        """
         try:
             return super().form_valid(form)
+
         except IntegrityError:
+            # Add a user‑friendly error message to the "name" field
             form.add_error("name", "You already have a bed with this name.")
             return self.form_invalid(form)
 
@@ -333,43 +461,83 @@ def bed_delete(request, pk):
 
 class PlantListView(LoginRequiredMixin, ListView):
     """
-    Display a list of plants belonging to the logged-in user.
+    Displays all Plant objects belonging to the logged‑in user.
 
-    This view uses Django's ListView to retrieve and render only the
-    plants owned by the current user, ensuring per-user data isolation.
+    This view powers the main "Your Plants" page and supports:
+      • Per‑user data isolation
+      • Searching
+      • Filtering (lifespan, type, bed)
+      • Sorting
+      • Pagination
+
+    The structure mirrors BedListView for consistency, but with
+    plant‑specific filters and sorting options.
     """
+
     model = Plant
     template_name = "core/plants/plant_list.html"
-    paginate_by = 3
+    paginate_by = 3  # Mobile‑friendly page size
 
     def get_queryset(self):
+        """
+        Build the queryset dynamically based on user input.
+
+        The order of operations is intentional:
+
+        1. Start with only the plants owned by the logged‑in user.
+        2. Apply a default sort (alphabetical by name).
+        3. Apply optional filters:
+             - lifespan
+             - type
+             - bed
+             - partial name search
+        4. Apply optional sorting, but only if the requested sort
+           field is in the allowed list (prevents unsafe ordering).
+
+        This pattern ensures:
+          • predictable behaviour
+          • no cross‑user data leakage
+          • safe, validated sorting
+          • clean, readable logic
+        """
+
+        # Step 1: User‑scoped base queryset
         qs = Plant.objects.filter(owner=self.request.user)
 
-        # Default sort
+        # Step 2: Default ordering
         qs = qs.order_by("name")
 
-        # == Filtering ==
-        # Filter by lifespan
+        # -------------------------
+        # Filtering: Lifespan
+        # -------------------------
         lifespan = self.request.GET.get("lifespan")
         if lifespan:
             qs = qs.filter(lifespan=lifespan)
 
-        # filter by type
+        # -------------------------
+        # Filtering: Plant type
+        # -------------------------
         plant_type = self.request.GET.get("type")
         if plant_type:
             qs = qs.filter(type=plant_type)
 
-        # filter by bed
+        # -------------------------
+        # Filtering: Bed
+        # -------------------------
         bed_id = self.request.GET.get("bed")
         if bed_id:
             qs = qs.filter(bed_id=bed_id)
 
-        # Search by name (partial match)
+        # -------------------------
+        # Filtering: Search by name
+        # -------------------------
         search = self.request.GET.get("search")
         if search:
             qs = qs.filter(name__icontains=search)
 
-        # Sorting
+        # -------------------------
+        # Sorting (validated)
+        # -------------------------
         allowed_sorts = [
             "name", "-name",
             "planting_date", "-planting_date",
@@ -385,6 +553,12 @@ class PlantListView(LoginRequiredMixin, ListView):
         return qs
 
     def get_context_data(self, **kwargs):
+        """
+        Add extra context needed for filter dropdowns.
+
+        These choices come from the PlantLifespan and PlantType enums,
+        ensuring the template always receives the canonical values.
+        """
         context = super().get_context_data(**kwargs)
         context["lifespan_choices"] = PlantLifespan.choices
         context["type_choices"] = PlantType.choices
@@ -451,10 +625,16 @@ class PlantCreateView(LoginRequiredMixin, CreateView):
     """
     Create a new plant for the logged-in user.
 
-    Django's CreateView handles form display, validation, and saving.
-    The logged-in user is automatically assigned as the plant owner
-    before the object is saved. Duplicate names are caught and
-    surfaced as form errors.
+    This view renders the plant creation form and supports inline creation
+    of GardenBed objects via a Bootstrap modal. The modal submits via AJAX,
+    so this view does not need to handle any redirect or session logic
+    related to bed creation.
+
+    Responsibilities:
+    - Render the plant form
+    - Assign the logged-in user as the plant owner
+    - Handle duplicate plant names gracefully
+    - Provide an empty GardenBedForm to the template for the modal
     """
     model = Plant
     form_class = PlantForm
@@ -462,32 +642,37 @@ class PlantCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("plant_list")
 
     def form_valid(self, form):
+        """
+        Assign the logged-in user as the plant owner and handle duplicate
+        plant names. This method behaves exactly like a normal CreateView
+        except for the duplicate-name handling.
+        """
         form.instance.owner = self.request.user
-        # Exception handling when attempting to create a duplicate
+
         try:
             response = super().form_valid(form)
         except IntegrityError:
             form.add_error("name", "You already have a plant with this name.")
             return self.form_invalid(form)
 
-        # Success message
         messages.success(self.request, "Plant created successfully.")
-
         return response
 
     def get_form_kwargs(self):
         """
-        Extend default form kwargs to include the logged-in user.
-
-        This allows the PlantForm to filter the 'bed' queryset so that
-        users can only assign plants to their own garden beds.
+        Inject the logged-in user into the form so that the 'bed' field
+        can be filtered to only show beds owned by that user.
         """
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
 
-    # For modal create bed directly from create plant
     def get_context_data(self, **kwargs):
+        """
+        Add an empty GardenBedForm to the context so the template can
+        render the 'Create Bed' modal. The modal is submitted via AJAX,
+        so no additional view logic is required here.
+        """
         context = super().get_context_data(**kwargs)
         context["bed_form"] = GardenBedForm()
         return context
@@ -495,11 +680,23 @@ class PlantCreateView(LoginRequiredMixin, CreateView):
 
 class PlantUpdateView(LoginRequiredMixin, UpdateView):
     """
-    Edit an existing plant belonging to the logged-in user.
+    Allows the logged‑in user to edit one of their existing Plants.
 
-    This view reuses Django's UpdateView to handle form rendering and
-    validation. Duplicate names are caught and surfaced as form errors.
+    This view uses Django's UpdateView to handle:
+      • form rendering
+      • validation
+      • saving changes
+
+      • The queryset is restricted to the current user's plants to prevent
+        cross‑user access (same pattern as all other Plant/Bed views).
+      • Duplicate plant names (per user) are caught at the database level
+        and converted into clean form errors.
+      • The form receives the logged‑in user via get_form_kwargs(), allowing
+        PlantForm to filter the 'bed' dropdown to only show the user's beds.
+      • The modal “Create Bed” workflow is supported by injecting a fresh
+        GardenBedForm into the context.
     """
+
     model = Plant
     form_class = PlantForm
     template_name = "core/plants/plant_edit.html"
@@ -507,31 +704,64 @@ class PlantUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("plant_list")
 
     def get_queryset(self):
+        """
+        Restrict the queryset to plants owned by the logged‑in user.
+
+        This ensures:
+          • Users cannot edit plants they do not own.
+          • If a user tries to access /plants/<id>/edit/ for a plant that
+            isn't theirs, Django will automatically raise a 404.
+        """
         return Plant.objects.filter(owner=self.request.user)
 
     def form_valid(self, form):
-        # confirmation message
+        """
+        Attempt to save the updated plant.
+
+        Behaviour:
+          • On success, a confirmation message is shown.
+          • If the user attempts to rename the plant to a name they already
+            use, the database raises IntegrityError (due to a unique
+            constraint on name + owner). We catch this and convert it into
+            a user‑friendly form error.
+
+        This avoids exposing internal errors and keeps the UX smooth.
+        """
         messages.success(self.request, "Plant updated successfully.")
-        # exception handling for duplicate plant name
+
         try:
             return super().form_valid(form)
+
         except IntegrityError:
+            # Add a user‑friendly error message to the "name" field
             form.add_error("name", "You already have a plant with this name.")
             return self.form_invalid(form)
 
     def get_form_kwargs(self):
         """
-        Extend default form kwargs to include the logged-in user.
+        Extend default form kwargs to include the logged‑in user.
+        
+          • PlantForm uses the 'user' kwarg to filter the 'bed' dropdown.
+          • This ensures users can only assign plants to their own beds.
+          • Prevents cross‑user data leakage through form choices.
 
-        This allows the PlantForm to filter the 'bed' queryset so that
-        users can only assign plants to their own garden beds.
+        This pattern keeps the form logic clean and reusable.
         """
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
 
-    # For modal create bed directly from edit plant page
     def get_context_data(self, **kwargs):
+        """
+        Add a fresh GardenBedForm to the context.
+
+        This enables the inline “Create Bed” modal on the Plant Edit page.
+        The modal uses this form to create a new bed via AJAX without
+        leaving the page.
+
+        Keeping this logic here (rather than in the template) keeps the
+        template clean and maintains separation of concerns.
+        """
         context = super().get_context_data(**kwargs)
         context["bed_form"] = GardenBedForm()
         return context
@@ -685,31 +915,48 @@ class TaskDetailView(DetailView):
 
 class CustomLoginView(LoginView):
     """
-    Custom login view that adds support for a 'Remember me' option.
+    Extends Django's built‑in LoginView to support a 'Remember me' option.
 
-    Django's default authentication keeps users logged in even after the
-    browser is closed, because session cookies persist until their expiry
-    date. This view overrides that behaviour so that:
+    Background:
+      • By default, Django's session cookie persists even after the browser
+        is closed — it only expires when SESSION_COOKIE_AGE is reached
+        (2 weeks by default).
+      • This behaviour does NOT match user expectations when a login form
+        includes a 'Remember me' checkbox.
 
-    - If the user does NOT tick 'Remember me':
-        The session expires when the browser is closed
-        (session expiry = 0).
+    Goal:
+      • If the user does NOT tick 'Remember me':
+            → Session expires when the browser closes (expiry = 0)
+      • If the user DOES tick 'Remember me':
+            → Session persists for Django's normal duration
 
-    - If the user DOES tick 'Remember me':
-        The session persists for Django's default duration
-        (2 weeks unless configured otherwise).
-
-    This ensures the login behaviour matches user expectations and the
-    semantics of the 'Remember me' checkbox on the login form.
+    This override ensures the login behaviour aligns with the semantics
+    of the checkbox and provides a familiar, intuitive UX.
     """
+
     def form_valid(self, form):
+        """
+        Called when the login form is successfully validated.
+
+        We inspect the POST data to determine whether the user selected
+        'Remember me', and adjust the session expiry accordingly.
+          • Django stores session expiry per‑session, not globally.
+          • set_expiry(0) → session cookie becomes a browser‑session cookie.
+          • set_expiry(seconds) → persistent cookie for that duration.
+
+        This keeps the logic simple, explicit, and fully aligned with
+        Django's session framework.
+        """
         remember_me = self.request.POST.get('remember_me')
 
         if not remember_me:
-            # Expire session when browser closes
+            # User did NOT tick 'Remember me':
+            # → Expire the session when the browser closes.
             self.request.session.set_expiry(0)
         else:
-            # Keep session for the default duration (2 weeks)
+            # User DID tick 'Remember me':
+            # → Keep the session for Django's default duration (2 weeks).
+            #   1209600 seconds = 14 days.
             self.request.session.set_expiry(1209600)
 
         return super().form_valid(form)

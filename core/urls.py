@@ -51,10 +51,10 @@ urlpatterns = [
          PlantUpdateView.as_view(), name="plant_edit"),
     path("plants/<int:pk>/delete/",
          plant_delete, name="plant_delete"),
-
-    # Tasks (Function based views)
     path("plants/<int:plant_id>/tasks/create/",
          task_create, name="task_create"),
+
+    # Tasks (Function based views)
     path("tasks/<int:task_id>/delete/",
          views.task_delete, name="task_delete"),
     path("tasks/<int:task_id>/edit/",
