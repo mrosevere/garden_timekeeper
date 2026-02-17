@@ -253,6 +253,9 @@ EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "webmaster@localhost")
 
 
+# Restricted logging output:
+# It does not expose sensitive information to users.
+# It only sends errors to Heroku logs — exactly what you want.
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

@@ -56,6 +56,11 @@ urlpatterns = [
     # Instead, we explicitly define ONLY the upload endpoint and point it
     # to our Cloudinary-enabled subclass.
     # -----------------------------------------------------------------
+
+    # Summernote editor (required)
+    path('summernote/', include('django_summernote.urls')),
+
+    # Summernote upload override (Cloudinary)
     path(
          "summernote/upload_attachment/",
          CloudinarySummernoteUploadAttachment.as_view(),
