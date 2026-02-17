@@ -41,6 +41,19 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 /* ==              Media Queries                               == */
 /* ============================================================== */
 
+/* Small Mobile Devices (Less than 376px */
+@media (max-width: 375px) {
+    .container-fluid { 
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+
+    
+/* Closing bracket for Small Mobile Devices Media Query */
+}
+/* Do not delete this closing bracket!!  */
+
+
 /* mobile size media queries */
 @media (max-width: 576px) {
 
