@@ -25,14 +25,14 @@
                 {{ form.bed.label_tag }}
                 <div class="d-flex align-items-center gap-2">
                     {{ form.bed }}
-                    <a
-                        href="{% url 'bed_create' %}"
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#createBedModal"
-                        class="btn btn-outline-secondary btn-sm"
                     >
                         + Add new bed
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -63,11 +63,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
-                    <form method="post" action="{% url 'bed_create' %}">
+                    <form id="bedCreateForm" method="post" action="{% url 'bed_create' %}">
                         {% csrf_token %}
                         <div class="modal-body">
                             {{ bed_form|crispy }}
-                            <input type="hidden" name="next" value="{% url 'plant_edit' plant.id %}">
                         </div>
 
                         <div class="modal-footer">
