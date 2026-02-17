@@ -97,7 +97,8 @@ WSGI_APPLICATION = 'garden_timekeeper.wsgi.application'
 
 
 # Database
-# Use SQLite for development and testing (when there is no URL)
+# If DATABASE_URL exists, us it. Otherwise fll back to SQLLite
+# (Uses SQLite for development and testing (when there is no URL))
 DATABASES = {
     'default': dj_database_url.parse(
         os.getenv("DATABASE_URL", "sqlite:///db.sqlite3"),
