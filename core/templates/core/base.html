@@ -9,16 +9,6 @@
     <meta name="author" content="Mark Rosevere">
 
     <title>{% block title %}Garden Timekeeper{% endblock %}</title>
-
-    <!-- jQuery required for Summernote -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Summernote CSS as not using iframe -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
-
-    <!-- Summernote JS as not using iframe -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
-
    
     <!-- Bootstrap 5 -->
     <link
@@ -28,15 +18,15 @@
       crossorigin="anonymous"
     >
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <!-- Custom static CSS -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <!-- Custom static JS -->
-    <script src="{% static 'assets/js/style.js' %}"></script>
+    <!-- Summernote CSS (full version, required for image uploads) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote.min.css" rel="stylesheet">
 
     <!-- favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/static/assets/images/favicon/apple-touch-icon.png">
@@ -127,11 +117,50 @@
       <p class="mb-0 text-muted">Garden Timekeeper © {% now "Y" %}</p>
     </footer>
 
+    <!-- ===================================== -->
+    <!-- ==     JavaScript Scripts          == -->
+    <!-- ===================================== -->
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom JS -->
+   <!-- ============================================================
+     Summernote + Dependencies
+     ------------------------------------------------------------
+     These scripts must load in this exact order:
+
+       1. jQuery                → Summernote depends on it
+       2. jQuery UI             → required by File Upload plugin
+       3. jQuery File Upload    → Summernote uses .fileupload()
+       4. Summernote JS         → full version (NOT lite)
+       5. Your custom JS        → must run AFTER all libraries
+
+     IMPORTANT:
+       • Loading these in the wrong order causes "$ is not defined"
+         or "$.fileupload is not a function".
+       • Summernote-Lite does NOT support image uploads.
+   ============================================================ -->
+
+    <!-- jQuery (required by Summernote) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- jQuery UI (required by the File Upload plugin) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    <!-- jQuery File Upload dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/10.32.0/js/vendor/jquery.ui.widget.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/10.32.0/js/jquery.fileupload.js"></script>
+
+    <!-- Full Summernote JS (supports image uploads) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote.min.js"></script>
+
+   <!-- End of Summernote dependencies  -->
+
+    <!-- custom JS (must load AFTER all other dependencies) -->
     <script src="{% static 'assets/js/style.js' %}"></script>
-    
+
+    <!-- Page-specific JS (e.g., Summernote init code) -->
+    {% block extra_js %}{% endblock %}
+
   </body>
 </html>
