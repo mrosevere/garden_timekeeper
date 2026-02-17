@@ -10,14 +10,16 @@ privacy and personalised garden management.
 # Django
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView
 )
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.db import IntegrityError
-from django.contrib import messages
+from django.http import JsonResponse
+
 
 from datetime import date
 from calendar import monthrange
@@ -255,23 +257,45 @@ class BedCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("bed_list")
 
     def form_valid(self, form):
+        """
+        Handle successful creation of a new GardenBed.
+
+        This method supports two workflows:
+
+        1. **AJAX modal creation (Option A)**
+        When the bed is created from within the Plant Create modal,
+        the request is sent via AJAX. In this case, the view returns a
+        JSON response containing the new bed's ID and name. The frontend
+        uses this data to update the bed dropdown dynamically, select the
+        new bed, and close the modal — all without reloading the page.
+
+        2. **Standard non-AJAX creation**
+        When the user visits the standalone "Create Bed" page directly,
+        the view behaves like a normal CreateView: it saves the object,
+        shows a success message, and redirects to the bed list.
+
+        Duplicate bed names (per user) are caught and surfaced as form errors.
+        """
         form.instance.owner = self.request.user
 
         try:
-            response = super().form_valid(form)
+            new_bed = form.save()
         except IntegrityError:
             form.add_error("name", "You already have a bed with this name.")
             return self.form_invalid(form)
 
-        # Success message (for creating via modal)
+        # AJAX request → return JSON
+        if (self.request.headers.get("X-Requested-With", "")
+                .lower() == "xmlhttprequest"):
+            return JsonResponse({
+                "success": True,
+                "id": new_bed.id,
+                "name": new_bed.name,
+            })
+
+        # Fallback for non-AJAX
         messages.success(self.request, "New bed created successfully.")
-
-        # next for inline modal creation
-        next_url = self.request.POST.get("next")
-        if next_url:
-            return redirect(next_url)
-
-        return response
+        return redirect(self.success_url)
 
 
 class BedUpdateView(LoginRequiredMixin, UpdateView):
@@ -451,10 +475,16 @@ class PlantCreateView(LoginRequiredMixin, CreateView):
     """
     Create a new plant for the logged-in user.
 
-    Django's CreateView handles form display, validation, and saving.
-    The logged-in user is automatically assigned as the plant owner
-    before the object is saved. Duplicate names are caught and
-    surfaced as form errors.
+    This view renders the plant creation form and supports inline creation
+    of GardenBed objects via a Bootstrap modal. The modal submits via AJAX,
+    so this view does not need to handle any redirect or session logic
+    related to bed creation.
+
+    Responsibilities:
+    - Render the plant form
+    - Assign the logged-in user as the plant owner
+    - Handle duplicate plant names gracefully
+    - Provide an empty GardenBedForm to the template for the modal
     """
     model = Plant
     form_class = PlantForm
@@ -462,32 +492,37 @@ class PlantCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("plant_list")
 
     def form_valid(self, form):
+        """
+        Assign the logged-in user as the plant owner and handle duplicate
+        plant names. This method behaves exactly like a normal CreateView
+        except for the duplicate-name handling.
+        """
         form.instance.owner = self.request.user
-        # Exception handling when attempting to create a duplicate
+
         try:
             response = super().form_valid(form)
         except IntegrityError:
             form.add_error("name", "You already have a plant with this name.")
             return self.form_invalid(form)
 
-        # Success message
         messages.success(self.request, "Plant created successfully.")
-
         return response
 
     def get_form_kwargs(self):
         """
-        Extend default form kwargs to include the logged-in user.
-
-        This allows the PlantForm to filter the 'bed' queryset so that
-        users can only assign plants to their own garden beds.
+        Inject the logged-in user into the form so that the 'bed' field
+        can be filtered to only show beds owned by that user.
         """
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
 
-    # For modal create bed directly from create plant
     def get_context_data(self, **kwargs):
+        """
+        Add an empty GardenBedForm to the context so the template can
+        render the 'Create Bed' modal. The modal is submitted via AJAX,
+        so no additional view logic is required here.
+        """
         context = super().get_context_data(**kwargs)
         context["bed_form"] = GardenBedForm()
         return context

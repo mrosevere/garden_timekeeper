@@ -81,8 +81,13 @@ class PlantForm(forms.ModelForm):
         plants only to their own beds and prevents cross-user data
         exposure.
         """
-        user = kwargs.pop("user")
+        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+
+        if user is not None:
+            self.fields["bed"].queryset = GardenBed.objects.filter(owner=user)
+        else:
+            self.fields["bed"].queryset = GardenBed.objects.none()
 
         # Crispy helper (minimal setup for consistency with Task form)
         self.helper = FormHelper()
