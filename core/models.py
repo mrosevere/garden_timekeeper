@@ -105,11 +105,17 @@ class Plant(models.Model):
         choices=PlantType.choices,
     )
     planting_date = models.DateField(null=True, blank=True)
+    # Ensure that linked Plants are NOT also deleted when a Bed is deleted.
+    # Any plants linked to the deleted bed will no longer have a Bed assigned.
+    # The Template modal will also warn the user.
     bed = models.ForeignKey(
         GardenBed,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="plants"
     )
+
     notes = models.TextField(blank=True)
 
     image = models.ImageField(upload_to="plant_images/", blank=True, null=True)
