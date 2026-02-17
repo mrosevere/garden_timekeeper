@@ -37,7 +37,7 @@ ALLOWED_HOSTS = [
     ".herokuapp.com",
     "localhost",
     "127.0.0.1",
-    "https://garden-timekeeper-588fc83d2eb9.herokuapp.com/"
+    "garden-timekeeper-588fc83d2eb9.herokuapp.com"
 ]
 
 
