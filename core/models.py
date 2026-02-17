@@ -9,6 +9,7 @@ from django.conf import settings
 from calendar import monthrange
 from datetime import date, timedelta
 # from django.utils import timezone
+from cloudinary.models import CloudinaryField
 
 # ================= Garden Bed Models =================
 
@@ -118,7 +119,8 @@ class Plant(models.Model):
 
     notes = models.TextField(blank=True)
 
-    image = models.ImageField(upload_to="plant_images/", blank=True, null=True)
+    # Store images in Cloudinary - not locally or they won't display in Prod.
+    image = CloudinaryField("image", blank=True, null=True)
 
     def __str__(self):
         return self.name
