@@ -32,7 +32,7 @@
     Not specified
   {% endif %}
 </p>
-<p><strong>Notes:</strong> {{ plant.notes|linebreaksbr|default:"No additional notes" }}</p>
+<p><strong>Notes:</strong> {{ plant.notes|safe|default:"No additional notes" }}</p>
 
 
 <!-- Return to plants button -->
