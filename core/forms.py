@@ -1,7 +1,7 @@
 from django import forms
 from .models import GardenBed, Plant, PlantTask
 from crispy_forms.helper import FormHelper
-from django_summernote.widgets import SummernoteInplaceWidget
+from django_summernote.widgets import SummernoteWidget
 
 
 # -----------------------------------------------------
@@ -68,7 +68,10 @@ class PlantForm(forms.ModelForm):
                 attrs={"class": "form-control", "type": "date"}
             ),
             "bed": forms.Select(attrs={"class": "form-select"}),
-            "notes": SummernoteInplaceWidget(),
+            "notes": SummernoteWidget(
+                attrs={'summernote': {'airMode': False}}
+                ),
+
         }
 
     def __init__(self, *args, **kwargs):
@@ -119,5 +122,7 @@ class PlantTaskForm(forms.ModelForm):
         }
         fields = "__all__"
         widgets = {
-            "notes": SummernoteInplaceWidget(),
+            'notes': SummernoteWidget(
+                attrs={'summernote': {'airMode': False}}
+            ),
         }

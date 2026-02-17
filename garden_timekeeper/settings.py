@@ -193,17 +193,24 @@ SUMMERNOTE_CONFIG = {
     # (disable iframe so I can use standard CSS styling)
     'iframe': False,
 
-    # Set the toolbar layout
+    # Store Summernote uploads (images, files) in Cloudinary
+    "attachment_storage": "cloudinary_storage.storage.MediaCloudinaryStorage",
+
+    # Optional: folder prefix in Cloudinary
+    "attachment_upload_to": "summernote",
+
+    # Set the toolbar layout to be restricted so it takes less room
+    #     ['style', ['bold', 'italic', 'underline', 'clear']],
+    #     ['para', ['ul', 'ol', 'paragraph']],
+    #     ['insert', ['link', 'picture']],
+    #     ['view', ['fullscreen']],
+    # ],
     'toolbar': [
-        ['style', ['bold', 'italic', 'underline', 'clear']],
+        ['style', ['style']],  # includes headings
         ['para', ['ul', 'ol', 'paragraph']],
-        # removed 'picture' see issue-123
-        ['insert', ['link']],
+        ['insert', ['link', 'picture']],
         ['view', ['fullscreen']],
     ],
-
-    # Disable file uploads (local images)
-    'disable_upload': True,
 
     # Optional: restrict allowed tags for safety
     'allowed_tags': [
