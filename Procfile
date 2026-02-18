@@ -1,1 +1,0 @@
-web: gunicorn garden_timekeeper.wsgi
