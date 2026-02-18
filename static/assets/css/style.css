@@ -1,13 +1,109 @@
+/* Google Fonts (Inter) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 :root {
-    --pastel-green: #d8f3dc;
-    --pastel-blue: #d0e8ff;
-    --pastel-yellow: #fff4cc;
-    --pastel-pink: #ffdce5;
-    --pastel-purple: #e8d9ff;
+
+    /* Potential Group 2 */
+    --color-text: #040a09;
+    --color-background: #e3f3e6;
+    --color-primary: #5a9db6;
+    --color-secondary: #4f7da6;
+    --color-accent: #555b8c;
+    --color-nav-footer: #f5f8f5;
+
+    --color-text-darkmode: #f4fbfa;
+    --color-background-darkmode: #030706;
+    --color-primary-darkmode: #47ae9e;
+    --color-secondary-darkmode: #3f5190;
+    --color-accent-darkmode: #343b7f;
+
+    /* Add to your palette */
+    --color-primary-hover: #3e7a8f;      
+    --color-primary-active: #2a5b6d;     
+    --color-primary-darkmode-hover: #5fc4b2; 
+
+    --color-focus-ring-light: #555b8c;    
+    --color-focus-ring-dark: #a599e9;   
+
 }
 
+
+/* ===== BUTTON STYLES ===== */
+
+/* Primary Button */
+.btn-primary {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-secondary) !important;
+    color: white !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-hover) !important;
+    border-color: var(--color-secondary-hover, #3d6487) !important;
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    background-color: var(--color-primary-active) !important;
+    border-color: var(--color-secondary) !important;
+    transform: translateY(0);
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background-color: var(--color-secondary) !important;
+    border-color: var(--color-secondary) !important;
+    color: white !important;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-secondary-hover, #3d6487) !important;
+    border-color: var(--color-secondary-hover, #3d6487) !important;
+}
+
+/* Outline button */
+.btn-outline-primary {
+    color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+}
+
+/* ============= */
+
+
+/* Make the nav dropdown text black for better contrast */
+.nav-link{
+    color: black;
+}
+
+.navbar-logo { 
+    max-height: 40px;
+    width: auto;
+}
+
+/* Remove Safari/Chrome mobile password icons */
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+
 body {
-    background-color: var(--pastel-green);
+    background-color: var(--color-background);
+    font-family: 'Inter', sans-serif;
+}
+
+.custom-navbar {
+    background-color: var(--color-nav-footer);
+}
+
+footer {
+    background-color: var(--color-nav-footer);
 }
 
 /* Ensure that the body fills all of the viewport */
@@ -25,16 +121,7 @@ main {
 }
 
 
-.navbar-logo { 
-    max-height: 40px;
-    width: auto;
-}
 
-/* Remove Safari/Chrome mobile password icons */
-input[type="password"]::-webkit-credentials-auto-fill-button {
-    display: none !important;
-    visibility: hidden !important;
-}
 
 
 /* ============================================================== */
@@ -43,9 +130,15 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 
 /* Small Mobile Devices (Less than 376px */
 @media (max-width: 375px) {
+    /* Reduce the font size slightly */
+    html {
+        font-size: 15px;
+    }
+
+    /* reduce the padding */
     .container-fluid { 
-        padding-left: 4px;
-        padding-right: 4px;
+        padding-left: 1px;
+        padding-right: 1px;
     }
 
     
