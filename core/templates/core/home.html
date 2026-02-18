@@ -1,0 +1,79 @@
+{% extends "core/base.html" %}
+
+{% block title %}Home — Garden Timekeeper{% endblock %}
+
+{% block content %}
+<h1 class="display-5 fw-bold">Welcome to Garden Timekeeper</h1>
+<p class="lead">Your garden, beautifully organised.</p>
+
+    <!-- Image (desktop only) -->
+    <div class="col-lg-6 d-none d-lg-block">
+        <div class="hero-image rounded-4 shadow-sm"></div>
+    </div>
+
+<div class="home-background">
+<div class="container">
+{% if user.is_authenticated %}
+    <div class="row row g-1">
+        <!-- Dashboard Link -->
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="card-body p-3">
+                    <h5 class="card-title">What's Due This Week</h5>
+                    <p class="card-text">Get a quick overview of all the care tasks you need to do for your plants in the coming week.</p>
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary">View Dashboard</a>
+                </div>
+            </div>
+        </div>
+        <!-- Plant List Link -->
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="card-body p-3">
+                    <h5 class="card-title">Manage Plants & Tasks</h5>
+                    <p class="card-text">View and update your plant collection, add tasks to them, and keep your garden thriving.</p>
+                    <div class="d-flex">
+                        <a href="{% url 'plant_list' %}" class="btn btn-primary me-2" style="min-width: 120px;">View Plants</a>
+                        <a href="{% url 'plant_create' %}" class="btn btn-primary  me-2" style="min-width: 110px;">Add Plant</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Beds and Containers -->
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="card-body p-3">
+                    <h5 class="card-title">Manage Garden Beds & Containers</h5>
+                    <p class="card-text">Organise your plants by garden beds and containers for easy management.</p>
+                    <a href="{% url 'bed_list' %}" class="btn btn-primary">View Beds & Containers</a>
+                </div>
+            </div>
+        </div>
+
+{% else %}
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Track Your Garden's Needs</h2>
+            <p>Keep tabs on watering, fertilizing, and other care tasks for each of your plants.</p>
+        </div>
+        <div class="col-md-6">
+            <h2>Organise Your Garden</h2>
+            <p>Group your plants by garden beds and easily manage their care schedules.</p>
+        </div>
+        <div>
+            <h2>already have an account?</h2>
+            <p>log in to continue your journey.</p>
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Log In</a>
+        </div>
+        <div>
+            <h2>Get Started Today</h2>
+            <p>Sign up for a free account and start organising your garden with Garden Timekeeper.</p>
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Sign Up Now</a>
+        </div>
+    </div>
+{% endif %}
+</div>    
+</div>
+
+    </div>
+</div>
+{% endblock %}
