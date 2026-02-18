@@ -74,7 +74,7 @@
 }
 
 /* ============= */
-
+/* === NAV & Login === */
 
 /* Make the nav dropdown text black for better contrast */
 .nav-link{
@@ -92,6 +92,16 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
     visibility: hidden !important;
 }
 
+
+/* ============= */
+/* ======= HOME PAGE === */
+    .home-background .container {
+        background: var(--color-nav-footer);
+        border-radius: 2rem;
+        padding: 1rem;
+        box-shadow: 0 0 30px rgba(0,0,0,0.15);
+    }
+/* ============= */
 
 body {
     background-color: var(--color-background);
@@ -128,7 +138,10 @@ main {
 /* ==              Media Queries                               == */
 /* ============================================================== */
 
-/* Small Mobile Devices (Less than 376px */
+
+/* ============================================= */
+/* ==  XS Devices (Less than 376px) == */
+/* ============================================= */
 @media (max-width: 375px) {
     /* Reduce the font size slightly */
     html {
@@ -141,13 +154,13 @@ main {
         padding-right: 1px;
     }
 
-    
-/* Closing bracket for Small Mobile Devices Media Query */
 }
-/* Do not delete this closing bracket!!  */
 
 
-/* mobile size media queries */
+
+/* ============================================= */
+/* ==  Small Mobile Devices (376px - 576px)   == */
+/* ============================================= */
 @media (max-width: 576px) {
 
     /* Make Summernote fully responsive on mobile */
@@ -167,4 +180,14 @@ main {
     .note-toolbar {
         flex-wrap: wrap !important;
     }
+}
+
+
+/* ============================================= */
+/* ==  large Devices (>=992px)                == */
+/* ============================================= */
+@media (min-width: 992px) {
+
+
+
 }
