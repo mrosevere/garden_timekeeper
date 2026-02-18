@@ -328,7 +328,7 @@ class BedCreateView(LoginRequiredMixin, CreateView):
 
     model = GardenBed
     form_class = GardenBedForm
-    template_name = "core/bed_create.html"
+    template_name = "core/beds/bed_create.html"
     success_url = reverse_lazy("bed_list")  # Used ONLY for non-AJAX fallback
 
     def form_valid(self, form):
@@ -872,7 +872,10 @@ def task_skip(request, task_id):
     task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
     task.skip()
     task.save()
-    # Return it to the calling page (HTTP_REFERRER)
+
+    # Return success message to the user
+    messages.success(request, f"Task '{task.name}' skipped.")
+
     return redirect(request.META.get("HTTP_REFERER", "dashboard"))
 
 
