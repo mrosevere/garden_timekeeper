@@ -1,0 +1,44 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="container py-4">
+
+    <h1 class="h3 mb-4">{{ task.name }}</h1>
+
+    <div class="card">
+        <div class="card-body">
+
+            <p><strong>Plant:</strong>
+                <a href="{% url 'plant_detail' task.plant.id %}">
+                    {{ task.plant.name }}
+                </a>
+            </p>
+
+            <p><strong>Bed:</strong>
+                <a href="{% url 'bed_detail' task.plant.bed.id %}">
+                    {{ task.plant.bed.name }}
+                </a>
+            </p>
+
+            <p><strong>Due:</strong> {{ task.next_due }}</p>
+            <p><strong>Frequency:</strong> {{ task.get_frequency_display }}</p>
+
+            {% if task.notes %}
+            <p><strong>Notes:</strong></p>
+            <div class="border p-3 bg-light">
+                {{ task.notes|safe }}
+            </div>
+            {% endif %}
+
+            <div class="mt-4 d-flex gap-2">
+                <a href="{% url 'task_update' task.id %}" class="btn btn-primary">Edit Task</a>
+                <a href="{% url 'task_delete' task.id %}" class="btn btn-danger">Delete Task</a>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Meta tags for search engines -->
+    <meta name="description" content="Garden Timekeeper helps you track your plants' growth, watering schedules, and more.">
+    <meta name="keywords" content="garden, plants, tracking, growth, watering, schedule, dashboard">
+    <meta name="author" content="Mark Rosevere">
+
+    <title>{% block title %}Garden Timekeeper{% endblock %}</title>
+   
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    >
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Custom static CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
+
+    <!-- Summernote CSS (full version, required for image uploads) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote.min.css" rel="stylesheet">
+
+    <!-- favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/assets/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/assets/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/assets/images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/static/assets/images/favicon/site.webmanifest">
+  </head>
+
+  
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg custom-navbar shadow-sm mb-4">
+      <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-center" style="height: 40px;">
+          <a class="navbar-brand" href="/">
+            <img 
+              src="/static/assets/images/logos/gt-icon.png"
+              alt="Garden Timekeeper Logo"
+              class="navbar-logo">
+          </a>
+        </div>
+        <a class="navbar-brand fw-bold" href="/">Garden Timekeeper</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <!-- Login Navigation -->
+              {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+              </li>
+              {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+              </li>
+              {% endif %}
+            <!-- Page Navigation -->
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/beds">bed List</a>
+            </li>
+              <li class="nav-item">
+              <a class="nav-link" href="/plants">Plant List</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'account_settings' %}">My Account</a>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+      <div class="container mt-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+
+    <!-- Main content -->
+    <main class="container">{% block content %} {% endblock %}</main>
+
+    <!-- Footer -->
+    <footer class="footer text-center py-3 mt-4 border-top">
+      <p class="mb-0 text-muted">Garden Timekeeper © {% now "Y" %}</p>
+    </footer>
+
+    <!-- ===================================== -->
+    <!-- ==     JavaScript Scripts          == -->
+    <!-- ===================================== -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+   <!-- ============================================================
+     Summernote + Dependencies
+     ------------------------------------------------------------
+     These scripts must load in this exact order:
+
+       1. jQuery                → Summernote depends on it
+       2. jQuery UI             → required by File Upload plugin
+       3. jQuery File Upload    → Summernote uses .fileupload()
+       4. Summernote JS         → full version (NOT lite)
+       5. Your custom JS        → must run AFTER all libraries
+
+     IMPORTANT:
+       • Loading these in the wrong order causes "$ is not defined"
+         or "$.fileupload is not a function".
+       • Summernote-Lite does NOT support image uploads.
+   ============================================================ -->
+
+    <!-- jQuery (required by Summernote) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- jQuery UI (required by the File Upload plugin) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    <!-- jQuery File Upload dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/10.32.0/js/vendor/jquery.ui.widget.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/10.32.0/js/jquery.fileupload.js"></script>
+
+    <!-- Full Summernote JS (supports image uploads) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote.min.js"></script>
+
+   <!-- End of Summernote dependencies  -->
+
+    <!-- custom JS (must load AFTER all other dependencies) -->
+    <script src="{% static 'assets/js/style.js' %}"></script>
+
+    <!-- Page-specific JS (e.g., Summernote init code) -->
+    {% block extra_js %}{% endblock %}
+
+  </body>
+</html>
