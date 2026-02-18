@@ -2,79 +2,77 @@
 {% load month_filters %}
 {% block content %}
 
-
-<div class="container py-4">  
-
-  <!-- DASHBOARD TOP CONTROLS -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
+<!-- DASHBOARD TOP CONTROLS -->
+<div class="container py-2">   
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4 text-center text-sm-start">
       
-      <!-- Left: Page Title -->
-      <h1 class="h3 mb-0 px-3">Dashboard</h1>
+      <!-- Page Title -->
+      <h1 class="h3 mb-3 px-2">Dashboard</h1>
 
-      <!-- Right: Action Buttons -->
-       <div class="btn-group">
-          <a href="{% url 'plant_create' %}" class="btn btn-outline-primary">Add Plant</a>
-          <a href="{% url 'bed_create' %}" class="btn btn-outline-primary">Add Bed</a>
+      <!-- Action Buttons -->
+       <div>
+          <a href="{% url 'plant_create' %}" class="btn btn-outline-primary me-2">Add Plant</a>
+          <a href="{% url 'bed_create' %}" class="btn btn-outline-primary me-2">Add Bed</a>
        </div>
-      
   </div>
 </div>
 
-<div class="container mb-4">
+<!-- DATE SELECTOR BUTTONS -->
+<div class="container mb-4">         <!-- Outer container -->
+    <div class="row align-items-center">   <!-- Row for header + controls -->
+        <!-- Column 1: Selected Month -->
+        <div class="col-auto">  
 
-    <div class="d-flex justify-content-between align-items-center">
+            <!-- Selected Month Heading (e.g., "February 2026") -->
+            <h2 class="h4 mb-0">
+                <!-- passed from the month_filters -->
+                {{ selected_month|month_name }} {{ selected_year }}
+            </h2>
+        </div>  <!-- Column 1: Selected Month -->
 
-        <!-- Left: Selected Month -->
-        <h2 class="h4 mb-0">
-            <!-- passed from the month_filters -->
-            {{ selected_month|month_name }} {{ selected_year }}
+        <!-- Column 2: Navigation Buttons + Dropdown -->
+        <div class="col-auto ms-auto d-flex flex-wrap align-items-center gap-2">
+            
+            <!-- Button Group for Today / Prev / Next -->
+             <div class="btn-group">
+                
+                <!-- Today Button -->
+                <a href="?view=month&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:'1,' }}" class="btn btn-outline-secondary">
+                    Today</a>
+                
+                <!-- Previous Month Arrow button -->
+                <!--Disable button if we are in the current month to stop users navigating into past months -->
+                {% if selected_year == today.year and selected_month == today.month %}
+                    <button class="btn btn-outline-secondary" disabled>
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                <!-- Otherwise: enable previous month navigation -->
+                {% else %}                
+                    <a href="?view=month&year={{ previous_year }}&month={{ previous_month }}&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:"1," }}"
+                    class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                {% endif %}
 
-        </h2>
+                <!-- Next Month Arrow button -->
+                <a href="?view=month&year={{ next_year }}&month={{ next_month }}&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:'1,' }}"
+                    class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>    
+             </div>
 
-        <!-- Right: Navigation Buttons -->
-        <div class="btn-group">
-
-            <!-- Today Button -->
-            <a href="?view=month&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:"1," }}
-"
-               class="btn btn-outline-secondary">
-                Today
-            </a>
-
-
-            <!-- Previous Month (disabled only if we are in the current month, to stop backwards nav) -->
-            {% if selected_year == today.year and selected_month == today.month %}
-                <!-- At current month: disable -->
-                <button class="btn btn-outline-secondary" disabled>
-                    <i class="fa-solid fa-chevron-left"></i>
-                </button>
-            {% else %}
-                <!-- Otherwise: allow navigation -->
-                <a href="?view=month&year={{ previous_year }}&month={{ previous_month }}&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:"1," }}"
-                class="btn btn-outline-secondary">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </a>
-            {% endif %}
-
-
-            <!-- Next Month -->
-            <a href="?view=month&year={{ next_year }}&month={{ next_month }}&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:"1," }}
-"
-            class="btn btn-outline-secondary">
-                <i class="fa-solid fa-chevron-right"></i>
-            </a>
-
-            <!-- Jump to Month to display the next 12 months (even if that rolls over the year) -->
-            <div class="btn-group ms-2">
+            <!-- Dropdown for Jump to Month -->
+            <div class="dropdown">
+                
+                <!-- Dropdown button -->
                 <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
                     Jump to…
-                </button>
-
-                <ul class="dropdown-menu">
-
-                    <!-- Current Year -->
+                </button> 
+                
+                <!-- Dropdown List -->
+                <ul class="dropdown-menu dropdown-menu-end">
                     <li><h6 class="dropdown-header">{{ today.year }}</h6></li>
-
+                    <!-- Dropdown list items for the current year (from the current month)-->
                     {% for m in today.month|to:12 %}
                         <li>
                             <a class="dropdown-item"
@@ -83,12 +81,13 @@
                             </a>
                         </li>
                     {% endfor %}
-
+                    
+                    <!-- Divider in the dropdown list to split the current year from next year -->
                     <li><hr class="dropdown-divider"></li>
 
-                    <!-- Next Year -->
+                    <!-- Dropdown list items for the next calendar year -->
                     <li><h6 class="dropdown-header">{{ today.year|add:"1" }}</h6></li>
-
+                    <!-- Months are Int so need to ensure we don't go over 12! -->
                     {% for m in 1|to:12 %}
                         <li>
                             <a class="dropdown-item"
@@ -97,197 +96,316 @@
                             </a>
                         </li>
                     {% endfor %}
-
                 </ul>
+            </div>  <!-- Dropdown for Jump to Month -->
+        </div>  <!-- Column 2: Navigation Buttons + Dropdown -->
+    </div>  <!-- Row for header + controls -->
+</div>  <!-- Outer container -->
+
+<!-- Hide overdue tasks toggle -->
+<div class="row">  <!-- Row for hide overdue toggle -->
+    <div>
+        <form method="get" class="d-inline">
+            <input type="hidden" name="view" value="month">
+            <input type="hidden" name="year" value="{{ selected_year }}">
+            <input type="hidden" name="month" value="{{ selected_month }}">
+            <input type="hidden" name="sort" value="{{ current_sort }}">
+            <input type="hidden" name="direction" value="{{ current_direction }}">
+
+            <!-- reloads the page, adds a query parameter to the url if Ticked ("hide_overdue=1"), which Django view uses to filter tasks -->
+            <div class="form-check d-inline-block ms-3">
+                <input class="form-check-input"
+                    type="checkbox"
+                    name="hide_overdue"
+                    value="1"
+                    id="hideOverdueCheck"
+                    {% if hide_overdue %}checked{% endif %}
+                    onchange="this.form.submit()">
+                    <label class="form-check-label" for="hideOverdueCheck">
+                        Hide overdue tasks
+                    </label>
             </div>
+        </form>
+    </div>  <!-- Hide overdue tasks toggle -->
+</div> <!-- Row for hide overdue toggle -->
 
+<!-- ================================================================================== -->
+<!-- ==                Tasks List                                                       -->
+<!-- ================================================================================== -->
 
+<!-- ======================================================== -->
+<!-- Card version: Hide the cards on d-md and above (>=768px) -->
+<!-- ======================================================== -->
+<div class="d-block d-md-none container mb-4"> 
+    <div class="row g-3"> <!-- Row for spacing between cards -->
 
-
-
-
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- Checkbox to hide overdue tasks -->
-<form method="get" class="d-inline">
-    <input type="hidden" name="view" value="month">
-    <input type="hidden" name="year" value="{{ selected_year }}">
-    <input type="hidden" name="month" value="{{ selected_month }}">
-    <input type="hidden" name="sort" value="{{ current_sort }}">
-    <input type="hidden" name="direction" value="{{ current_direction }}">
-
-    <div class="form-check d-inline-block ms-3">
-        <input class="form-check-input"
-               type="checkbox"
-               name="hide_overdue"
-               value="1"
-               id="hideOverdueCheck"
-               {% if hide_overdue %}checked{% endif %}
-               onchange="this.form.submit()">
-
-        <label class="form-check-label" for="hideOverdueCheck">
-            Hide overdue tasks
-        </label>
-    </div>
-</form>
-
-<!-- Table of tasks -->
-<div class="container">
-<table class="table table-striped align-middle">
-    <!-- Table Header (sortable columns) -->
-<thead>
-    <tr>
-        <th>Complete?</th>
-
-        <!-- Task -->
-        <th>
-            <a href="?sort=name&direction={% if current_sort == 'name' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
-                Task
-                {% if current_sort == "name" %}
-                    {% if current_direction == "asc" %}
-                        <i class="fa-solid fa-arrow-up ms-1"></i>
-                    {% else %}
-                        <i class="fa-solid fa-arrow-down ms-1"></i>
-                    {% endif %}
-                {% endif %}
-            </a>
-        </th>
-
-        <!-- Plant -->
-        <th>
-            <a href="?sort=plant&direction={% if current_sort == 'plant' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
-                Plant
-                {% if current_sort == "plant" %}
-                    {% if current_direction == "asc" %}
-                        <i class="fa-solid fa-arrow-up ms-1"></i>
-                    {% else %}
-                        <i class="fa-solid fa-arrow-down ms-1"></i>
-                    {% endif %}
-                {% endif %}
-            </a>
-        </th>
-
-        <!-- Bed -->
-        <th class="d-none d-md-table-cell">
-            <a href="?sort=bed&direction={% if current_sort == 'bed' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
-                Bed
-                {% if current_sort == "bed" %}
-                    {% if current_direction == "asc" %}
-                        <i class="fa-solid fa-arrow-up ms-1"></i>
-                    {% else %}
-                        <i class="fa-solid fa-arrow-down ms-1"></i>
-                    {% endif %}
-                {% endif %}
-            </a>
-        </th>
-
-        <!-- Due -->
-        <th>
-            <a href="?sort=due&direction={% if current_sort == 'due' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
-                Due
-                {% if current_sort == "due" %}
-                    {% if current_direction == "asc" %}
-                        <i class="fa-solid fa-arrow-up ms-1"></i>
-                    {% else %}
-                        <i class="fa-solid fa-arrow-down ms-1"></i>
-                    {% endif %}
-                {% endif %}
-            </a>
-        </th>
-
-        <!-- Frequency -->
-        <th class="d-none d-md-table-cell">
-            <a href="?sort=frequency&direction={% if current_sort == 'frequency' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
-                Frequency
-                {% if current_sort == "frequency" %}
-                    {% if current_direction == "asc" %}
-                        <i class="fa-solid fa-arrow-up ms-1"></i>
-                    {% else %}
-                        <i class="fa-solid fa-arrow-down ms-1"></i>
-                    {% endif %}
-                {% endif %}
-            </a>
-        </th>
-
-        <th class="text-end">Actions</th>
-    </tr>
-</thead>
-
-
-    <!-- table body -->
-    <tbody>
         {% for task in tasks %}
-        <!-- Conditional logic for row highlighting based on due date -->
-        <tr
-        {% if task.next_due < start_of_month %}
-            class="table-danger"
-        {% elif task.next_due == today %}
-            class="table-warning"
-        {% endif %}
+            <!-- Each card takes full width on small screens -->
+            <div class="col-12"> 
+            
+                <!-- Apply the card class based on due date -->
+                <div class="card shadow-sm{% if task.next_due < today %} bg-danger {% elif task.next_due == today %} bg-warning{% endif %}">
 
-          <!-- Complete? -->
-          <td>
-                <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
-                    {% csrf_token %}
-                    <input type="checkbox" onChange="this.form.submit()">
-                </form>
-          </td>
+                    <!-- Card Header -->
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <a href="{% url 'task_detail' task.id %}">
+                                {{ task.name }}
+                            </a>
 
-          <!-- Task -->
-          <td>
-            <a href="{% url 'task_detail' task.id %}">
-                {{ task.name }}
-            </a>
-          </td>
+                            {% if task.next_due < today %}
+                                <i class="fa-solid fa-circle-exclamation text-danger ms-2"
+                                title="This task is overdue"></i>
 
-          <!--  Plant -->
-          <td>
-              <a href="{% url 'plant_detail' task.plant.id %}">
-                  {{ task.plant.name }}
-              </a>
-          </td>
+                            {% elif task.next_due == today %}
+                                <i class="fa-solid fa-circle-exclamation text-warning ms-2"
+                                title="This task is due today"></i>
+                            {% endif %}
+                        </h5>
+                        <span class="badge bg-secondary">{{ task.status }}</span>
+                    </div>
 
-          <!-- bed -->
-          <td class="d-none d-md-table-cell">
-              <a href="{% url 'bed_detail' task.plant.bed.id %}">
-                  {{ task.plant.bed.name }}
-              </a>
-          </td>
+                    <!-- Card Body -->
+                    <div class="card-body">
 
-          <!-- Due -->
-          <td>
-            {% if task.next_due < start_of_month %}
-                <i class="fa-solid fa-circle-exclamation text-danger ms-2"></i>
-            {% elif task.next_due == today %}
-                <i class="fa-solid fa-circle-exclamation text-warning ms-2"></i>
-            {% endif %}
-            {{ task.next_due }}
-          </td>
-           <td class="d-none d-md-table-cell">
-              {{ task.get_frequency_display }}
-          </td>
+                        <!-- Plant Name -->
+                        <div class="mb-2">
+                            <strong>Plant:</strong>
+                            <a href="{% url 'plant_detail' task.plant.id %}" class="{% if task.next_due < start_of_month %}text-white{% endif %}">
+                                {{ task.plant.name }}
+                            </a>
+                        </div>
 
-          <!-- Actions -->
-          <td class="text-end">
-              <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-              <a href="{% url 'task_delete' task.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="6" class="text-center text-muted py-4">
-                Congratulations! You don't have any tasks due with your current filters!
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                        <!-- Location -->
+                        <div class="mb-2">
+                            <strong>Location:</strong>
+                            <a href="{% url 'bed_detail' task.plant.bed.id %}" class="{% if task.next_due < start_of_month %}text-white{% endif %}">
+                                {{ task.plant.bed.name }}
+                            </a>
+                        </div>
 
+                        <!-- Due Date -->
+                        <div class="mb-2">
+                            <strong>Due:</strong> {{ task.next_due }}
+                        </div>
+
+                    </div> <!-- Card Body -->
+
+                    <!-- Card Footer (actions) -->
+                    <div class="card-footer d-flex justify-content-end gap-2">
+
+                        <!-- Complete button -->
+                        <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-primary" style="min-width:80px;">
+                                {% if task.completed %}
+                                    <i class="fa-solid fa-check"></i> Done
+                                {% else %}
+                                    Done
+                                {% endif %}
+                            </button>
+                        </form>
+
+                        <!-- Edit -->
+                        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary" style="min-width:80px;">Edit</a>
+
+                        <!-- Delete -->
+                        <a href="{% url 'task_delete' task.id %}" class="btn btn-sm btn-secondary" style="min-width:70px;">Delete</a>
+
+                    </div> <!-- Card Footer -->
+
+                </div> <!-- End of single card -->
+            </div> <!-- col-12 -->
+
+            {% empty %}
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <p class="card-text mb-0">Congratulations! You don't have any tasks due with your current filters!</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div> <!-- End row for spacing between cards -->
+</div> <!-- End container for small screens -->
+
+
+<!-- ======================================================== -->
+<!-- Table version: Hide the table on d-md and below (<768px) -->
+<!-- ======================================================== -->
+<div class="d-none d-md-block">
+    <div class="container mb-4">           <!-- Outer container for spacing -->
+
+        <!-- Table Wrapper: scrollable on smaller screens -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                
+                <!-- Table Head: sortable columns -->
+                <thead>
+                    <!-- Column headers with sort links/icons -->
+                    <tr>
+                        <!-- Complete flag Header -->
+                        <th>
+                            Complete?
+                        </th>
+
+                        <!-- Task Header -->
+                        <th>
+                            <a href="?sort=name&direction={% if current_sort == 'name' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
+                                Task
+                                {% if current_sort == "name" %}
+                                    {% if current_direction == "asc" %}
+                                        <i class="fa-solid fa-arrow-up ms-1"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-arrow-down ms-1"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </a>
+                        </th>
+
+                        <!-- Plant Header -->
+                        <th>
+                            <a href="?sort=plant&direction={% if current_sort == 'plant' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
+                                Plant
+                                {% if current_sort == "plant" %}
+                                    {% if current_direction == "asc" %}
+                                        <i class="fa-solid fa-arrow-up ms-1"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-arrow-down ms-1"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </a>
+                        </th>
+
+                        <!-- Bed Header -->
+                        <th class="d-none d-md-table-cell">
+                            <a href="?sort=bed&direction={% if current_sort == 'bed' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
+                                Bed
+                                {% if current_sort == "bed" %}
+                                    {% if current_direction == "asc" %}
+                                        <i class="fa-solid fa-arrow-up ms-1"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-arrow-down ms-1"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </a>
+                        </th>
+
+                        <!-- Due Header -->
+                        <th>
+                            <a href="?sort=due&direction={% if current_sort == 'due' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
+                                Due
+                                {% if current_sort == "due" %}
+                                    {% if current_direction == "asc" %}
+                                        <i class="fa-solid fa-arrow-up ms-1"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-arrow-down ms-1"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </a>
+                        </th>
+
+                        <!-- Frequency Header -->
+                        <th class="d-none d-md-table-cell">
+                            <a href="?sort=frequency&direction={% if current_sort == 'frequency' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
+                                Frequency
+                                {% if current_sort == "frequency" %}
+                                    {% if current_direction == "asc" %}
+                                        <i class="fa-solid fa-arrow-up ms-1"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-arrow-down ms-1"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </a>
+                        </th>
+                        
+                        <!-- Actions Header -->
+                        <th class="text-end">
+                            Actions
+                        </th>
+                    </tr> <!-- Column headers with sort links/icons -->
+                </thead>
+
+                <!-- Table Body: data rows -->
+                <tbody>
+                    <!-- Loop through tasks -->
+                    {% for task in tasks %}
+                    
+                    <!-- Conditional logic for row highlighting based on due date -->
+                    <tr
+                    {% if task.next_due < today %}
+                        class="table-danger"
+                    {% elif task.next_due == today %}
+                        class="table-warning"
+                    {% endif %}>
+
+                    <!-- Complete Checkbox -->
+                    <td>
+                        <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <input type="checkbox" onChange="this.form.submit()">
+                            </form>
+                    </td>
+
+                    <!-- Task -->
+                    <td>
+                        <a href="{% url 'task_detail' task.id %}">
+                            {{ task.name }}
+                        </a>
+                    </td>
+
+                    <!--  Plant -->
+                    <td>
+                        <a href="{% url 'plant_detail' task.plant.id %}">
+                            {{ task.plant.name }}
+                        </a>
+                    </td>
+
+                    <!-- bed -->
+                    <td class="d-none d-md-table-cell">
+                        <a href="{% url 'bed_detail' task.plant.bed.id %}">
+                            {{ task.plant.bed.name }}
+                        </a>
+                    </td>
+
+                    <!-- Due -->
+                    <td>
+                        {% if task.next_due < today %}
+                            <i class="fa-solid fa-circle-exclamation text-danger ms-2"
+                            title="This task is overdue"></i>
+                        {% elif task.next_due == today %}
+                            <i class="fa-solid fa-circle-exclamation text-warning ms-2"
+                            title="This task is due today"></i>
+                        {% endif %}
+                        {{ task.next_due }}
+                    </td>
+                    <td class="d-none d-md-table-cell">
+                        {{ task.get_frequency_display }}
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="text-end">
+                        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-outline-primary">Skip</a>
+                    </td>
+                    </tr>
+
+                    <!-- If there are no tasks, display message without the table -->
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            Congratulations! You don't have any tasks due with your current filters!
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+
 
 {% endblock %}
