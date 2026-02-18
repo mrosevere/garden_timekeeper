@@ -10,7 +10,7 @@
 
     <title>{% block title %}Garden Timekeeper{% endblock %}</title>
    
-    <!-- Bootstrap 5 -->
+    <!-- Bootstrap 5 CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -25,8 +25,8 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
 
-    <!-- Summernote CSS (full version, required for image uploads) -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote.min.css" rel="stylesheet">
+    <!-- Summernote CSS for Bootstrap 5 (required for proper toolbar + modal styling) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs5.min.css" rel="stylesheet">
 
     <!-- favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/static/assets/images/favicon/apple-touch-icon.png">
@@ -34,8 +34,6 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/static/assets/images/favicon/favicon-16x16.png">
     <link rel="manifest" href="/static/assets/images/favicon/site.webmanifest">
   </head>
-
-  
 
   <body>
     <!-- Navbar -->
@@ -62,18 +60,18 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <!-- Login Navigation -->
-              {% if user.is_authenticated %}
+            {% if user.is_authenticated %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'logout' %}">Logout</a>
               </li>
-              {% else %}
+            {% else %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'login' %}">Login</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'register' %}">Register</a>
               </li>
-              {% endif %}
+            {% endif %}
             <!-- Page Navigation -->
             <li class="nav-item">
               <a class="nav-link" href="/">Home</a>
@@ -84,13 +82,12 @@
             <li class="nav-item">
               <a class="nav-link" href="/beds">bed List</a>
             </li>
-              <li class="nav-item">
+            <li class="nav-item">
               <a class="nav-link" href="/plants">Plant List</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url 'account_settings' %}">My Account</a>
             </li>
-
           </ul>
         </div>
       </div>
@@ -108,9 +105,8 @@
       </div>
     {% endif %}
 
-
     <!-- Main content -->
-    <main class="container">{% block content %} {% endblock %}</main>
+    <main class="container">{% block content %}{% endblock %}</main>
 
     <!-- Footer -->
     <footer class="footer text-center py-3 mt-4 border-top">
@@ -121,40 +117,28 @@
     <!-- ==     JavaScript Scripts          == -->
     <!-- ===================================== -->
     
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-   <!-- ============================================================
-     Summernote + Dependencies
-     ------------------------------------------------------------
-     These scripts must load in this exact order:
-
-       1. jQuery                → Summernote depends on it
-       2. jQuery UI             → required by File Upload plugin
-       3. jQuery File Upload    → Summernote uses .fileupload()
-       4. Summernote JS         → full version (NOT lite)
-       5. Your custom JS        → must run AFTER all libraries
-
-     IMPORTANT:
-       • Loading these in the wrong order causes "$ is not defined"
-         or "$.fileupload is not a function".
-       • Summernote-Lite does NOT support image uploads.
-   ============================================================ -->
+    <!-- Core JS order:
+         1. jQuery        → required by Summernote
+         2. Summernote JS → rich text editor + image modal
+         3. Bootstrap JS  → modals, collapse, etc.
+    -->
 
     <!-- jQuery (required by Summernote) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- jQuery UI (required by the File Upload plugin) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-    <!-- jQuery File Upload dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/10.32.0/js/vendor/jquery.ui.widget.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/10.32.0/js/jquery.fileupload.js"></script>
-
     <!-- Full Summernote JS (supports image uploads) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote.min.js"></script>
 
-   <!-- End of Summernote dependencies  -->
+    <!-- Bootstrap 5 JS bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Summernote + Bootstrap 5 modal close compatibility patch -->
+    <script>
+      // Ensure Summernote's legacy ".close" buttons close the modal under Bootstrap 5
+      $(document).on('click', '.note-modal .close', function() {
+        $(this).closest('.modal').modal('hide');
+      });
+    </script>
 
     <!-- custom JS (must load AFTER all other dependencies) -->
     <script src="{% static 'assets/js/style.js' %}"></script>
