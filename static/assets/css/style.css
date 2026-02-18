@@ -27,7 +27,6 @@
 
 }
 
-
 /* ===== BUTTON STYLES ===== */
 
 /* Primary Button */
@@ -63,17 +62,39 @@
 
 /* Outline button */
 .btn-outline-primary {
-    color: var(--color-primary) !important;
+    color: black !important;
     border-color: var(--color-primary) !important;
     background-color: transparent !important;
 }
 
 .btn-outline-primary:hover {
-    background-color: var(--color-primary) !important;
+    background-color: var(--color-primary-hover) !important;
+    color: white !important;
+}
+
+.btn-outline-secondary {
+    color: black !important;
+    border-color: var(--color-secondary) !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--color-primary-hover) !important;
     color: white !important;
 }
 
 /* ============= */
+/* Background Danger & Warnings */
+
+.bg-danger {
+    background-color: #f7aa99 !important;
+}
+
+.bg-warning {
+    background-color: #F5F4BD !important;
+}
+/* ============= */
+
 /* === NAV & Login === */
 
 /* Make the nav dropdown text black for better contrast */
@@ -92,8 +113,6 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
     visibility: hidden !important;
 }
 
-
-/* ============= */
 /* ======= HOME PAGE === */
     .home-background .container {
         background: var(--color-nav-footer);

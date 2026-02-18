@@ -150,7 +150,8 @@ def dashboard(request):
     # -----------------------------
     hide_overdue = request.GET.get("hide_overdue") == "1"
     if hide_overdue:
-        tasks = tasks.filter(next_due__gte=start_of_month)
+        # tasks = tasks.filter(next_due__gte=start_of_month)
+        tasks = tasks.filter(next_due__gte=today)
 
     # -----------------------------
     # 5. CONTEXT
@@ -740,7 +741,6 @@ class PlantUpdateView(LoginRequiredMixin, UpdateView):
     def get_form_kwargs(self):
         """
         Extend default form kwargs to include the logged‑in user.
-        
           • PlantForm uses the 'user' kwarg to filter the 'bed' dropdown.
           • This ensures users can only assign plants to their own beds.
           • Prevents cross‑user data leakage through form choices.
@@ -872,7 +872,8 @@ def task_skip(request, task_id):
     task = get_object_or_404(PlantTask, id=task_id, plant__owner=request.user)
     task.skip()
     task.save()
-    return redirect("plant_detail")
+    # Return it to the calling page (HTTP_REFERRER)
+    return redirect(request.META.get("HTTP_REFERER", "dashboard"))
 
 
 @login_required
