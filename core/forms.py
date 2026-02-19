@@ -17,8 +17,25 @@ class GardenBedForm(forms.ModelForm):
     """
 
     class Meta:
+        """
+        Form for creating/editing Garden Beds.
+
+        The "description" field is presented as optional Notes to encourage
+        users to record useful growing conditions or reminders.
+        """
         model = GardenBed
         fields = ["name", "location", "description"]
+
+        # Label the description field as "Notes" as better UX
+        labels = {
+            "description": "Notes",
+        }
+
+        # Add helper text to explain field usage.
+        help_texts = {
+            "description":
+                "Example: Full sun, dries out quickly, slug-prone area.",
+        }
 
         widgets = {
             "name": forms.TextInput(
@@ -26,7 +43,14 @@ class GardenBedForm(forms.ModelForm):
             "location": forms.TextInput(
                 attrs={"class": "form-control"}),
             "description": forms.Textarea(
-                attrs={"class": "form-control", "rows": 3}),
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": (
+                        "optional additional notes"
+                    ),
+                    }
+                ),
         }
 
 
