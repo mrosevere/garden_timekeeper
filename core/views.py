@@ -187,65 +187,57 @@ def dashboard(request):
 
 class BedListView(LoginRequiredMixin, ListView):
     """
-    Displays all GardenBed objects belonging to the logged‑in user.
+    Displays all GardenBed objects belonging to the logged-in user.
 
-    This view powers the main "Your Garden Beds" page and supports:
-      - Per‑user data isolation
-      - Searching
-      - Filtering
+    This view powers the "Your Garden Beds" page and supports:
+      - Per-user data isolation
+      - Searching by name
+      - Filtering by location
       - Sorting
       - Pagination
 
-    It uses Django's ListView, but overrides get_queryset() to apply
-    user‑specific filtering and dynamic query modifications based on
-    GET parameters.
-
-    This keeps the view clean, predictable, and easy to extend.
+    Special UX feature:
+      - Beds with blank location show as "None" in filter dropdown.
+      - Selecting "None" filters for beds with empty location.
     """
 
     model = GardenBed
     template_name = "core/beds/bed_list.html"
-    paginate_by = 3  # Small page size for mobile‑friendly UX
+    paginate_by = 3  # Small page size for mobile-friendly UX
 
     def get_queryset(self):
         """
         Build the queryset dynamically based on user input.
 
-        The order of operations is intentional:
-
-        1. Start with only the beds owned by the logged‑in user.
-        2. Apply a default sort (alphabetical by name).
+        Steps:
+        1. Start with only the beds owned by the logged-in user.
+        2. Apply default sort (alphabetical by name).
         3. Apply optional filters:
-             - search by partial name match
-             - filter by exact location
-        4. Apply optional sorting, but only if the requested sort
-           field is in the allowed list (prevents unsafe ordering).
-
-        This pattern ensures:
-          - predictable behaviour
-          - no cross‑user data leakage
-          - safe, validated sorting
-          - clean, readable logic
+           - search by partial name match
+           - filter by exact location (including "none")
+        4. Apply optional sorting if the requested sort field is allowed.
         """
-
-        # Step 1: User‑scoped base queryset
-        qs = GardenBed.objects.filter(owner=self.request.user)
-
-        # Step 2: Default ordering
-        qs = qs.order_by("name")
+        qs = GardenBed.objects.filter(owner=self.request.user).order_by("name")
 
         # -------------------------
-        # Filtering: Search by name
+        # Search filter
         # -------------------------
         search = self.request.GET.get("search")
         if search:
             qs = qs.filter(name__icontains=search)
 
         # -------------------------
-        # Filtering: Location
+        # Location filter
         # -------------------------
         location = self.request.GET.get("location")
-        if location:
+        if location == "none":
+            # User selected 'None', filter for blank/NULL locations
+            qs = (
+                qs.filter(location__isnull=True)
+                | qs.filter(location__exact="")
+            )
+        elif location:
+            # Filter by exact location match
             qs = qs.filter(location=location)
 
         # -------------------------
@@ -254,14 +246,53 @@ class BedListView(LoginRequiredMixin, ListView):
         allowed_sorts = [
             "name", "-name",
             "location", "-location",
-            "created_at", "-created_at",
+            "created_at", "-created_at"
         ]
-
         sort = self.request.GET.get("sort")
         if sort in allowed_sorts:
             qs = qs.order_by(sort)
 
         return qs
+
+    def get_context_data(self, **kwargs):
+        """
+        Add extra context for template rendering:
+          - location_choices: unique locations for the filter dropdown.
+                Blank locations are represented as ('none', 'None')
+          - sort_options: used to build table headers with sorting links.
+          - current_sort & current_direction: to display arrows.
+        """
+        context = super().get_context_data(**kwargs)
+
+        # Get all unique locations for current user
+        raw_locations = (
+            GardenBed.objects
+            .filter(owner=self.request.user)
+            .values_list("location", flat=True)
+            .distinct()
+            .order_by("location")
+        )
+
+        # Convert blank locations to ('none', 'None') for filter dropdown
+        context['location_choices'] = [
+            (
+                loc if loc else 'none',
+                loc if loc else 'None'
+            ) for loc in raw_locations
+        ]
+
+        # Table sort headers
+        context['sort_options'] = [
+            {'field': 'name', 'label': 'Name'},
+            {'field': 'location', 'label': 'Location'},
+            {'field': 'created_at', 'label': 'Created'},
+        ]
+
+        # Track current sort state to show arrows
+        context['current_sort'] = self.request.GET.get('sort', 'name')
+        context['current_direction'] = self.request.GET.get('direction', 'asc')
+
+        return context
 
 
 class BedDetailView(LoginRequiredMixin, DetailView):
