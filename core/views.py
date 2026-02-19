@@ -547,8 +547,12 @@ class PlantListView(LoginRequiredMixin, ListView):
             "bed__name", "-bed__name",
         ]
 
-        sort = self.request.GET.get("sort")
+        sort = self.request.GET.get("sort", "name")
+        direction = self.request.GET.get("direction", "asc")
+
         if sort in allowed_sorts:
+            if direction == "desc":
+                sort = f"-{sort.lstrip('-')}"
             qs = qs.order_by(sort)
 
         return qs
@@ -563,6 +567,20 @@ class PlantListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["lifespan_choices"] = PlantLifespan.choices
         context["type_choices"] = PlantType.choices
+
+        # Sort options for template
+        context["sort_options"] = [
+            {"field": "name", "label": "Name"},
+            {"field": "planting_date", "label": "Planting Date"},
+            {"field": "type", "label": "Type"},
+            {"field": "lifespan", "label": "Lifespan"},
+            {"field": "bed__name", "label": "Bed"},
+        ]
+
+        # Pass current sort + direction to template
+        context["current_sort"] = self.request.GET.get("sort", "name")
+        context["current_direction"] = self.request.GET.get("direction", "asc")
+
         return context
 
 
