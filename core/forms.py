@@ -1,7 +1,6 @@
 from django import forms
 from .models import GardenBed, Plant, PlantTask
 from crispy_forms.helper import FormHelper
-from django_summernote.widgets import SummernoteWidget
 
 
 # -----------------------------------------------------
@@ -92,22 +91,12 @@ class PlantForm(forms.ModelForm):
                 attrs={"class": "form-control", "type": "date"}
             ),
             "bed": forms.Select(attrs={"class": "form-select"}),
-            "notes": SummernoteWidget(
-                attrs={'summernote': {'airMode': False}}
-                ),
 
+            # Replace SummernoteWidget with a plain textarea
+            "notes": forms.Textarea(attrs={"class": "form-control"}),
         }
 
     def __init__(self, *args, **kwargs):
-        """
-        Initialise the PlantForm with user-specific context.
-
-        This override extracts the logged-in user from kwargs and
-        restricts the 'bed' field queryset to only the GardenBed
-        instances owned by that user. This ensures users can assign
-        plants only to their own beds and prevents cross-user data
-        exposure.
-        """
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
@@ -117,7 +106,7 @@ class PlantForm(forms.ModelForm):
         else:
             self.fields["bed"].queryset = GardenBed.objects.none()
 
-        # Crispy helper (minimal setup for consistency with Task form)
+        # Crispy helper (same as Task)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.include_media = False
