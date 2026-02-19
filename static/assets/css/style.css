@@ -122,6 +122,59 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
     }
 /* ============= */
 
+/* =========================== */
+/* PAGINATION AS BUTTONS       */
+/* =========================== */
+
+/* Pagination container */
+.pagination {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    justify-content: center;  /* center horizontally */
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+/* Page links styled like buttons */
+.pagination .page-link {
+    color: white;
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-secondary);
+    min-width: 38px;
+    padding: 0.375rem 0.75rem;
+    text-align: center;
+    border-radius: 0.375rem; /* rounded like buttons */
+    transition: all 0.2s;
+}
+
+/* Hover state */
+.pagination .page-link:hover {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-secondary-hover, #3d6487);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Active page */
+.pagination .page-item.active .page-link {
+    background-color: var(--color-primary-active);
+    border-color: var(--color-secondary);
+    color: white;
+    font-weight: 600;
+}
+
+/* Disabled page links */
+.pagination .page-item.disabled .page-link {
+    background-color: #d3d3d3;
+    border-color: #b0b0b0;
+    color: #777;
+    cursor: not-allowed;
+}
+
+
+
+/* ==================================== */
+
 body {
     background-color: var(--color-background);
     font-family: 'Inter', sans-serif;
@@ -198,6 +251,13 @@ main {
 
     .note-toolbar {
         flex-wrap: wrap !important;
+    }
+
+/* PAGINATION: Small screens adjustments */
+    .pagination .page-link {
+        padding: 0.25rem 0.5rem;
+        min-width: 30px;
+        font-size: 0.875rem;
     }
 }
 
