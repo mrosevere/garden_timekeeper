@@ -118,8 +118,3 @@ class PlantTaskForm(forms.ModelForm):
             "name": "Task Name",
         }
         fields = "__all__"
-        widgets = {
-            'notes': SummernoteWidget(
-                attrs={'summernote': {'airMode': False}}
-            ),
-        }
