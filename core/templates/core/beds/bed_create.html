@@ -1,15 +1,41 @@
-{% extends "core/base.html" %} {% block content %}
-
+{% extends "core/base.html" %}
 {% load crispy_forms_tags %}
 
+{% block content %}
+
 <div class="container py-4">
-  <h1 class="mb-3">Add a New Garden Bed</h1>
 
-  <form method="post">
-    {% csrf_token %} {{ form|crispy }}
-    <button type="submit" class="btn btn-primary">Create Bed</button>
-  </form>
+  <!-- Page Title -->
+  <h1 class="h3 mb-4">Add a New Garden Bed</h1>
 
-  <a href="{% url 'bed_list' %}" class="btn btn-secondary mt-3">Back to beds</a>
+  <!-- Form Card -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+
+      <form method="post" aria-label="Create new garden bed form">
+        {% csrf_token %}
+
+        <!-- Crispy Form -->
+        {{ form|crispy }}
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 mt-3">
+          <!-- Primary Submit -->
+          <button type="submit" class="btn btn-primary">
+            Create Bed
+          </button>
+
+          <!-- Secondary Cancel -->
+          <a href="{% url 'bed_list' %}" class="btn btn-secondary" style="min-width: 100px;">
+            Cancel
+          </a>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
 </div>
+
 {% endblock %}
