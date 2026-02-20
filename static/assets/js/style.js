@@ -95,3 +95,53 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+// -------------------------------------------------------------
+// Image Delete Button Behaviour
+// -------------------------------------------------------------
+// This script replaces Django's "Clear" checkbox with a proper
+// "Delete image" button that matches your app's styling.
+//
+// When the user clicks "Delete image":
+//   - The hidden Clear checkbox is ticked
+//   - The thumbnail preview disappears
+//   - A red "Image will be removed" message appears
+//
+// If the user clicks the button again (toggle behaviour):
+//   - The checkbox is unticked
+//   - The preview returns
+//   - The message disappears
+//
+// This keeps Django's deletion logic intact while providing
+// modern, intuitive UX.
+// -------------------------------------------------------------
+
+document.addEventListener("DOMContentLoaded", function () {
+    const clearCheckbox = document.querySelector("#id_image-clear");
+    const deleteBtn = document.querySelector("#delete-image-btn");
+    const previewBlock = document.getElementById("current-image-block");
+    const removedMsg = document.getElementById("image-removed-msg");
+
+    if (clearCheckbox && deleteBtn) {
+        deleteBtn.addEventListener("click", function () {
+            const isDeleting = !clearCheckbox.checked;
+
+            // Toggle checkbox
+            clearCheckbox.checked = isDeleting;
+
+            // Toggle preview visibility
+            if (previewBlock) {
+                previewBlock.style.display = isDeleting ? "none" : "block";
+            }
+
+            // Toggle "image will be removed" message
+            if (removedMsg) {
+                removedMsg.style.display = isDeleting ? "block" : "none";
+            }
+
+            // Update button text for clarity
+            deleteBtn.textContent = isDeleting ? "Undo delete" : "Delete image";
+        });
+    }
+});
