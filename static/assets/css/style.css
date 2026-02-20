@@ -256,8 +256,16 @@ th.sortable.sort-desc i {
     opacity: 1;
     color: #0d6efd;
 }
-
 /* END of sortable Table headers */
+
+/* Ensure images inside notes never overflow on mobile */
+.notes-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+
 
 /* ============================================================== */
 /* ==              Media Queries                               == */
