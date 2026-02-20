@@ -1,3 +1,7 @@
+// Reserved for global behaviours (navbar, modals, etc.)
+// Plant Detail Page logic lives in plant_detail.js
+
+
 // Confirm the JS bundle is loaded
 console.log("Garden Timekeeper JS loaded");
 
@@ -98,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // -------------------------------------------------------------
-// Image Delete Button Behaviour
+// 3. Image Delete Button Behaviour
 // -------------------------------------------------------------
 // This script replaces Django's "Clear" checkbox with a proper
 // "Delete image" button that matches your app's styling.
