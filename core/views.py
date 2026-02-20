@@ -20,7 +20,6 @@ from django.urls import reverse_lazy
 from django.db import IntegrityError
 from django.http import JsonResponse
 
-
 from datetime import date
 from calendar import monthrange
 
@@ -627,23 +626,15 @@ class PlantDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "plant"
 
     def get_queryset(self):
-        """
-        Returns query set
-        """
         return Plant.objects.filter(owner=self.request.user)
 
     def get_context_data(self, **kwargs):
-        """
-        Adds context data for view logic
-
-        The context data is used to check whether a task is in season.
-        """
         context = super().get_context_data(**kwargs)
         plant = context["plant"]
 
         today = date.today()
 
-        # Precompute seasonal status for each task
+        # Build enriched task list
         task_info = []
         for task in plant.tasks.all():
             overdue = task.is_overdue()
@@ -657,17 +648,18 @@ class PlantDetailView(LoginRequiredMixin, DetailView):
                 "due_soon": due_soon,
             })
 
-        # Sort order:
-        # 1. Overdue
-        # 2. Due soon
-        # 3. Everything else
+        # Sort tasks
         task_info.sort(
             key=lambda x: (
-                not x["overdue"],  # overdue first
-                not x["due_soon"],  # then due soon
-                x["task"].next_due or date.max  # then by date
-                ))
+                not x["overdue"],
+                not x["due_soon"],
+                x["task"].next_due or date.max
+            )
+        )
+
+        # SEND ALL TASKS TO TEMPLATE as filtering is done client side
         context["task_info"] = task_info
+
         return context
 
 
