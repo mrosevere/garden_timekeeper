@@ -3,42 +3,101 @@
 
 <div class="container py-4">
 
+    <!-- --------------------------------------------------------- -->
+    <!--      Breadcrumb: Plant → Task                             -->
+    <!-- --------------------------------------------------------- -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item">
+                <a href="{% url 'plant_detail' task.plant.id %}">{{ task.plant.name }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {{ task.name }}
+            </li>
+        </ol>
+    </nav>
+
+    <!-- --------------------------------------------------------- -->
+    <!--   Page Title                                              -->
+    <!-- --------------------------------------------------------- -->
     <h1 class="h3 mb-4">{{ task.name }}</h1>
 
-    <div class="card">
+    <div class="card shadow-sm">
         <div class="card-body">
 
-            <p><strong>Plant:</strong>
-                <a href="{% url 'plant_detail' task.plant.id %}">
-                    {{ task.plant.name }}
-                </a>
-            </p>
+            <!-- ---------------------------------------------------------
+               Two-column metadata layout (responsive)
+               dl = Description List, dt = term, dd = description
+               --------------------------------------------------------- -->
+            <dl class="row mb-0">
 
-            <p><strong>Bed:</strong>
-                <a href="{% url 'bed_detail' task.plant.bed.id %}">
-                    {{ task.plant.bed.name }}
-                </a>
-            </p>
+                <dt class="col-sm-3 fw-semibold">Plant</dt>
+                <dd class="col-sm-9">
+                    <a href="{% url 'plant_detail' task.plant.id %}">
+                        {{ task.plant.name }}
+                    </a>
+                </dd>
 
-            <p><strong>Due:</strong> {{ task.next_due }}</p>
-            <p><strong>Frequency:</strong> {{ task.get_frequency_display }}</p>
+                <dt class="col-sm-3 fw-semibold">Bed</dt>
+                <dd class="col-sm-9">
+                    <a href="{% url 'bed_detail' task.plant.bed.id %}">
+                        {{ task.plant.bed.name }}
+                    </a>
+                </dd>
 
+                <dt class="col-sm-3 fw-semibold">Next Due</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-primary-subtle text-primary-emphasis px-3 py-2">
+                        {{ task.next_due }}
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3 fw-semibold">Frequency</dt>
+                <dd class="col-sm-9">
+                    {{ task.get_frequency_display }}
+                </dd>
+
+            </dl>
+
+            <!-- ---------------------------------------------------------
+               Notes section (only shown if present)
+               --------------------------------------------------------- -->
             {% if task.notes %}
-            <p><strong>Notes:</strong></p>
-            <div class="border p-3 bg-light">
+            <hr class="my-4">
+            <h2 class="h6 mb-2">Notes</h2>
+
+            <div class="border rounded p-3 bg-light notes-content">
                 {{ task.notes|safe }}
             </div>
             {% endif %}
 
-            <div class="mt-4 d-flex gap-2">
-                <a href="{% url 'task_update' task.id %}" class="btn btn-primary">Edit Task</a>
-                <a href="{% url 'task_delete' task.id %}" class="btn btn-danger">Delete Task</a>
-                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+            <!-- ---------------------------------------------------------
+               Action buttons
+               --------------------------------------------------------- -->
+            <div class="mt-4 d-flex flex-column flex-sm-row justify-content-between gap-2">
+                <!-- Left: Navigation (left aligned on all screens) -->
+                <div class="d-flex flex-wrap gap-2 order-2 order-sm-1">
+                    <a href="{% url 'plant_detail' task.plant.id %}" class="btn btn-outline-secondary">
+                        Back to Plant
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                        Back to Dashboard
+                    </a>
+                </div>
+
+                <!-- Right: Actions (right aligned on mobile AND desktop) -->
+                <div class="d-flex flex-wrap gap-2 order-1 order-sm-2 ms-sm-auto" style="align-self: flex-end;">
+                    <a href="{% url 'task_update' task.id %}" class="btn btn-primary">
+                        Edit Task
+                    </a>
+                    <a href="{% url 'task_delete' task.id %}" class="btn btn-danger">
+                        Delete Task
+                    </a>
+                </div>
             </div>
 
         </div>
     </div>
-
 </div>
 
 {% endblock %}
