@@ -7,12 +7,12 @@
   <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4 text-center text-sm-start">
       
       <!-- Page Title -->
-      <h1 class="h3 mb-3 px-2">Dashboard</h1>
+      <h1 class="h3 mb-3 px-2">Dashboard - My Tasks</h1>
 
       <!-- Action Buttons -->
        <div>
-          <a href="{% url 'plant_create' %}" class="btn btn-outline-primary me-2">Add Plant</a>
-          <a href="{% url 'bed_create' %}" class="btn btn-outline-primary me-2">Add Bed</a>
+          <a href="{% url 'plant_create' %}" class="btn btn-primary me-2">Add Plant</a>
+          <a href="{% url 'bed_create' %}" class="btn btn-primary me-2">Add Bed</a>
        </div>
   </div>
 </div>
@@ -179,9 +179,16 @@
                         <!-- Location -->
                         <div class="mb-2">
                             <strong>Location:</strong>
-                            <a href="{% url 'bed_detail' task.plant.bed.id %}" class="{% if task.next_due < start_of_month %}text-white{% endif %}">
-                                {{ task.plant.bed.name }}
-                            </a>
+                            {% if task.plant.bed %}
+                                <a href="{% url 'bed_detail' task.plant.bed.id %}"
+                                class="{% if task.next_due < start_of_month %}text-white{% endif %}">
+                                    {{ task.plant.bed.name }}
+                                </a>
+                            {% else %}
+                                <span class="{% if task.next_due < start_of_month %}text-white{% else %}text-muted{% endif %}">
+                                    Unassigned
+                                </span>
+                            {% endif %}
                         </div>
 
                         <!-- Due Date -->
@@ -194,6 +201,12 @@
                     <!-- Card Footer (actions) -->
                     <div class="card-footer d-flex justify-content-end gap-2">
 
+                        <!-- Edit -->
+                        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary" style="min-width:80px;">Edit</a>
+
+                        <!-- Skip -->
+                        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary" style="min-width:70px;">Skip</a>
+
                         <!-- Complete button -->
                         <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
                             {% csrf_token %}
@@ -205,12 +218,6 @@
                                 {% endif %}
                             </button>
                         </form>
-
-                        <!-- Edit -->
-                        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary" style="min-width:80px;">Edit</a>
-
-                        <!-- Delete -->
-                        <a href="{% url 'task_delete' task.id %}" class="btn btn-sm btn-secondary" style="min-width:70px;">Delete</a>
 
                     </div> <!-- Card Footer -->
 
@@ -245,11 +252,6 @@
                 <thead>
                     <!-- Column headers with sort links/icons -->
                     <tr>
-                        <!-- Complete flag Header -->
-                        <th>
-                            Complete?
-                        </th>
-
                         <!-- Task Header -->
                         <th>
                             <a href="?sort=name&direction={% if current_sort == 'name' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
@@ -340,14 +342,6 @@
                         class="table-warning"
                     {% endif %}>
 
-                    <!-- Complete Checkbox -->
-                    <td>
-                        <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
-                            {% csrf_token %}
-                            <input type="checkbox" onChange="this.form.submit()">
-                            </form>
-                    </td>
-
                     <!-- Task -->
                     <td>
                         <a href="{% url 'task_detail' task.id %}">
@@ -364,9 +358,13 @@
 
                     <!-- bed -->
                     <td class="d-none d-md-table-cell">
-                        <a href="{% url 'bed_detail' task.plant.bed.id %}">
-                            {{ task.plant.bed.name }}
-                        </a>
+                        {% if task.plant.bed %}
+                            <a href="{% url 'bed_detail' task.plant.bed.id %}">
+                                {{ task.plant.bed.name }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted">Unassigned</span>
+                        {% endif %}
                     </td>
 
                     <!-- Due -->
@@ -386,8 +384,18 @@
 
                     <!-- Actions -->
                     <td class="text-end">
-                        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-outline-primary">Skip</a>
+                        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary">Skip</a>
+                        <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-primary" style="min-width:80px;">
+                                {% if task.completed %}
+                                    <i class="fa-solid fa-check"></i> Done
+                                {% else %}
+                                    Done
+                                {% endif %}
+                            </button>
+                        </form>
                     </td>
                     </tr>
 
