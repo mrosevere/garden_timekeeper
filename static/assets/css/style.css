@@ -202,8 +202,30 @@ main {
     flex: 1;
 }
 
+/* IMAGE CSS - make the Image fields look better */
 
+.current-image-preview {
+    width: 300px;      /* small size */
+    height: auto;
+    border-radius: 0.5rem;
+    display: block;
+}
 
+.clickable-image {
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.clickable-image:hover {
+    opacity: 0.85;
+}
+
+/* Restrict Image links to the image (not the whole row */
+#current-image-block a {
+    display: inline-block;
+}
+
+/* END OF IMAGE CSS - make the Image fields look better */
 
 
 /* ============================================================== */
