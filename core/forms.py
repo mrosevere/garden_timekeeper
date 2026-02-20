@@ -1,6 +1,8 @@
 from django import forms
+from django.forms.widgets import ClearableFileInput
 from .models import GardenBed, Plant, PlantTask
 from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout
 
 
 # -----------------------------------------------------
@@ -92,7 +94,10 @@ class PlantForm(forms.ModelForm):
             ),
             "bed": forms.Select(attrs={"class": "form-select"}),
 
-            # Replace SummernoteWidget with a plain textarea
+            # set to clearable so user can delete an image
+            "image": ClearableFileInput(attrs={"class": "form-control"}),
+
+            # Notes changed to plain textarea (Summernote initialised manually)
             "notes": forms.Textarea(attrs={"class": "form-control"}),
         }
 
@@ -100,16 +105,42 @@ class PlantForm(forms.ModelForm):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
-        # Restrict beds to the current user
+        # -------------------------------------------------------------
+        # Limit the "bed" dropdown to beds owned by the current user
+        # -------------------------------------------------------------
         if user is not None:
-            self.fields["bed"].queryset = GardenBed.objects.filter(owner=user)
+            self.fields["bed"].queryset = GardenBed.objects.filter(
+                owner=user
+                )
         else:
             self.fields["bed"].queryset = GardenBed.objects.none()
 
-        # Crispy helper (same as Task)
+        # -------------------------------------------------------------
+        # Crispy helper setup
+        # -------------------------------------------------------------
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.include_media = False
+
+        # -------------------------------------------------------------
+        # IMPORTANT:
+        # Prevent crispy from rendering the "image" field automatically.
+        #
+        # Without this, crispy injects Django's default ClearableFileInput
+        # block, which includes:
+        #   - "Currently:"
+        #   - the hashed filename
+        #   - the default Clear checkbox
+        #   - the "Change:" label
+        #   - a duplicate file input
+        #
+        # Prevent crispy from generating a layout or auto‑rendering fields
+        # We render a fully custom image section in the template, so we
+        # explicitly exclude the field here.
+        # -------------------------------------------------------------
+
+        self.helper.layout = Layout()
+        self.helper.exclude = ["image"]
 
 
 # -----------------------------------------------------

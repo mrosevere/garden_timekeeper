@@ -1,93 +1,211 @@
 {% extends "core/base.html" %}
 {% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
 {% block content %}
 
-<div class="container py-4">
+<div class="container mt-4">
+
+    <h2 class="mb-3">Edit: "{{ plant.name }}"</h2>
+
     <div class="card shadow-sm">
         <div class="card-body">
 
-        <h1 class="mb-3">Edit: "{{ plant.name }}"</h1>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
 
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <!-- Name -->
-            {{ form.name|as_crispy_field }}
-
-            <!-- Latin Name -->
-            {{ form.latin_name|as_crispy_field }}
-
-            <!-- Image --> 
-            {{ form.image|as_crispy_field }}
-
-            <!-- Bed + Add New Bed Button -->
-            <div class="mb-3">
-                {{ form.bed.label_tag }}
-                <div class="d-flex align-items-center gap-2">
-                    {{ form.bed }}
-                    <button
-                        type="button"
-                        class="btn btn-outline-secondary btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#createBedModal"
-                    >
-                        + Add new bed
-                    </button>
-                </div>
-            </div>
-
-            <!-- Lifespan -->
-            {{ form.lifespan|as_crispy_field }}
-
-            <!-- Type -->
-            {{ form.type|as_crispy_field }}
-
-            <!-- Planting Date -->
-            {{ form.planting_date|as_crispy_field }}
-
-            <!-- Notes (Summernote) -->
-            {{ form.notes|as_crispy_field }}
-
-            <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
-            <a href="{% url 'plant_list' %}" class="btn btn-secondary mt-3">Cancel</a>
-        </form>
-
-
-        <!-- Create Bed Modal -->
-        <div class="modal fade" id="createBedModal" tabindex="-1" aria-labelledby="createBedModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createBedModalLabel">Create a New Garden Bed</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- ----------------------- -->
+                <!-- Name  Card       -->
+                <!-- ----------------------- -->
+                <div class="card mb-3">
+                    <div class="card-header bg-light">Plant Name</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Name Column-->
+                            <div class="col-sm-12 col-md-6">
+                                {{ form.name|as_crispy_field }}
+                            </div>
+                            <!-- Latin Name Column -->
+                            <div class="col-sm-12 col-md-6">
+                                {{ form.latin_name|as_crispy_field }}
+                            </div>
+                        </div>
                     </div>
+                </div>
+      
 
-                    <form id="bedCreateForm" method="post" action="{% url 'bed_create' %}">
-                        {% csrf_token %}
-                        <div class="modal-body">
-                            {{ bed_form|crispy }}
-                        </div>
+                <!-- Image & Delete button Column -->
+                <div class="card mb-3">
+                    <div class="card-header bg-light">Plant Image</div>
+                    <div class="card-body">
+                        <div class="row">
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Create Bed</button>
+                            <!-- Image File selection Column -->
+                            <div class="col-12">
+
+                                <input type="file" name="image" id="id_image" class="form-control">
+
+                                <input type="checkbox"
+                                    id="id_image-clear"
+                                    name="{{ form.image.name }}-clear"
+                                    style="display:none;">
+
+                                <p id="image-removed-msg" class="text-danger mt-2" style="display:none;">
+                                    Image will be removed when you save.
+                                </p>
+                            </div>
+
+
+                            <!-- Image Preview and Delete Button Column -->
+                             <!-- Image size set in CSS -->
+                            <div class="col-12 d-flex flex-column align-items-center">
+                                {{ form.image.label_tag }}
+
+                                {% if form.instance.image %}
+                                    <div id="current-image-block" class="mb-2">
+                                        <a href="{{ form.instance.image.url }}" target="_blank" rel="noopener noreferrer">
+                                            <img src="{{ form.instance.image.url }}"
+                                                alt="Current image"
+                                                class="img-thumbnail current-image-preview clickable-image">
+                                        </a>
+                                    </div>
+                                {% endif %}
+
+                                <button type="button"
+                                        id="delete-image"
+                                        class="btn btn-danger btn-sm mb-2"
+                                        {% if not form.instance.image %}
+                                            disabled
+                                        {% endif %}>
+                                    Delete image
+                                </button>
+                            </div>
+                            
+
                         </div>
-                    </form>
+                    </div>
+                </div>
+                <!-- End of Image Section -->
+
+                <!-- Placement Card -->
+                <div class="card mb-3">
+                    <div class="card-header bg-light">Placement</div>
+                    <div class="card-body">
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+                                {{ form.bed.label_tag }}
+                                <div class="d-flex align-items-center gap-2">
+                                    {{ form.bed }}
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#createBedModal"
+                                    >
+                                        Create Bed
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form.planting_date|as_crispy_field }}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Type & Lifespan Card -->
+                <div class="card mb-3">
+                    <div class="card-header bg-light">Type & Lifespan</div>
+                    <div class="card-body">
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+                                {{ form.type|as_crispy_field }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form.lifespan|as_crispy_field }}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Section (Not in a card)-->
+                {{ form.notes|as_crispy_field }}
+
+                <!-- Buttons Section -->
+                <div class="mt-3 d-flex justify-content-end gap-2">
+                    <!-- Add Task -->
+                    {% if plant %}
+                        <a href="{% url 'task_create' plant.id %}" class="btn btn-secondary">
+                            Add Task
+                        </a>
+                    {% endif %}
+                    <!-- Cancel -->
+                    <a href="{% url 'plant_list' %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                    <!-- Save -->
+                    <button type="submit" class="btn btn-primary">
+                        Save
+                    </button>
 
                 </div>
-            </div>
-        </div>
 
-        {% if plant %}
-            <a href="{% url 'task_create' plant.id %}" class="btn btn-outline-primary btn-sm mt-3">
-                Add Task for {{ plant.name }}
-            </a>
-        {% endif %}
+
+
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create Bed Modal -->
+<div class="modal fade" id="createBedModal" tabindex="-1" aria-labelledby="createBedModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="createBedModalLabel">Create a New Garden Bed</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="bedCreateForm" method="post" action="{% url 'bed_create' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ bed_form|crispy }}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Bed</button>
+                </div>
+            </form>
 
         </div>
     </div>
 </div>
 
+{% endblock %}
 
+{% block extra_js %}
+<!-- Summernote’s JS and CSS must be loaded before the init code -->
+<script>
+    $(function() {
+        $('#id_notes').summernote({
+            height: 200,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link', 'picture']],
+                ['view', ['fullscreen']]
+            ]
+        });
+    });
+</script>
 {% endblock %}
