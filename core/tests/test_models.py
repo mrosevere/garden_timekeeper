@@ -13,6 +13,10 @@ from core.models import (
 )
 
 
+# =========================================================
+# PLANT TASK MODEL TESTS (UNCHANGED)
+# =========================================================
+
 class PlantTaskModelTests(TestCase):
 
     def setUp(self):
@@ -262,11 +266,10 @@ class GardenBedCreateViewTests(TestCase):
         # Should re-render the form, not redirect
         self.assertEqual(response.status_code, 200)
 
-        self.assertFormError(
-            response,
-            "form",
-            "name",
-            "You already have a bed with this name."
+        form = response.context["form"]
+        self.assertIn(
+            "You already have a bed with this name.",
+            form.errors["name"]
         )
 
         # Still only one bed
