@@ -303,7 +303,7 @@ class PlantTask(models.Model):
         Calculates the next due date based on frequency and seasonal window.
         Does not save the model — just returns the calculated date.
         """
-        today = date.today()
+        today = from_date or date.today()
 
         # --- 1. Handle NEW tasks (no last_done) ---
         if self.last_done is None:

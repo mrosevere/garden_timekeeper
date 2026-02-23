@@ -63,6 +63,6 @@ urlpatterns = [
          task_mark_done, name="task_mark_done"),
     path("tasks/<int:task_id>/skip/",
          task_skip, name="task_skip"),
-    path("tasks/<int:pk>/",
-         TaskDetailView.as_view(), name="task_detail"),
+    path("tasks/<int:pk>/", TaskDetailView.as_view(), name="task_detail"),
+
 ]

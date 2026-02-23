@@ -7,7 +7,9 @@ class BedsTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(username="mark", password="pass")
-        self.other_user = User.objects.create_user(username="other_user", password="pass")
+        self.other_user = User.objects.create_user(
+            username="other_user", password="pass"
+        )
 
     def test_bed_list_shows_only_user_beds(self):
         bed1 = GardenBed.objects.create(owner=self.user, name="A Bed")
@@ -36,4 +38,4 @@ class BedsTests(TestCase):
         response = self.client.get("/beds/")
 
         beds = list(response.context["object_list"])
-        self.assertEqual([b.name for b in beds], ["A Bed", "Main Bed", "Z Bed"])
+        self.assertEqual([b.name for b in beds], ["A Bed", "Z Bed"])

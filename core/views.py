@@ -62,19 +62,42 @@ def dashboard(request):
     view_mode = request.GET.get("view", "month")
 
     # -----------------------------
-    # 2. SELECTED MONTH
+    # 2. SELECTED MONTH & YEAR (validated)
     # -----------------------------
     selected_year = request.GET.get("year")
     selected_month = request.GET.get("month")
 
+    # Default to today
+    year = today.year
+    month = today.month
+
+    # Only attempt parsing if both params exist
     if selected_year and selected_month:
         try:
-            year = int(selected_year)
-            month = int(selected_month)
-        except ValueError:
-            year, month = today.year, today.month
-    else:
-        year, month = today.year, today.month
+            parsed_year = int(selected_year)
+            parsed_month = int(selected_month)
+
+            # Validate BEFORE using
+            date(parsed_year, parsed_month, 1)
+
+            # Assign only after validation succeeds
+            year = parsed_year
+            month = parsed_month
+
+        except Exception:
+            # Fall back to today's year/month
+            year = today.year
+            month = today.month
+
+    # Prevent navigating backwards
+    if (year, month) < (today.year, today.month):
+        year = today.year
+        month = today.month
+
+    # Safe to construct dates now
+    start_of_month = date(year, month, 1)
+    last_day = monthrange(year, month)[1]
+    end_of_month = date(year, month, last_day)
 
     # -----------------------------
     # 2b. MONTH BOUNDARIES
@@ -244,13 +267,14 @@ class BedListView(LoginRequiredMixin, ListView):
         # -------------------------
         # Sorting (validated)
         # -------------------------
-        allowed_sorts = [
-            "name", "-name",
-            "location", "-location",
-            "created_at", "-created_at"
-        ]
-        sort = self.request.GET.get("sort")
+        allowed_sorts = ["name", "location", "created_at"]
+
+        sort = self.request.GET.get("sort", "name")
+        direction = self.request.GET.get("direction", "asc")
+
         if sort in allowed_sorts:
+            if direction == "desc":
+                sort = f"-{sort}"
             qs = qs.order_by(sort)
 
         return qs
@@ -271,7 +295,6 @@ class BedListView(LoginRequiredMixin, ListView):
             .filter(owner=self.request.user)
             .values_list("location", flat=True)
             .distinct()
-            .order_by("location")
         )
 
         # Convert blank locations to ('none', 'None') for filter dropdown
@@ -292,6 +315,7 @@ class BedListView(LoginRequiredMixin, ListView):
         # Track current sort state to show arrows
         context['current_sort'] = self.request.GET.get('sort', 'name')
         context['current_direction'] = self.request.GET.get('direction', 'asc')
+        context["beds"] = context["object_list"]
 
         return context
 
@@ -545,9 +569,6 @@ class PlantListView(LoginRequiredMixin, ListView):
         # Step 1: User‑scoped base queryset
         qs = Plant.objects.filter(owner=self.request.user)
 
-        # Step 2: Default ordering
-        qs = qs.order_by("name")
-
         # -------------------------
         # Filtering: Lifespan
         # -------------------------
@@ -580,20 +601,23 @@ class PlantListView(LoginRequiredMixin, ListView):
         # Sorting (validated)
         # -------------------------
         allowed_sorts = [
-            "name", "-name",
-            "planting_date", "-planting_date",
-            "type", "-type",
-            "lifespan", "-lifespan",
-            "bed__name", "-bed__name",
+            "name",
+            "planting_date",
+            "type",
+            "lifespan",
+            "bed__name",
         ]
 
         sort = self.request.GET.get("sort", "name")
         direction = self.request.GET.get("direction", "asc")
 
         if sort in allowed_sorts:
+            base_sort = sort.lstrip("-")
             if direction == "desc":
-                sort = f"-{sort.lstrip('-')}"
-            qs = qs.order_by(sort)
+                sort = f"-{base_sort}"
+            else:
+                sort = base_sort
+            qs = qs.order_by(sort, "id")
 
         return qs
 
@@ -620,6 +644,7 @@ class PlantListView(LoginRequiredMixin, ListView):
         # Pass current sort + direction to template
         context["current_sort"] = self.request.GET.get("sort", "name")
         context["current_direction"] = self.request.GET.get("direction", "asc")
+        context["plants"] = context["object_list"]
 
         return context
 
@@ -980,7 +1005,7 @@ def task_update(request, task_id):
     })
 
 
-class TaskDetailView(DetailView):
+class TaskDetailView(LoginRequiredMixin, DetailView):
     """
     Task detail view to display the task information to the user
 
@@ -989,3 +1014,6 @@ class TaskDetailView(DetailView):
     model = PlantTask
     template_name = "core/tasks/task_detail.html"
     context_object_name = "task"
+
+    def get_queryset(self):
+        return PlantTask.objects.filter(user=self.request.user)
