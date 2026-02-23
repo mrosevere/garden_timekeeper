@@ -9,7 +9,6 @@ privacy and personalised garden management.
 
 # Django
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import (
@@ -19,6 +18,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.db import IntegrityError
 from django.http import JsonResponse
+from django.utils.safestring import mark_safe
+from django.urls import reverse
+
 
 from datetime import date
 from calendar import monthrange
@@ -373,15 +375,23 @@ class BedCreateView(LoginRequiredMixin, CreateView):
 
         # Detect AJAX request from the modal workflow
         if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            # Return JSON so the page does NOT reload
             return JsonResponse({
                 "success": True,
                 "id": self.object.id,
                 "name": self.object.name,
             })
 
-        # Fallback: normal form submission (full page)
-        messages.success(self.request, "New bed created successfully.")
+        # Normal full-page submission
+        messages.success(
+            self.request,
+            mark_safe(
+                "New bed created successfully! "
+                "<a href='{}' class='btn btn-sm btn-primary ms-2'>"
+                "Add a Plant</a>"
+                .format(reverse('plant_create'))
+            )
+        )
+
         return redirect(self.success_url)
 
     def form_invalid(self, form):
@@ -686,19 +696,31 @@ class PlantCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         """
         Assign the logged-in user as the plant owner and handle duplicate
-        plant names. This method behaves exactly like a normal CreateView
-        except for the duplicate-name handling.
+        plant names. After saving, provide a guided 'Next Step' message
+        encouraging the user to add a task to the new plant.
         """
         form.instance.owner = self.request.user
 
         try:
-            response = super().form_valid(form)
+            self.object = form.save()
         except IntegrityError:
             form.add_error("name", "You already have a plant with this name.")
             return self.form_invalid(form)
 
-        messages.success(self.request, "Plant created successfully.")
-        return response
+        # Enhanced success message with "Add a Task" button
+        messages.success(
+            self.request,
+            mark_safe(
+                "Plant created successfully! "
+                "<a href='{}' class='btn btn-sm btn-primary ms-2'>"
+                "Add a Task</a>"
+                .format(reverse(
+                    'task_create', kwargs={'plant_id': self.object.id}
+                    ))
+            )
+        )
+
+        return redirect(self.success_url)
 
     def get_form_kwargs(self):
         """
@@ -853,10 +875,21 @@ def task_create(request, plant_id):
         if form.is_valid():
             task = form.save(commit=False)
             task.plant = plant
-            # REQUIRED for per-user ownership (issue-118)
-            task.user = request.user
+            task.user = request.user  # REQUIRED for per-user ownership
             task.next_due = task.calculate_next_due()
             task.save()
+
+            # Enhanced success message with "View Dashboard" button
+            messages.success(
+                request,
+                mark_safe(
+                    "Task created successfully! "
+                    "<a href='{}' class='btn btn-sm btn-primary ms-2'>"
+                    "View Dashboard</a>"
+                    .format(reverse('dashboard'))
+                )
+            )
+
             return redirect("plant_detail", pk=plant.id)
     else:
         form = PlantTaskForm()
