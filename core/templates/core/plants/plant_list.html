@@ -184,6 +184,7 @@
               {# Build link preserving current filters #}
               <a href="?sort={{ option.field }}&direction={% if current_sort == option.field and current_direction == 'asc' %}desc{% else %}asc{% endif %}&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}">
                 {{ option.label }}
+
                 {% if current_sort == option.field %}
                   {% if current_direction == "asc" %}
                     <i class="fa-solid fa-arrow-up ms-1"></i>

@@ -8,13 +8,23 @@ class PlantViewTests(TestCase):
 
     def setUp(self):
         # Users
-        self.user = User.objects.create_user(username="mark", password="pass")
-        self.other_user = User.objects.create_user(username="other", password="pass")
+        self.user = User.objects.create_user(
+            username="mark", password="pass"
+        )
+        self.other_user = User.objects.create_user(
+            username="other", password="pass"
+        )
 
         # Beds
-        self.bed1 = GardenBed.objects.create(owner=self.user, name="Bed A")
-        self.bed2 = GardenBed.objects.create(owner=self.user, name="Bed B")
-        self.other_bed = GardenBed.objects.create(owner=self.other_user, name="Other Bed")
+        self.bed1 = GardenBed.objects.create(
+            owner=self.user, name="Bed A"
+        )
+        self.bed2 = GardenBed.objects.create(
+            owner=self.user, name="Bed B"
+        )
+        self.other_bed = GardenBed.objects.create(
+            owner=self.other_user, name="Other Bed"
+        )
 
         # Plants
         self.plant1 = Plant.objects.create(
@@ -51,7 +61,9 @@ class PlantViewTests(TestCase):
         self.assertIn("/accounts/login/", response.url)
 
     def test_plant_detail_requires_login(self):
-        response = self.client.get(reverse("plant_detail", args=[self.plant1.pk]))
+        response = self.client.get(
+            reverse("plant_detail", args=[self.plant1.pk])
+        )
         self.assertEqual(response.status_code, 302)
 
     # ---------------------------------------------------------
@@ -84,7 +96,9 @@ class PlantViewTests(TestCase):
     def test_plant_list_filter_by_bed(self):
         self.client.login(username="mark", password="pass")
 
-        response = self.client.get(reverse("plant_list") + f"?bed={self.bed1.id}")
+        response = self.client.get(
+            reverse("plant_list") + f"?bed={self.bed1.id}"
+        )
         plants = response.context["plants"]
 
         self.assertIn(self.plant1, plants)
@@ -111,11 +125,13 @@ class PlantViewTests(TestCase):
     def test_plant_list_sorting(self):
         self.client.login(username="mark", password="pass")
 
-        response = self.client.get(reverse("plant_list") + "?sort=name&direction=desc")
+        response = self.client.get(
+            reverse("plant_list") + "?sort=name&direction=desc"
+        )
         plants = list(response.context["plants"])
 
-        self.assertEqual(plants[0], self.plant2)  # Rose
-        self.assertEqual(plants[1], self.plant1)  # Tomato
+        self.assertEqual(plants[0], self.plant1)  # Tomato
+        self.assertEqual(plants[1], self.plant2)  # Rose
 
     # ---------------------------------------------------------
     # DETAIL VIEW
@@ -123,13 +139,17 @@ class PlantViewTests(TestCase):
 
     def test_user_can_view_own_plant_detail(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.get(reverse("plant_detail", args=[self.plant1.pk]))
+        response = self.client.get(
+            reverse("plant_detail", args=[self.plant1.pk])
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/plants/plant_detail.html")
 
     def test_user_cannot_view_other_users_plant(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.get(reverse("plant_detail", args=[self.other_plant.pk]))
+        response = self.client.get(
+            reverse("plant_detail", args=[self.other_plant.pk])
+        )
 
         self.assertEqual(response.status_code, 404)
