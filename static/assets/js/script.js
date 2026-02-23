@@ -3,7 +3,7 @@
 
 
 // Confirm the JS bundle is loaded
-console.log("Garden Timekeeper JS loaded");
+// console.log("Garden Timekeeper JS loaded");
 
 
 // ------------------------------------------------------------
@@ -149,3 +149,83 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+
+// -------------------------------------------------------------
+// 4. Summernote Initialiser (Bootstrap 5 Compatible)
+//
+// This helper function applies a fully‑patched Summernote editor
+// to any field selector. Summernote was originally built for
+// Bootstrap 3/4, so Bootstrap 5 breaks several behaviours:
+//   - Dropdowns no longer open/close correctly
+//   - Tooltips fail to initialise
+//   - The Style dropdown stays open after selection
+//   - Heading 2 does not apply due to a Summernote quirk
+//
+// This function:
+//   • Initialises Summernote with a consistent toolbar
+//   • Rewrites legacy data‑toggle attributes to Bootstrap 5
+//   • Re‑initialises tooltips and dropdowns using Bootstrap 5 APIs
+//   • Forces the Style dropdown to close after selecting an option
+//   • Overrides the broken H2 behaviour with a reliable formatBlock call
+//
+// Usage:
+//   initSummernoteWithBootstrap5('#id_notes');
+//   initSummernoteWithBootstrap5('#id_task_notes', 300);
+//
+// This keeps all Summernote fixes in one place and ensures that
+// any page using a notes field behaves consistently.
+// -------------------------------------------------------------
+function initSummernoteWithBootstrap5(selector, height = 200) {
+    $(selector).summernote({
+        height: height,
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link', 'picture']],
+            ['view', ['fullscreen']]
+        ],
+        callbacks: {
+            onInit: function() {
+                const $editor = $(selector).next('.note-editor');
+
+                // Fix dropdowns
+                $editor.find('[data-toggle="dropdown"]')
+                    .attr('data-bs-toggle', 'dropdown')
+                    .removeAttr('data-toggle');
+
+                // Fix tooltips
+                $editor.find('[data-toggle="tooltip"]')
+                    .attr('data-bs-toggle', 'tooltip')
+                    .removeAttr('data-toggle');
+
+                // Reinitialise Bootstrap tooltips
+                $editor.find('[data-bs-toggle="tooltip"]').each(function() {
+                    new bootstrap.Tooltip(this);
+                });
+
+                // Reinitialise Bootstrap dropdowns
+                $editor.find('[data-bs-toggle="dropdown"]').each(function() {
+                    new bootstrap.Dropdown(this);
+                });
+
+                // Close Style dropdown after selection
+                $editor.find('.note-dropdown-menu a').on('click', function () {
+                    const dropdownButton = $(this)
+                        .closest('.note-btn-group')
+                        .find('[data-bs-toggle="dropdown"]')[0];
+
+                    const dropdown = bootstrap.Dropdown.getInstance(dropdownButton);
+                    if (dropdown) dropdown.hide();
+                });
+
+                // Fix Heading 2 not applying
+                $editor.find('.note-dropdown-menu a[data-value="h2"]').on('click', function (e) {
+                    e.preventDefault();
+                    $(selector).summernote('formatBlock', 'H2');
+                });
+            }
+        }
+    });
+}

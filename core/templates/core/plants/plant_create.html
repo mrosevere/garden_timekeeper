@@ -74,20 +74,3 @@
 
 </div>
 {% endblock %}
-
-{% block extra_js %}
-<script>
-    $(function() {
-        $('#id_notes').summernote({
-            height: 200,
-            toolbar: [
-                ['style', ['style']],
-                ['font', ['bold', 'italic', 'underline', 'clear']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['insert', ['link', 'picture']],
-                ['view', ['fullscreen']]
-            ]
-        });
-    });
-</script>
-{% endblock %}
