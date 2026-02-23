@@ -11,48 +11,66 @@ from crispy_forms.layout import Layout
 class GardenBedForm(forms.ModelForm):
     """
     A ModelForm for creating and editing GardenBed instances.
-
-    This form provides Bootstrap styled widgets for all fields to
-    ensure consistent UI across the application. It exposes the
-    name, location, and description fields from the GardenBed model.
+    Includes duplicate-name validation to prevent DB IntegrityErrors.
     """
 
-    class Meta:
-        """
-        Form for creating/editing Garden Beds.
+    def __init__(self, *args, **kwargs):
+        # Capture the user passed in from the view
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
 
-        The "description" field is presented as optional Notes to encourage
-        users to record useful growing conditions or reminders.
-        """
+    class Meta:
         model = GardenBed
         fields = ["name", "location", "description"]
 
-        # Label the description field as "Notes" as better UX
         labels = {
             "description": "Notes",
         }
 
-        # Add helper text to explain field usage.
         help_texts = {
             "description":
                 "Example: Full sun, dries out quickly, slug-prone area.",
         }
 
         widgets = {
-            "name": forms.TextInput(
-                attrs={"class": "form-control"}),
-            "location": forms.TextInput(
-                attrs={"class": "form-control"}),
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "location": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(
                 attrs={
                     "class": "form-control",
                     "rows": 3,
-                    "placeholder": (
-                        "optional additional notes"
-                    ),
-                    }
-                ),
+                    "placeholder": "optional additional notes",
+                }
+            ),
         }
+
+    # -----------------------------------------------------
+    #   Duplicate Name Validation (case-insensitive)
+    # -----------------------------------------------------
+    def clean_name(self):
+        """
+        Prevent duplicate bed names (case-insensitive) for the same user.
+        This avoids DB-level IntegrityErrors during tests.
+        """
+        name = self.cleaned_data["name"].strip()
+
+        # Determine owner:
+        # - CreateView: user passed via get_form_kwargs()
+        # - UpdateView: instance.owner already set
+        owner = self.user or getattr(self.instance, "owner", None)
+
+        qs = GardenBed.objects.filter(owner=owner, name__iexact=name)
+
+        # Exclude current instance when editing
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise forms.ValidationError(
+                "You already have a bed with this name."
+            )
+
+        return name
 
 
 # -----------------------------------------------------
