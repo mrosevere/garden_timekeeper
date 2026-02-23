@@ -177,8 +177,9 @@ else:
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# where to send the user on login
-LOGIN_REDIRECT_URL = "dashboard"
+# Fallback redirect (should be taken from the accounts\login_view)
+# used ifI switch to Django’s built‑in LoginView
+LOGIN_REDIRECT_URL = "home"
 
 # Force user to login again after browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = os.getenv(
