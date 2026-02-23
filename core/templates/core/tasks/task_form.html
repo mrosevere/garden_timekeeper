@@ -4,7 +4,16 @@
 {% block content %}
 <div class="container mt-4">
 
-    <h2 class="mb-3">{{ title }} for {{ plant.name }}</h2>
+    <h2 class="mb-3">
+    {{ title }}
+    <!-- Add guard for missing plant -->
+    {% if plant %}
+        for {{ plant.name }}
+    {% else %}
+        <span class="text-muted">(No plant assigned)</span>
+    {% endif %}
+    </h2>
+
 
     <div class="card shadow-sm">
         <div class="card-body">

@@ -171,9 +171,17 @@
                         <!-- Plant Name -->
                         <div class="mb-2">
                             <strong>Plant:</strong>
-                            <a href="{% url 'plant_detail' task.plant.id %}" class="{% if task.next_due < start_of_month %}text-white{% endif %}">
-                                {{ task.plant.name }}
-                            </a>
+                            <!-- Add guard for missing plant -->
+                            {% if task.plant %}
+                                <a href="{% url 'plant_detail' task.plant.id %}"
+                                class="{% if task.next_due < start_of_month %}text-white{% endif %}">
+                                    {{ task.plant.name }}
+                                </a>
+                            {% else %}
+                                <span class="{% if task.next_due < start_of_month %}text-white{% else %}text-muted{% endif %}">
+                                    No plant
+                                </span>
+                            {% endif %}
                         </div>
 
                         <!-- Location -->
@@ -202,7 +210,7 @@
                     <div class="card-footer d-flex justify-content-end gap-2">
 
                         <!-- Edit -->
-                        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary" style="min-width:80px;">Edit</a>
+                        <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-secondary" style="min-width:80px;">Edit</a>
 
                         <!-- Skip -->
                         <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary" style="min-width:70px;">Skip</a>
@@ -351,9 +359,14 @@
 
                     <!--  Plant -->
                     <td>
-                        <a href="{% url 'plant_detail' task.plant.id %}">
-                            {{ task.plant.name }}
-                        </a>
+                        <!-- Add guard for missing plant -->
+                        {% if task.plant %}
+                            <a href="{% url 'plant_detail' task.plant.id %}">
+                                {{ task.plant.name }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted">No plant</span>
+                        {% endif %}
                     </td>
 
                     <!-- bed -->
@@ -384,7 +397,7 @@
 
                     <!-- Actions -->
                     <td class="text-end">
-                        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                        <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-secondary">Edit</a>
                         <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary">Skip</a>
                         <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
                             {% csrf_token %}
