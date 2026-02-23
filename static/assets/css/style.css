@@ -265,6 +265,32 @@ th.sortable.sort-desc i {
     display: block;
 }
 
+/* Custom styling for Summernote toolbar buttons */
+.note-editor .note-btn.active,
+.note-editor .note-btn:active {
+    background-color: var(--bs-primary-bg-subtle, #d0e3ff) !important;
+    border-color: var(--bs-primary-border-subtle, #9ec5fe) !important;
+    color: var(--bs-primary-text, #084298) !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.15);
+}
+
+/* Fix Summernote fullscreen mode under Bootstrap 5 */
+.note-editor.note-frame.fullscreen {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1050 !important; /* above modals */
+    background: #fff !important;
+}
+
+.note-editor.note-frame.fullscreen .note-editable {
+    height: calc(100% - 50px) !important; /* leave room for toolbar */
+    overflow-y: auto !important;
+}
 
 
 /* ============================================================== */
