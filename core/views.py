@@ -366,7 +366,7 @@ class BedCreateView(LoginRequiredMixin, CreateView):
 
     1. **AJAX modal submission**
        - Triggered when the user clicks “Add new bed”
-        inside the Plant Create/Edit pages.
+         inside the Plant Create/Edit pages.
        - The modal form submits via fetch() with the header:
              X-Requested-With: XMLHttpRequest
        - Instead of redirecting, we return JSON so the page does NOT reload.
@@ -388,17 +388,43 @@ class BedCreateView(LoginRequiredMixin, CreateView):
     template_name = "core/beds/bed_create.html"
     success_url = reverse_lazy("bed_list")  # Used ONLY for non-AJAX fallback
 
+    # ---------------------------------------------------------
+    # Inject the user into the form BEFORE validation
+    # ---------------------------------------------------------
+    def get_form_kwargs(self):
+        """
+        Ensures the form receives the logged-in user so that
+        duplicate-name validation can run BEFORE hitting the
+        database. This prevents IntegrityErrors during tests.
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    # ---------------------------------------------------------
+    # Handle valid form submissions
+    # ---------------------------------------------------------
     def form_valid(self, form):
         """
         Called when the form is valid.
 
-        We attach the logged-in user as the bed owner, then decide whether
-        to return JSON (AJAX modal) or redirect (normal form).
+        - Assigns the owner to the logged-in user.
+        - Attempts to save the new GardenBed.
+        - If a DB-level IntegrityError occurs (should be rare now
+          that the form validates duplicates), we convert it into
+          a clean form error instead of crashing.
+        - Returns JSON for AJAX requests or redirects normally.
         """
         form.instance.owner = self.request.user
-        self.object = form.save()
 
-        # Detect AJAX request from the modal workflow
+        try:
+            self.object = form.save()
+        except IntegrityError:
+            # Safety net — form should catch duplicates first
+            form.add_error("name", "You already have a bed with this name.")
+            return self.form_invalid(form)
+
+        # AJAX path
         if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return JsonResponse({
                 "success": True,
@@ -406,7 +432,7 @@ class BedCreateView(LoginRequiredMixin, CreateView):
                 "name": self.object.name,
             })
 
-        # Normal full-page submission
+        # Normal path
         messages.success(
             self.request,
             mark_safe(
@@ -419,6 +445,9 @@ class BedCreateView(LoginRequiredMixin, CreateView):
 
         return redirect(self.success_url)
 
+    # ---------------------------------------------------------
+    # Handle invalid form submissions
+    # ---------------------------------------------------------
     def form_invalid(self, form):
         """
         Handles invalid form submissions.
