@@ -141,10 +141,18 @@
     </script>
 
     <!-- custom JS (must load AFTER all other dependencies) -->
-    <script src="{% static 'assets/js/style.js' %}"></script>
+    <script src="{% static 'assets/js/script.js' %}"></script>
 
     <!-- Page-specific JS (e.g., Summernote init code) -->
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}
+    <script>
+        $(function() {
+            if ($('#id_notes').length) {
+                initSummernoteWithBootstrap5('#id_notes');
+            }
+        });
+    </script>
+    {% endblock %}
 
   </body>
 </html>
