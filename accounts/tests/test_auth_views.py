@@ -46,7 +46,7 @@ class AuthTests(TestCase):
 
         self.assertIn("_auth_user_id", self.client.session)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "core/dashboard.html")
+        self.assertTemplateUsed(response, "core/home.html")
 
     # ================== Failed login Attempts ==================
     def test_login_fails_with_no_credentials(self):
