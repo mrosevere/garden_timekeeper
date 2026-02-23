@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase, RequestFactory
 from django.template import Context, Template
-from core.templatetags.navigation_tags import active
+# from core.templatetags.navigation_tags import active
 from core.templatetags.month_filters import month_name, to
 
 

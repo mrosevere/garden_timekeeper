@@ -8,13 +8,23 @@ class BedViewTests(TestCase):
 
     def setUp(self):
         # Users
-        self.user = User.objects.create_user(username="mark", password="pass")
-        self.other_user = User.objects.create_user(username="other", password="pass")
+        self.user = User.objects.create_user(
+            username="mark", password="pass"
+        )
+        self.other_user = User.objects.create_user(
+            username="other", password="pass"
+        )
 
         # Beds
-        self.bed1 = GardenBed.objects.create(owner=self.user, name="A Bed", location="North")
-        self.bed2 = GardenBed.objects.create(owner=self.user, name="Z Bed", location="South")
-        self.other_bed = GardenBed.objects.create(owner=self.other_user, name="Other Bed")
+        self.bed1 = GardenBed.objects.create(
+            owner=self.user, name="A Bed", location="North"
+        )
+        self.bed2 = GardenBed.objects.create(
+            owner=self.user, name="Z Bed", location="South"
+        )
+        self.other_bed = GardenBed.objects.create(
+            owner=self.other_user, name="Other Bed"
+        )
 
     # ---------------------------------------------------------
     # LOGIN REQUIRED
@@ -80,7 +90,9 @@ class BedViewTests(TestCase):
     def test_bed_list_sorting(self):
         self.client.login(username="mark", password="pass")
 
-        response = self.client.get(reverse("bed_list") + "?sort=name&direction=desc")
+        response = self.client.get(
+            reverse("bed_list") + "?sort=name&direction=desc"
+        )
         beds = list(response.context["beds"])
 
         self.assertEqual(beds[0], self.bed2)  # Z Bed
@@ -99,7 +111,9 @@ class BedViewTests(TestCase):
 
     def test_user_cannot_view_other_users_bed(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.get(reverse("bed_detail", args=[self.other_bed.pk]))
+        response = self.client.get(
+            reverse("bed_detail", args=[self.other_bed.pk])
+        )
 
         self.assertEqual(response.status_code, 404)
 
@@ -117,7 +131,11 @@ class BedViewTests(TestCase):
         })
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(GardenBed.objects.filter(name="Herb Bed", owner=self.user).exists())
+        self.assertTrue(
+            GardenBed.objects.filter(
+                name="Herb Bed", owner=self.user
+            ).exists()
+        )
 
     # ---------------------------------------------------------
     # EDIT VIEW
@@ -139,11 +157,13 @@ class BedViewTests(TestCase):
     def test_user_cannot_edit_other_users_bed(self):
         self.client.login(username="mark", password="pass")
 
-        response = self.client.post(reverse("bed_edit", args=[self.other_bed.pk]), {
-            "name": "Hacked",
-            "description": "Hacked",
-            "location": "Hacked",
-        })
+        response = self.client.post(
+            reverse("bed_edit", args=[self.other_bed.pk]), {
+                "name": "Hacked",
+                "description": "Hacked",
+                "location": "Hacked",
+            }
+        )
 
         self.assertEqual(response.status_code, 404)
 
@@ -161,5 +181,7 @@ class BedViewTests(TestCase):
     def test_user_cannot_delete_other_users_bed(self):
         self.client.login(username="mark", password="pass")
 
-        response = self.client.post(reverse("bed_delete", args=[self.other_bed.pk]))
+        response = self.client.post(
+            reverse("bed_delete", args=[self.other_bed.pk])
+        )
         self.assertEqual(response.status_code, 404)
