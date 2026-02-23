@@ -42,7 +42,7 @@ def login_view(request):
         * Field-level error messages.
     - This view focuses solely on flow control and user feedback.
     """
-    print(">>> USING CUSTOM LOGIN_VIEW <<<")
+    # print(">>> USING CUSTOM LOGIN_VIEW <<<")
 
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
