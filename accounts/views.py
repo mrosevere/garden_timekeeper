@@ -23,23 +23,27 @@ def login_view(request):
     Handle user login using the custom LoginForm.
 
     Workflow:
-    - GET request: display a blank login form
+    - GET request:
+        → Display a blank login form.
     - POST request:
-        * Bind submitted data to LoginForm
-        * Validate credentials using Django's authentication backend
-        * On success:
-           - log the user in,
-           -  apply remember-me logic,
-           -  redirect to dashboard
-        * On failure: re-render the form with field-level and general errors
+        → Bind submitted data to LoginForm.
+        → Validate credentials using Django's authentication backend.
+        → On success:
+              * Log the user in.
+              * Apply 'Remember me' session‑expiry logic.
+              * Redirect to the home page.
+        → On failure:
+              * Re-render the form with field-level and general errors.
 
-    The LoginForm handles:
-    - Username/password validation
-    - Bootstrap styling via __init__
-    - Field-level error messages
-
-    The view focuses solely on flow control and user feedback.
+    Notes:
+    - The LoginForm handles:
+        * Username/password validation.
+        * Bootstrap styling via __init__.
+        * Field-level error messages.
+    - This view focuses solely on flow control and user feedback.
     """
+    print(">>> USING CUSTOM LOGIN_VIEW <<<")
+
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
 
@@ -47,20 +51,29 @@ def login_view(request):
             user = form.get_user()
             remember_me = request.POST.get("remember_me")
 
+            # Log the user in
             login(request, user)
 
+            # -----------------------------
             # Session expiry logic
+            # -----------------------------
+            # If 'Remember me' is NOT ticked:
+            #   → Session expires when the browser closes.
+            # If 'Remember me' IS ticked:
+            #   → Session persists for 2 weeks (1209600 seconds).
             if not remember_me:
-                request.session.set_expiry(0)  # Ends when browser closes
+                request.session.set_expiry(0)  # Browser-session cookie
             else:
-                request.session.set_expiry(1209600)  # 2 weeks
+                request.session.set_expiry(1209600)  # 14 days
 
             messages.success(request, f"Welcome back {user.username}!")
-            return redirect("dashboard")
+            return redirect("home")  # Redirect to home page after login
 
+        # Invalid credentials → show error message
         messages.error(request, "Invalid username or password")
 
     else:
+        # GET request → blank form
         form = LoginForm()
 
     return render(request, "accounts/login.html", {"form": form})
