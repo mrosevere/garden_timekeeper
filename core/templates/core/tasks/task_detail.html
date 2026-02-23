@@ -9,7 +9,12 @@
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb small">
             <li class="breadcrumb-item">
-                <a href="{% url 'plant_detail' task.plant.id %}">{{ task.plant.name }}</a>
+                <!-- Add Guard if task.plant is missing -->
+                {% if task.plant %}
+                    <a href="{% url 'plant_detail' task.plant.id %}">{{ task.plant.name }}</a>
+                {% else %}
+                    <span class="text-muted">No plant</span>
+                {% endif %}
             </li>
             <li class="breadcrumb-item active" aria-current="page">
                 {{ task.name }}
@@ -31,18 +36,29 @@
                --------------------------------------------------------- -->
             <dl class="row mb-0">
 
-                <dt class="col-sm-3 fw-semibold">Plant</dt>
-                <dd class="col-sm-9">
+            <dt class="col-sm-3 fw-semibold">Plant</dt>
+            <dd class="col-sm-9">
+                <!-- Add guard in case task is ever left without a plant 
+                 (shouldn't happen but just in case) -->
+                {% if task.plant %}
                     <a href="{% url 'plant_detail' task.plant.id %}">
                         {{ task.plant.name }}
                     </a>
-                </dd>
+                {% else %}
+                    <span class="text-muted">No plant assigned</span>
+                {% endif %}
+            </dd>
 
                 <dt class="col-sm-3 fw-semibold">Bed</dt>
                 <dd class="col-sm-9">
-                    <a href="{% url 'bed_detail' task.plant.bed.id %}">
-                        {{ task.plant.bed.name }}
-                    </a>
+                    <!-- Handle plants that do not have a bed assigned -->
+                    {% if task.plant.bed %}
+                        <a href="{% url 'bed_detail' task.plant.bed.id %}">
+                            {{ task.plant.bed.name }}
+                        </a>
+                    {% else %}
+                        <span class="text-muted">No bed assigned</span>
+                    {% endif %}
                 </dd>
 
                 <dt class="col-sm-3 fw-semibold">Next Due</dt>
