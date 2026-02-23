@@ -1,7 +1,16 @@
 import datetime
 from django.test import TestCase
 from django.contrib.auth.models import User
-from core.models import Plant, GardenBed, PlantTask, PlantType, PlantLifespan
+from django.urls import reverse
+from django.db import IntegrityError
+
+from core.models import (
+    Plant,
+    GardenBed,
+    PlantTask,
+    PlantType,
+    PlantLifespan,
+)
 
 
 class PlantTaskModelTests(TestCase):
@@ -80,10 +89,6 @@ class PlantTaskModelTests(TestCase):
     # ---------------------------------------------------------
 
     def test_next_due_for_new_task_in_season(self):
-        """
-        If last_done is None and today is in season,
-        next_due should be today.
-        """
         task = PlantTask(
             plant=self.plant,
             user=self.user,
@@ -97,10 +102,6 @@ class PlantTaskModelTests(TestCase):
         self.assertEqual(result, test_date)
 
     def test_next_due_for_new_task_before_season(self):
-        """
-        If last_done is None and today is BEFORE the seasonal window,
-        next_due should be the first day of the season THIS YEAR.
-        """
         task = PlantTask(
             plant=self.plant,
             user=self.user,
@@ -114,10 +115,6 @@ class PlantTaskModelTests(TestCase):
         self.assertEqual(result, datetime.date(2024, 6, 1))
 
     def test_next_due_for_new_task_after_season(self):
-        """
-        If last_done is None and today is AFTER the seasonal window,
-        next_due should be the first day of NEXT YEAR'S season.
-        """
         task = PlantTask(
             plant=self.plant,
             user=self.user,
@@ -154,7 +151,7 @@ class PlantTaskModelTests(TestCase):
         )
 
         result = task.calculate_next_due(from_date=datetime.date(2024, 1, 31))
-        self.assertEqual(result, datetime.date(2024, 2, 29))  # leap year
+        self.assertEqual(result, datetime.date(2024, 2, 29))
 
     def test_next_due_recurring_respects_season(self):
         task = PlantTask(
@@ -167,7 +164,6 @@ class PlantTaskModelTests(TestCase):
             seasonal_end_month=6,
         )
 
-        # 7 days after Jan 1 is Jan 8 → out of season → should roll forward
         result = task.calculate_next_due(from_date=datetime.date(2024, 1, 1))
         self.assertEqual(result, datetime.date(2024, 4, 1))
 
@@ -230,3 +226,51 @@ class PlantTaskModelTests(TestCase):
 
         task.skip()
         self.assertEqual(task.next_due, datetime.date(2024, 4, 1))
+
+
+# =========================================================
+# NEW TESTS — DUPLICATE BED NAME VALIDATION
+# =========================================================
+
+class GardenBedModelTests(TestCase):
+    """Ensure DB-level uniqueness constraint works."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="mark", password="pass")
+
+    def test_duplicate_bed_name_raises_integrity_error(self):
+        GardenBed.objects.create(owner=self.user, name="Herbs")
+
+        with self.assertRaises(IntegrityError):
+            GardenBed.objects.create(owner=self.user, name="herbs")
+
+
+class GardenBedCreateViewTests(TestCase):
+    """Ensure the CreateView shows a clean form error instead of crashing."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="mark", password="pass")
+        self.client.login(username="mark", password="pass")
+        GardenBed.objects.create(owner=self.user, name="Herbs")
+
+    def test_duplicate_bed_name_shows_form_error(self):
+        response = self.client.post(
+            reverse("bed_create"),
+            {"name": "herbs", "location": ""}
+        )
+
+        # Should re-render the form, not redirect
+        self.assertEqual(response.status_code, 200)
+
+        self.assertFormError(
+            response,
+            "form",
+            "name",
+            "You already have a bed with this name."
+        )
+
+        # Still only one bed
+        self.assertEqual(
+            GardenBed.objects.filter(owner=self.user).count(),
+            1
+        )
