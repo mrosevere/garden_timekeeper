@@ -99,13 +99,22 @@ WSGI_APPLICATION = 'garden_timekeeper.wsgi.application'
 # Database
 # If DATABASE_URL exists, us it. Otherwise fll back to SQLLite
 # (Uses SQLite for development and testing (when there is no URL))
-DATABASES = {
-    'default': dj_database_url.parse(
-        os.getenv("DATABASE_URL", "sqlite:///db.sqlite3"),
-        conn_max_age=600,
-        ssl_require=False
-    )
-}
+if dj_database_url:
+    DATABASES = {
+        'default': dj_database_url.parse(
+            os.getenv("DATABASE_URL", "sqlite:///db.sqlite3"),
+            conn_max_age=600,
+            ssl_require=False
+        )
+    }
+else:
+    # Fallback for test environment
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation

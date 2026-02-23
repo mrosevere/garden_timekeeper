@@ -130,8 +130,8 @@ class PlantViewTests(TestCase):
         )
         plants = list(response.context["plants"])
 
-        self.assertEqual(plants[0], self.plant2)  # Rose
-        self.assertEqual(plants[1], self.plant1)  # Tomato
+        self.assertEqual(plants[0], self.plant1)  # Tomato
+        self.assertEqual(plants[1], self.plant2)  # Rose
 
     # ---------------------------------------------------------
     # DETAIL VIEW

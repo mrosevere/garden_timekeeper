@@ -20,6 +20,7 @@ from django.db import IntegrityError
 from django.http import JsonResponse
 from django.utils.safestring import mark_safe
 from django.urls import reverse
+from django.db.models.functions import Lower
 
 
 from datetime import date
@@ -613,11 +614,20 @@ class PlantListView(LoginRequiredMixin, ListView):
 
         if sort in allowed_sorts:
             base_sort = sort.lstrip("-")
-            if direction == "desc":
-                sort = f"-{base_sort}"
+
+            # Case-insensitive sorting ONLY for simple fields
+            if base_sort == "name":
+                annotated = "name_lower"
+                qs = qs.annotate(**{annotated: Lower("name")})
+                sort_field = annotated
             else:
-                sort = base_sort
-            qs = qs.order_by(sort, "id")
+                sort_field = base_sort
+
+            if direction == "desc":
+                sort_field = f"-{sort_field}"
+
+            # Secondary sort by id for deterministic ordering
+            qs = qs.order_by(sort_field, "id")
 
         return qs
 
@@ -643,7 +653,9 @@ class PlantListView(LoginRequiredMixin, ListView):
 
         # Pass current sort + direction to template
         context["current_sort"] = self.request.GET.get("sort", "name")
-        context["current_direction"] = self.request.GET.get("direction", "asc")
+        context["current_direction"] = (
+            self.request.GET.get("direction") or "asc"
+        )
         context["plants"] = context["object_list"]
 
         return context
