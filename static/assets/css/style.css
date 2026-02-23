@@ -292,6 +292,14 @@ th.sortable.sort-desc i {
     overflow-y: auto !important;
 }
 
+/* Plant Image - stop overflow on smallest screens*/
+.plant-image img {
+    width: 100%;
+    height: auto;
+    max-width: 300px; /* keeps  intended size on larger screens */
+    object-fit: cover;
+    display: block;
+}
 
 /* ============================================================== */
 /* ==              Media Queries                               == */
