@@ -210,15 +210,15 @@
                     <div class="card-footer d-flex justify-content-end gap-2">
 
                         <!-- Edit -->
-                        <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-secondary" style="min-width:80px;">Edit</a>
+                        <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-secondary">Edit</a>
 
                         <!-- Skip -->
-                        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary" style="min-width:70px;">Skip</a>
+                        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary">Skip</a>
 
                         <!-- Complete button -->
                         <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-primary" style="min-width:80px;">
+                            <button type="submit" class="btn btn-sm btn-primary">
                                 {% if task.completed %}
                                     <i class="fa-solid fa-check"></i> Done
                                 {% else %}
@@ -397,19 +397,22 @@
 
                     <!-- Actions -->
                     <td class="text-end">
-                        <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-secondary">Edit</a>
-                        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary">Skip</a>
-                        <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-primary" style="min-width:80px;">
-                                {% if task.completed %}
-                                    <i class="fa-solid fa-check"></i> Done
-                                {% else %}
-                                    Done
-                                {% endif %}
-                            </button>
-                        </form>
+                        <div class="d-flex justify-content-end flex-wrap gap-2">
+                            <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary" style="min-width: 52px;">Edit</a>
+                            <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary" style="min-width: 52px;">Skip</a>
+                            <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    {% if task.completed %}
+                                        <i class="fa-solid fa-check"></i> Done
+                                    {% else %}
+                                        Done
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </div>
                     </td>
+
                     </tr>
 
                     <!-- If there are no tasks, display message without the table -->
