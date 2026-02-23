@@ -1,3 +1,5 @@
+{% load navigation_tags %}
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -59,35 +61,58 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
-            <!-- Login Navigation -->
+
             {% if user.is_authenticated %}
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                <a class="nav-link {% active 'logout' %}" href="{% url 'logout' %}">
+                  Logout
+                </a>
               </li>
             {% else %}
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                <a class="nav-link {% active 'login' %}" href="{% url 'login' %}">
+                  Login
+                </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'register' %}">Register</a>
+                <a class="nav-link {% active 'register' %}" href="{% url 'register' %}">
+                  Register
+                </a>
               </li>
             {% endif %}
-            <!-- Page Navigation -->
+
             <li class="nav-item">
-              <a class="nav-link" href="/">Home</a>
+              <a class="nav-link {% active 'home' %}" href="{% url 'home' %}">
+                Home
+              </a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/dashboard">Dashboard</a>
+              <a class="nav-link {% active 'dashboard' %}" href="{% url 'dashboard' %}">
+                Dashboard
+              </a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/beds">bed List</a>
+              <a class="nav-link {% active 'bed_list' 'bed_detail' 'bed_edit' 'bed_create' %}"
+                href="{% url 'bed_list' %}">
+                Bed List
+              </a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/plants">Plant List</a>
+              <a class="nav-link {% active 'plant_list' 'plant_detail' 'plant_edit' 'plant_create' %}"
+                href="{% url 'plant_list' %}">
+                Plant List
+              </a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'account_settings' %}">My Account</a>
+              <a class="nav-link {% active 'account_settings' %}" href="{% url 'account_settings' %}">
+                My Account
+              </a>
             </li>
+
           </ul>
         </div>
       </div>
