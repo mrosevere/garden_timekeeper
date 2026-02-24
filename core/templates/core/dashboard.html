@@ -1,5 +1,7 @@
 {% extends "core/base.html" %} 
 {% load month_filters %}
+{% load static %}
+
 {% block content %}
 
 <!-- DASHBOARD TOP CONTROLS -->
@@ -129,6 +131,26 @@
     </div>  <!-- Hide overdue tasks toggle -->
 </div> <!-- Row for hide overdue toggle -->
 
+<!-- Search + filters -->
+<div class="container my-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-6">
+            <label for="dashboard-search" class="form-label mb-1">Search tasks</label>
+            <input id="dashboard-search" class="form-control" placeholder="Search by task, plant, or bed...">
+        </div>
+        <div class="col-6 col-md-3">
+            <label for="dashboard-status-filter" class="form-label mb-1">Status</label>
+            <select id="dashboard-status-filter" class="form-select">
+                <option value="">All</option>
+                <option value="overdue">Overdue</option>
+                <option value="due-today">Due today</option>
+                <option value="scheduled">Scheduled</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
 <!-- ================================================================================== -->
 <!-- ==                Tasks List                                                       -->
 <!-- ================================================================================== -->
@@ -136,7 +158,7 @@
 <!-- ======================================================== -->
 <!-- Card version: Hide the cards on d-md and above (>=768px) -->
 <!-- ======================================================== -->
-<div class="d-block d-md-none container mb-4"> 
+<div id="dashboard-cards" class="d-block d-md-none container mb-4"> 
     <div class="row g-3"> <!-- Row for spacing between cards -->
 
         {% for task in tasks %}
@@ -144,7 +166,15 @@
             <div class="col-12"> 
             
                 <!-- Apply the card class based on due date -->
-                <div class="card shadow-sm{% if task.next_due < today %} bg-danger {% elif task.next_due == today %} bg-warning{% endif %}">
+                <div
+                    class="card shadow-sm dashboard-card{% if task.next_due < today %} bg-danger {% elif task.next_due == today %} bg-warning{% endif %}"
+                    data-task-name="{{ task.name|lower }}"
+                    data-plant="{{ task.plant.name|default_if_none:''|lower }}"
+                    data-bed="{{ task.plant.bed.name|default_if_none:''|lower }}"
+                    data-status="{% if task.next_due < today %}overdue{% elif task.next_due == today %}due-today{% else %}scheduled{% endif %}"
+                    data-frequency="{{ task.get_frequency_display|lower }}"
+                    data-next-due="{{ task.next_due|date:'Y-m-d' }}"
+                >
 
                     <!-- Card Header -->
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -254,101 +284,47 @@
 
         <!-- Table Wrapper: scrollable on smaller screens -->
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                
-                <!-- Table Head: sortable columns -->
+            <table id="dashboard-table" class="table table-striped table-hover">
+                <!-- TABLE HEAD -->
                 <thead>
-                    <!-- Column headers with sort links/icons -->
                     <tr>
-                        <!-- Task Header -->
-                        <th>
-                            <a href="?sort=name&direction={% if current_sort == 'name' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
-                                Task
-                                {% if current_sort == "name" %}
-                                    {% if current_direction == "asc" %}
-                                        <i class="fa-solid fa-arrow-up ms-1"></i>
-                                    {% else %}
-                                        <i class="fa-solid fa-arrow-down ms-1"></i>
-                                    {% endif %}
-                                {% endif %}
-                            </a>
+                        <th class="sortable" data-sort="name">
+                            Task <i class="fa-solid fa-arrow-up-long opacity-0 ms-1"></i>
                         </th>
-
-                        <!-- Plant Header -->
-                        <th>
-                            <a href="?sort=plant&direction={% if current_sort == 'plant' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
-                                Plant
-                                {% if current_sort == "plant" %}
-                                    {% if current_direction == "asc" %}
-                                        <i class="fa-solid fa-arrow-up ms-1"></i>
-                                    {% else %}
-                                        <i class="fa-solid fa-arrow-down ms-1"></i>
-                                    {% endif %}
-                                {% endif %}
-                            </a>
+                        <th class="sortable" data-sort="plant">
+                            Plant <i class="fa-solid fa-arrow-up-long opacity-0 ms-1"></i>
                         </th>
-
-                        <!-- Bed Header -->
-                        <th class="d-none d-md-table-cell">
-                            <a href="?sort=bed&direction={% if current_sort == 'bed' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
-                                Bed
-                                {% if current_sort == "bed" %}
-                                    {% if current_direction == "asc" %}
-                                        <i class="fa-solid fa-arrow-up ms-1"></i>
-                                    {% else %}
-                                        <i class="fa-solid fa-arrow-down ms-1"></i>
-                                    {% endif %}
-                                {% endif %}
-                            </a>
+                        <th class="sortable d-none d-md-table-cell" data-sort="bed">
+                            Bed <i class="fa-solid fa-arrow-up-long opacity-0 ms-1"></i>
                         </th>
-
-                        <!-- Due Header -->
-                        <th>
-                            <a href="?sort=due&direction={% if current_sort == 'due' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
-                                Due
-                                {% if current_sort == "due" %}
-                                    {% if current_direction == "asc" %}
-                                        <i class="fa-solid fa-arrow-up ms-1"></i>
-                                    {% else %}
-                                        <i class="fa-solid fa-arrow-down ms-1"></i>
-                                    {% endif %}
-                                {% endif %}
-                            </a>
+                        <th class="sortable" data-sort="next_due">
+                            Due <i class="fa-solid fa-arrow-up-long opacity-0 ms-1"></i>
                         </th>
-
-                        <!-- Frequency Header -->
-                        <th class="d-none d-md-table-cell">
-                            <a href="?sort=frequency&direction={% if current_sort == 'frequency' and current_direction == 'asc' %}desc{% else %}asc{% endif %}">
-                                Frequency
-                                {% if current_sort == "frequency" %}
-                                    {% if current_direction == "asc" %}
-                                        <i class="fa-solid fa-arrow-up ms-1"></i>
-                                    {% else %}
-                                        <i class="fa-solid fa-arrow-down ms-1"></i>
-                                    {% endif %}
-                                {% endif %}
-                            </a>
+                        <th class="sortable d-none d-md-table-cell" data-sort="frequency">
+                            Frequency <i class="fa-solid fa-arrow-up-long opacity-0 ms-1"></i>
                         </th>
-                        
-                        <!-- Actions Header -->
-                        <th class="text-end">
-                            Actions
-                        </th>
-                    </tr> <!-- Column headers with sort links/icons -->
+                        <th class="text-end">Actions</th>
+                    </tr>
                 </thead>
-
-                <!-- Table Body: data rows -->
-                <tbody>
+                <!-- TABLE BODY -->
+                <tbody id="dashboard-table-body">
                     <!-- Loop through tasks -->
                     {% for task in tasks %}
                     
                     <!-- Conditional logic for row highlighting based on due date -->
                     <tr
-                    {% if task.next_due < today %}
-                        class="table-danger"
-                    {% elif task.next_due == today %}
-                        class="table-warning"
-                    {% endif %}>
+                        {% if task.next_due < today %}
+                            class="table-danger"
+                        {% elif task.next_due == today %}
+                            class="table-warning"
+                        {% endif %}
+                        data-task-name="{{ task.name|lower }}"
+                        data-plant="{{ task.plant.name|default_if_none:''|lower }}"
+                        data-bed="{{ task.plant.bed.name|default_if_none:''|lower }}"
+                        data-status="{% if task.next_due < today %}overdue{% elif task.next_due == today %}due-today{% else %}scheduled{% endif %}"
+                        data-frequency="{{ task.get_frequency_display|lower }}"
+                        data-next-due="{{ task.next_due|date:'Y-m-d' }}"
+                    >
 
                     <!-- Task -->
                     <td>
@@ -428,8 +404,13 @@
             </table>
         </div>
     </div>
+    <!-- Pagination for dashboard tasks (Desktop table only) -->
+    <div id="dashboard-pagination" class="mt-3 d-flex justify-content-center"></div>
 </div>
 
+{% endblock %}
 
-
+<!-- Custom JS for pagination, sorting, filtering etc -->
+{% block extra_js %}
+<script type="module" src="{% static 'assets/js/dashboard.js' %}"></script>
 {% endblock %}
