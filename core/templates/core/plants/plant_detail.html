@@ -25,7 +25,7 @@
                     <span>Plant Information</span>
 
                     <div class="d-flex gap-2">
-                        <a href="{% url 'plant_edit' plant.pk %}" class="btn btn-sm btn-primary" style="min-width: 60px;">
+                        <a href="{% url 'plant_edit' plant.pk %}" class="btn btn-sm btn-primary" style="min-width: 60px;" aria-label="Edit plant {{ plant.name }}">
                             Edit
                         </a>
                         <button
@@ -33,7 +33,7 @@
                             class="btn btn-sm btn-danger"
                             data-bs-toggle="modal"
                             data-bs-target="#deletePlantModal"
-                        >
+                            aria-label="Delete plant {{ plant.name }}">
                             Delete
                         </button>
                     </div>
@@ -84,6 +84,8 @@
                             type="button"
                             data-bs-toggle="collapse"
                             data-bs-target="#plantNotesCollapse"
+                            aria-controls="plantNotesCollapse"
+                            aria-label="Toggle notes for {{ plant.name }}"
                         >
                             Notes
                         </button>
@@ -137,55 +139,85 @@
         {% if task_info %}
 
             <!-- Filters -->
-            <div class="row g-2 mb-3 align-items-end">
-                <div class="col-12 col-md-6">
-                    <label for="task-search" class="form-label mb-1">Search Tasks</label>
-                    <input id="task-search" class="form-control" placeholder="Search by task name...">
-                </div>
+            <fieldset class="border-0 p-0 m-0">
+                <legend class="visually-hidden">Task Filters</legend>
 
-                <div class="col-6 col-md-3">
-                    <label for="status-filter" class="form-label mb-1">Status</label>
-                    <select id="status-filter" class="form-select">
-                        <option value="">All</option>
-                        <option value="overdue">Overdue</option>
-                        <option value="due-soon">Due Soon</option>
-                        <option value="scheduled">Scheduled</option>
-                    </select>
-                </div>
+                <div class="row g-2 mb-3 align-items-end">
 
-                <div class="col-6 col-md-3">
-                    <label for="season-filter" class="form-label mb-1">Season</label>
-                    <select id="season-filter" class="form-select">
-                        <option value="">All</option>
-                        <option value="in-season">In Season</option>
-                        <option value="out-of-season">Out of Season</option>
-                    </select>
+                    <div class="col-12 col-md-6">
+                        <label for="task-search" class="form-label mb-1">Search Tasks</label>
+                        <input id="task-search" class="form-control" placeholder="Search by task name...">
+                    </div>
+
+                    <div class="col-6 col-md-3">
+                        <label for="status-filter" class="form-label mb-1">Status</label>
+                        <select id="status-filter" class="form-select">
+                            <option value="">All</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="due-soon">Due Soon</option>
+                            <option value="scheduled">Scheduled</option>
+                        </select>
+                    </div>
+
+                    <div class="col-6 col-md-3">
+                        <label for="season-filter" class="form-label mb-1">Season</label>
+                        <select id="season-filter" class="form-select">
+                            <option value="">All</option>
+                            <option value="in-season">In Season</option>
+                            <option value="out-of-season">Out of Season</option>
+                        </select>
+                    </div>
+
                 </div>
-            </div>
+            </fieldset>
 
             <!-- Desktop table of tasks -->
             <div class="table-responsive d-none d-md-block">
                 <table class="table table-striped align-middle" id="plant-tasks-table">
+                    <!-- Table Head -->
                     <thead>
                         <tr>
-                            <th class="sortable" data-sort="name">
-                                Task <i class="fa-solid fa-arrow-up-long opacity-0"></i>
+                            <th scope="col" class="sortable" data-sort="name" aria-sort="none">
+                                <button class="table-sort-btn" aria-label="Sort by Task">
+                                    Task
+                                    <i class="fa-solid fa-arrow-up-long opacity-0" aria-hidden="true"></i>
+                                </button>
                             </th>
-                            <th class="sortable" data-sort="next_due">
-                                Next Due <i class="fa-solid fa-arrow-up-long opacity-0"></i>
+
+                            <th scope="col" class="sortable" data-sort="next_due" aria-sort="none">
+                                <button class="table-sort-btn" aria-label="Sort by Next Due">
+                                    Next Due
+                                    <i class="fa-solid fa-arrow-up-long opacity-0" aria-hidden="true"></i>
+                                </button>
                             </th>
-                            <th class="sortable" data-sort="status">
-                                Status <i class="fa-solid fa-arrow-up-long opacity-0"></i>
+
+                            <th scope="col" class="sortable" data-sort="status" aria-sort="none">
+                                <button class="table-sort-btn" aria-label="Sort by Status">
+                                    Status
+                                    <i class="fa-solid fa-arrow-up-long opacity-0" aria-hidden="true"></i>
+                                </button>
                             </th>
-                            <th class="sortable" data-sort="season">
-                                Season <i class="fa-solid fa-arrow-up-long opacity-0"></i>
+
+                            <th scope="col" class="sortable" data-sort="season" aria-sort="none">
+                                <button class="table-sort-btn" aria-label="Sort by Season">
+                                    Season
+                                    <i class="fa-solid fa-arrow-up-long opacity-0" aria-hidden="true"></i>
+                                </button>
                             </th>
-                            <th class="sortable" data-sort="frequency">
-                                Frequency <i class="fa-solid fa-arrow-up-long opacity-0"></i>
+
+                            <th scope="col" class="sortable" data-sort="frequency" aria-sort="none">
+                                <button class="table-sort-btn" aria-label="Sort by Frequency">
+                                    Frequency
+                                    <i class="fa-solid fa-arrow-up-long opacity-0" aria-hidden="true"></i>
+                                </button>
                             </th>
-                            <th class="text-end">Actions</th>
+
+                            <th scope="col" class="text-end">Actions</th>
+
                         </tr>
                     </thead>
+                    
+                    <!-- Table Body -->
                     <tbody>
                         {% for item in task_info %}
                             {% with task=item.task %}
@@ -202,8 +234,20 @@
                                     data-frequency="{{ task.get_frequency_display|lower }}"
                                     data-next-due="{{ task.next_due|date:'Y-m-d' }}"
                                 >
-                                    <td><a href="{% url 'task_detail' task.id %}">{{ task.name }}</a></td>
-                                    <td>{{ task.next_due|date:"F j, Y"|default:"Not set" }}</td>
+
+                                    <!-- Task Name -->
+                                    <td scope="row">
+                                        <a href="{% url 'task_detail' task.id %}">
+                                            {{ task.name }}
+                                        </a>
+                                    </td>
+
+                                    <!-- Next Due -->
+                                    <td>
+                                        {{ task.next_due|date:"F j, Y"|default:"Not set" }}
+                                    </td>
+
+                                    <!-- Status Badge -->
                                     <td>
                                         {% if item.overdue %}
                                             <span class="badge bg-danger">Overdue</span>
@@ -213,6 +257,8 @@
                                             <span class="badge bg-info text-dark">Scheduled</span>
                                         {% endif %}
                                     </td>
+
+                                    <!-- Season Badge -->
                                     <td>
                                         {% if item.in_season %}
                                             <span class="badge bg-success">In Season</span>
@@ -220,18 +266,37 @@
                                             <span class="badge bg-secondary">Out of Season</span>
                                         {% endif %}
                                     </td>
-                                    <td>{{ task.get_frequency_display }}</td>
+
+                                    <!-- Frequency -->
+                                    <td>
+                                        {{ task.get_frequency_display }}
+                                    </td>
+
+                                    <!-- Actions -->
                                     <td class="text-end">
-                                        <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary">Edit</a>
+
+                                        <!-- Edit Button -->
+                                        <a
+                                            href="{% url 'task_update' task.id %}"
+                                            class="btn btn-sm btn-secondary"
+                                            aria-label="Edit task {{ task.name }}"
+                                        >
+                                            Edit
+                                        </a>
+
+                                        <!-- Delete Button -->
                                         <button
                                             type="button"
                                             class="btn btn-sm btn-danger"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteTaskModal{{ task.id }}"
+                                            aria-label="Delete task {{ task.name }}"
                                         >
                                             Delete
                                         </button>
+
                                     </td>
+
                                 </tr>
                             {% endwith %}
                         {% endfor %}
@@ -255,12 +320,18 @@
                             data-season="{% if item.in_season %}in-season{% else %}out-of-season{% endif %}"
                             data-frequency="{{ task.get_frequency_display|lower }}"
                             data-next-due="{{ task.next_due|date:'Y-m-d' }}"
+                            aria-label="Task card for {{ task.name }}"
                         >
                             <div class="card-body">
+
+                                <!-- Title + Badges -->
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h2 class="card-title mb-0 h5">
-                                        <a href="{% url 'task_detail' task.id %}">{{ task.name }}</a>
+                                        <a href="{% url 'task_detail' task.id %}">
+                                            {{ task.name }}
+                                        </a>
                                     </h2>
+
                                     <div class="text-end">
                                         {% if item.overdue %}
                                             <span class="badge bg-danger">Overdue</span>
@@ -278,55 +349,103 @@
                                     </div>
                                 </div>
 
-                                <p class="mb-1"><strong>Next Due:</strong> {{ task.next_due|date:"F j, Y"|default:"Not set" }}</p>
-                                <p class="mb-2"><strong>Frequency:</strong> {{ task.get_frequency_display }}</p>
+                                <!-- Details -->
+                                <p class="mb-1">
+                                    <strong>Next Due:</strong>
+                                    {{ task.next_due|date:"F j, Y"|default:"Not set" }}
+                                </p>
 
+                                <p class="mb-2">
+                                    <strong>Frequency:</strong>
+                                    {{ task.get_frequency_display }}
+                                </p>
+
+                                <!-- Actions -->
                                 <div class="d-flex flex-wrap gap-2">
-                                    <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary">Edit</a>
+
+                                    <!-- Edit -->
+                                    <a
+                                        href="{% url 'task_update' task.id %}"
+                                        class="btn btn-sm btn-secondary"
+                                        aria-label="Edit task {{ task.name }}"
+                                    >
+                                        Edit
+                                    </a>
+
+                                    <!-- Delete -->
                                     <button
                                         type="button"
                                         class="btn btn-sm btn-danger"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteTaskModal{{ task.id }}"
+                                        aria-label="Delete task {{ task.name }}"
                                     >
                                         Delete
                                     </button>
+
                                 </div>
+
                             </div>
                         </div>
                     {% endwith %}
                 {% endfor %}
             </div>
 
-            <!-- Delete Task Modals -->
-            {% for item in task_info %}
-                {% with task=item.task %}
-                    <div class="modal fade" id="deleteTaskModal{{ task.id }}" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
 
-                                <div class="modal-header">
-                                    <h2 class="modal-title h5">Delete Task</h2>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
+        <!-- Delete Task Modals -->
+        {% for item in task_info %}
+            {% with task=item.task %}
+                <div
+                    class="modal fade"
+                    id="deleteTaskModal{{ task.id }}"
+                    tabindex="-1"
+                    aria-labelledby="deleteTaskLabel{{ task.id }}"
+                    aria-describedby="deleteTaskDesc{{ task.id }}"
+                >
+                    <div class="modal-dialog">
+                        <div class="modal-content">
 
-                                <div class="modal-body">
-                                    Are you sure you want to delete <strong>{{ task.name }}</strong>?
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <form method="post" action="{% url 'task_delete' task.id %}">
-                                        {% csrf_token %}
-                                        <button class="btn btn-danger">Delete</button>
-                                    </form>
-                                </div>
-
+                            <div class="modal-header">
+                                <h2 class="modal-title h5" id="deleteTaskLabel{{ task.id }}">
+                                    Delete Task: {{ task.name }}
+                                </h2>
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close delete task modal"
+                                ></button>
                             </div>
+
+                            <div class="modal-body" id="deleteTaskDesc{{ task.id }}">
+                                Are you sure you want to delete <strong>{{ task.name }}</strong>?
+                            </div>
+
+                            <div class="modal-footer">
+                                <button
+                                    class="btn btn-secondary"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Cancel deletion of task {{ task.name }}"
+                                >
+                                    Cancel
+                                </button>
+
+                                <form method="post" action="{% url 'task_delete' task.id %}">
+                                    {% csrf_token %}
+                                    <button
+                                        class="btn btn-danger"
+                                        aria-label="Confirm delete task {{ task.name }}"
+                                    >
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+
                         </div>
                     </div>
-                {% endwith %}
-            {% endfor %}
+                </div>
+            {% endwith %}
+        {% endfor %}
 
         {% else %}
             <p class="text-muted">No tasks yet.</p>
@@ -334,30 +453,53 @@
 
         <!-- Pagination container -->
         <div id="task-pagination" class="mt-3 d-flex justify-content-center"></div>
-
     </div> <!-- end tasks section -->
-
 </div> <!-- end container -->
 
 <!-- Delete Plant Modal -->
-<div class="modal fade" id="deletePlantModal" tabindex="-1">
+<div
+    class="modal fade"
+    id="deletePlantModal"
+    tabindex="-1"
+    aria-labelledby="deletePlantLabel"
+    aria-describedby="deletePlantDesc"
+>
     <div class="modal-dialog">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h2 class="modal-title h5">Delete Plant</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h2 class="modal-title h5" id="deletePlantLabel">
+                    Delete Plant: {{ plant.name }}
+                </h2>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close delete plant modal"
+                ></button>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body" id="deletePlantDesc">
                 Are you sure you want to delete <strong>{{ plant.name }}</strong>?
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                    aria-label="Cancel deletion of plant {{ plant.name }}"
+                >
+                    Cancel
+                </button>
+
                 <form method="post" action="{% url 'plant_delete' plant.pk %}">
                     {% csrf_token %}
-                    <button class="btn btn-danger">Delete</button>
+                    <button
+                        class="btn btn-danger"
+                        aria-label="Confirm delete plant {{ plant.name }}"
+                    >
+                        Delete
+                    </button>
                 </form>
             </div>
 
