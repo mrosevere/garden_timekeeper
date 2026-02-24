@@ -1,5 +1,8 @@
 // plant_detail.js
 
+// ---------------------------------------------------------
+// Imports
+// ---------------------------------------------------------
 import { qs, qsa, clear } from "./core/dom.js";
 import { applyFilters } from "./core/filters.js";
 import { Paginator } from "./core/pagination.js";
@@ -44,16 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function resetSortIcons() {
         sortableHeaders.forEach(th => {
-            // Reset icon
             const icon = th.querySelector("i");
-            // Change the opacity to 50 if you want a faded out arrow on ALL columns
             if (icon) icon.className = "fa-solid fa-arrow-up-long opacity-0";
-
-            // Remove sort classes
             th.classList.remove("sort-asc", "sort-desc");
         });
     }
-
 
     function sortTasks(items) {
         if (!currentSort.key || !currentSort.direction) return items;
@@ -89,12 +87,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             resetSortIcons();
 
-            // Add sort class to active header
             th.classList.add(
                 currentSort.direction === "asc" ? "sort-asc" : "sort-desc"
             );
 
-            // Update icon
             const icon = th.querySelector("i");
             if (icon) {
                 icon.className =
@@ -102,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         ? "fa-solid fa-arrow-up-long"
                         : "fa-solid fa-arrow-down-long";
             }
-
 
             paginator.setItems(applyAllFiltersAndSorting());
             paginator.goToPage(1);
@@ -130,17 +125,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ---------------------------------------------------------
-    // 5. Rendering function
+    // 5. Rendering function (UPDATED WITH NULL-SAFE GUARD)
     // ---------------------------------------------------------
     function render() {
         const tableBody = qs("#plant-tasks-table tbody");
         const cardContainer = qs(".d-md-none");
 
+        // ---------------------------------------------------------
+        // SAFETY CHECK:
+        // If the plant has NO tasks, the template does not render
+        // the table or mobile card container. Without this guard,
+        // calling clear(null) would throw:
+        // "Cannot read properties of null (reading 'firstChild')"
+        // ---------------------------------------------------------
+        if (!tableBody || !cardContainer) {
+            return;  // Nothing to render — exit safely
+        }
+
+        // Clear existing DOM content
         clear(tableBody);
         clear(cardContainer);
 
         const pageItems = paginator.getPageItems();
 
+        // Insert rows/cards for this page
         pageItems.forEach(task => {
             tableBody.appendChild(task.dom.row);
             cardContainer.appendChild(task.dom.card);
