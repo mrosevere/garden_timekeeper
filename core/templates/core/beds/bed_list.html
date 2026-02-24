@@ -101,13 +101,21 @@
 
       </div>
     </div>
+    <!-- Display message if no beds exist or no beds match filters -->
     {% empty %}
     <div class="col-12">
       <div class="card shadow-sm">
-        <div class="card-body text-center text-muted">You don’t have any garden beds yet.</div>
+        <div class="card-body text-center text-muted">
+          {% if total_beds == 0 %}
+            You don’t have any garden beds yet.
+          {% else %}
+            No beds match your filters.
+          {% endif %}
+        </div>
       </div>
     </div>
     {% endfor %}
+
   </div>
 </div>
 
@@ -116,7 +124,6 @@
 <!-- ======================================================== -->
 <div class="d-none d-md-block">
   <div class="container mb-4">
-    {% if object_list %}
     <div class="table-responsive">
       <table class="table table-striped table-hover align-middle">
         <thead>
@@ -138,7 +145,7 @@
             <th class="text-end">Actions</th>
           </tr>
         </thead>
-
+        <!-- Table body -->
         <tbody>
           {% for bed in object_list %}
           <tr>
@@ -150,17 +157,21 @@
               <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ bed.pk }}">Delete</button>
             </td>
           </tr>
-          {% empty %}
+          <!-- Show message if no beds exist or no beds match filters -->
+          {% empty %} 
           <tr>
             <td colspan="{{ sort_options|length|add:'1' }}" class="text-center text-muted py-4">
-              You don’t have any garden beds yet.
+              {% if total_beds == 0 %} 
+                You don’t have any garden beds yet. 
+              {% else %}
+                No beds match your filters. 
+              {% endif %}
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-    {% endif %}
   </div>
 </div>
 
