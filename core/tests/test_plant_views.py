@@ -283,7 +283,7 @@ class PlantViewTests(TestCase):
 
     def test_user_cannot_delete_other_users_plant(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.post(
+        self.client.post(
             reverse("plant_delete", args=[self.other_plant.id])
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Plant.objects.filter(id=self.other_plant.id).exists())
