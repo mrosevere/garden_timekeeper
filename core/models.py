@@ -207,7 +207,7 @@ class PlantTask(models.Model):
     frequency = models.CharField(
         max_length=3,
         choices=TASK_FREQUENCY,
-        default="7d"
+        default="12m"
     )
 
     # Repeat Flag (uncheck for a one off task)
