@@ -126,6 +126,13 @@ class PlantForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # ====================================================
+        # Fix summernote Aria issues
+        # ====================================================
+        self.fields['notes'].widget.attrs.update({
+            'aria-label': 'Notes about this plant'
+            })
+
+        # ====================================================
         # Limit the "bed" dropdown to beds owned by the current user
         # ====================================================
         if user is not None:
