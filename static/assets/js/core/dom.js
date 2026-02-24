@@ -1,4 +1,6 @@
 // core/dom.js
+/* jshint esversion: 11 */
+
 
 export function qs(selector, parent = document) {
     return parent.querySelector(selector);
