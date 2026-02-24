@@ -1,4 +1,5 @@
 // core/pagination.js
+/* jshint esversion: 11 */
 
 export class Paginator {
     constructor(items, perPage = 3) {

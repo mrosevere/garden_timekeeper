@@ -1,4 +1,6 @@
 // core/filters.js
+/* jshint esversion: 11 */
+
 import { normalise } from "./utils.js";
 
 export function applyFilters(tasks, { search, status, season }) {

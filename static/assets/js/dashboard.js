@@ -1,4 +1,5 @@
 // dashboard.js
+/* jshint esversion: 11 */
 
 import { qs, qsa, clear } from "./core/dom.js";
 import { Paginator } from "./core/pagination.js";

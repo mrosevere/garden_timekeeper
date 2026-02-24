@@ -5,6 +5,11 @@
 // Confirm the JS bundle is loaded
 // console.log("Garden Timekeeper JS loaded");
 
+/* global bootstrap, $ */
+/* exported initSummernoteWithBootstrap5 */
+/* jshint esversion: 11 */
+/* jshint -W064 */
+
 
 // ------------------------------------------------------------
 // 1. Auto‑untick "All year" when seasonal months change
@@ -176,6 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // This keeps all Summernote fixes in one place and ensures that
 // any page using a notes field behaves consistently.
 // -------------------------------------------------------------
+
 function initSummernoteWithBootstrap5(selector, height = 200) {
     $(selector).summernote({
         height: height,
@@ -202,12 +208,16 @@ function initSummernoteWithBootstrap5(selector, height = 200) {
 
                 // Reinitialise Bootstrap tooltips
                 $editor.find('[data-bs-toggle="tooltip"]').each(function() {
+                    /* jshint -W064 */
                     new bootstrap.Tooltip(this);
+                    /* jshint +W064 */
                 });
 
                 // Reinitialise Bootstrap dropdowns
                 $editor.find('[data-bs-toggle="dropdown"]').each(function() {
+                    /* jshint -W064 */
                     new bootstrap.Dropdown(this);
+                    /* jshint +W064 */
                 });
 
                 // Close Style dropdown after selection
