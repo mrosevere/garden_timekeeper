@@ -317,6 +317,7 @@ class BedListView(LoginRequiredMixin, ListView):
         context['current_sort'] = self.request.GET.get('sort', 'name')
         context['current_direction'] = self.request.GET.get('direction', 'asc')
         context["beds"] = context["object_list"]
+        context["total_beds"] = GardenBed.objects.filter(owner=self.request.user).count()
 
         return context
 
@@ -670,6 +671,7 @@ class PlantListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["lifespan_choices"] = PlantLifespan.choices
         context["type_choices"] = PlantType.choices
+        context["total_plants"] = Plant.objects.filter(owner=self.request.user).count()
 
         # Sort options for template
         context["sort_options"] = [
