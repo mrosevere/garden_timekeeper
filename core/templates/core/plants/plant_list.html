@@ -154,13 +154,19 @@
 
       </div>
     </div>
-    {% empty %}
-    <div class="col-12">
-      <div class="card shadow-sm">
-        <div class="card-body text-center text-muted">You don’t have any garden plants yet.</div>
+      {% empty %}
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body text-center text-muted">
+            {% if total_plants == 0 %}
+              You don’t have any plants yet.
+            {% else %}
+              No plants match your filters.
+            {% endif %}
+          </div>
+        </div>
       </div>
-    </div>
-    {% endfor %}
+      {% endfor %}
   </div>
 </div>
 
@@ -169,7 +175,6 @@
 <!-- ======================================================== -->
 <div class="d-none d-md-block">
   <div class="container mb-4">
-    {% if object_list %}
     <div class="table-responsive">
       <table class="table table-striped table-hover align-middle">
 
@@ -241,17 +246,20 @@
               </div>
             </td>
           </tr>
-          {% empty %}
+          {% empty %} 
           <tr>
-            <td colspan="7" class="text-center text-muted py-4">
-              You don’t have any garden plants yet.
+            <td colspan="{{ sort_options|length|add:'1' }}" class="text-center text-muted py-4">
+              {% if total_plants == 0 %} 
+                You don’t have any plants yet. 
+              {% else %}
+                No plants match your filters. 
+              {% endif %}
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-    {% endif %}
   </div>
 </div>
 
