@@ -13,7 +13,7 @@
 
       <!-- Action Buttons -->
        <div>
-          <a href="{% url 'plant_create' %}" class="btn btn-primary me-2">Add Plant</a>
+          <a href="{% url 'plant_create' %}" class="btn btn-primary me-2" aria-label="Add Plant">Add Plant</a>
           <a href="{% url 'bed_create' %}" class="btn btn-primary me-2">Add Bed</a>
        </div>
   </div>
@@ -45,20 +45,20 @@
                 <!-- Previous Month Arrow button -->
                 <!--Disable button if we are in the current month to stop users navigating into past months -->
                 {% if selected_year == today.year and selected_month == today.month %}
-                    <button class="btn btn-outline-secondary" disabled>
+                    <button class="btn btn-outline-secondary" aria-label="Previous Month (disabled)" disabled>
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
                 <!-- Otherwise: enable previous month navigation -->
                 {% else %}                
                     <a href="?view=month&year={{ previous_year }}&month={{ previous_month }}&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:"1," }}"
-                    class="btn btn-outline-secondary">
+                    class="btn btn-outline-secondary" aria-label="Previous Month">
                         <i class="fa-solid fa-chevron-left"></i>
                     </a>
                 {% endif %}
 
                 <!-- Next Month Arrow button -->
                 <a href="?view=month&year={{ next_year }}&month={{ next_month }}&sort={{ current_sort }}&direction={{ current_direction }}&hide_overdue={{ hide_overdue|yesno:'1,' }}"
-                    class="btn btn-outline-secondary">
+                    class="btn btn-outline-secondary" aria-label="Next Month">
                     <i class="fa-solid fa-chevron-right"></i>
                 </a>    
              </div>
@@ -67,7 +67,7 @@
             <div class="dropdown">
                 
                 <!-- Dropdown button -->
-                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-label="Jump to Month">
                     Jump to…
                 </button> 
                 
@@ -77,7 +77,7 @@
                     <!-- Dropdown list items for the current year (from the current month)-->
                     {% for m in today.month|to:12 %}
                         <li>
-                            <a class="dropdown-item"
+                            <a class="dropdown-item" 
                             href="?view=month&year={{ today.year }}&month={{ m }}&sort={{ current_sort }}&direction={{ current_direction }}">
                                 {{ m|month_name }}
                             </a>
@@ -204,7 +204,8 @@
                             <!-- Add guard for missing plant -->
                             {% if task.plant %}
                                 <a href="{% url 'plant_detail' task.plant.id %}"
-                                class="{% if task.next_due < start_of_month %}text-white{% endif %}">
+                                class="{% if task.next_due < start_of_month %}text-white{% endif %}"
+                                aria-label="Link to Plant">
                                     {{ task.plant.name }}
                                 </a>
                             {% else %}
@@ -219,7 +220,8 @@
                             <strong>Location:</strong>
                             {% if task.plant.bed %}
                                 <a href="{% url 'bed_detail' task.plant.bed.id %}"
-                                class="{% if task.next_due < start_of_month %}text-white{% endif %}">
+                                class="{% if task.next_due < start_of_month %}text-white{% endif %}"
+                                aria-label="Link to Bed">
                                     {{ task.plant.bed.name }}
                                 </a>
                             {% else %}
@@ -240,15 +242,15 @@
                     <div class="card-footer d-flex justify-content-end gap-2">
 
                         <!-- Edit -->
-                        <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                        <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-secondary" aria-label="Edit Task {{ task.name }}">Edit</a>
 
                         <!-- Skip -->
-                        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary">Skip</a>
+                        <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary" aria-label="Skip Task {{ task.name }}">Skip</a>
 
                         <!-- Complete button -->
                         <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-primary">
+                            <button type="submit" class="btn btn-sm btn-primary" aria-label="Mark Task {{ task.name }} as Done">
                                 {% if task.completed %}
                                     <i class="fa-solid fa-check"></i> Done
                                 {% else %}
@@ -328,7 +330,7 @@
 
                     <!-- Task -->
                     <td>
-                        <a href="{% url 'task_detail' task.id %}">
+                        <a href="{% url 'task_detail' task.id %}" aria-label="Link to Task: {{ task.name }}">
                             {{ task.name }}
                         </a>
                     </td>
@@ -337,7 +339,7 @@
                     <td>
                         <!-- Add guard for missing plant -->
                         {% if task.plant %}
-                            <a href="{% url 'plant_detail' task.plant.id %}">
+                            <a href="{% url 'plant_detail' task.plant.id %}" aria-label="Link to Plant: {{ task.plant.name }}">
                                 {{ task.plant.name }}
                             </a>
                         {% else %}
@@ -348,7 +350,7 @@
                     <!-- bed -->
                     <td class="d-none d-md-table-cell">
                         {% if task.plant.bed %}
-                            <a href="{% url 'bed_detail' task.plant.bed.id %}">
+                            <a href="{% url 'bed_detail' task.plant.bed.id %}" aria-label="Link to Bed: {{ task.plant.bed.name }}">
                                 {{ task.plant.bed.name }}
                             </a>
                         {% else %}
@@ -374,11 +376,11 @@
                     <!-- Actions -->
                     <td class="text-end">
                         <div class="d-flex justify-content-end flex-wrap gap-2">
-                            <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary" style="min-width: 52px;">Edit</a>
-                            <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary" style="min-width: 52px;">Skip</a>
+                            <a href="{% url 'task_update' task.id %}" class="btn btn-sm btn-secondary" style="min-width: 52px;" aria-label="Edit Task {{ task.name }}">Edit</a>
+                            <a href="{% url 'task_skip' task.id %}" class="btn btn-sm btn-primary" style="min-width: 52px;" aria-label="Skip Task {{ task.name }}">Skip</a>
                             <form method="POST" action="{% url 'task_mark_done' task.id %}" class="d-inline">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-primary">
+                                <button type="submit" class="btn btn-sm btn-primary" aria-label="Mark Task {{ task.name }} as Done">
                                     {% if task.completed %}
                                         <i class="fa-solid fa-check"></i> Done
                                     {% else %}
