@@ -178,7 +178,7 @@
 
                     <!-- Card Header -->
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">
+                        <h2 class="card-title mb-0 h5">
                             <a href="{% url 'task_detail' task.id %}">
                                 {{ task.name }}
                             </a>
@@ -191,7 +191,7 @@
                                 <i class="fa-solid fa-circle-exclamation text-warning ms-2"
                                 title="This task is due today"></i>
                             {% endif %}
-                        </h5>
+                        </h2>
                         <span class="badge bg-secondary">{{ task.status }}</span>
                     </div>
 
