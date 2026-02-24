@@ -73,7 +73,7 @@
                 
                 <!-- Dropdown List -->
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><h6 class="dropdown-header">{{ today.year }}</h6></li>
+                    <li><h3 class="dropdown-header h6">{{ today.year }}</h3></li>
                     <!-- Dropdown list items for the current year (from the current month)-->
                     {% for m in today.month|to:12 %}
                         <li>
@@ -88,7 +88,7 @@
                     <li><hr class="dropdown-divider"></li>
 
                     <!-- Dropdown list items for the next calendar year -->
-                    <li><h6 class="dropdown-header">{{ today.year|add:"1" }}</h6></li>
+                    <li><h3 class="dropdown-header h6">{{ today.year|add:"1" }}</h3></li>
                     <!-- Months are Int so need to ensure we don't go over 12! -->
                     {% for m in 1|to:12 %}
                         <li>
