@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container mt-4">
 
-    <h2 class="mb-3">Add a New Plant</h2>
+    <h1 class="mb-3">Add a New Plant</h1>
 
     <div class="card shadow-sm">
         <div class="card-body">
@@ -14,8 +14,10 @@
                 {% csrf_token %}
 
                 <!-- Name & Image -->
-                <div class="card mb-3">
-                    <div class="card-header bg-light">Name & Image</div>
+                <div class="card mb-3" aria-labelledby="section-name-image">
+                    <div class="card-header bg-light">
+                        <h2 id="section-name-image" class="h5 mb-0">Name & Image</h2>
+                    </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-12 col-md-6">
@@ -32,8 +34,10 @@
                 </div>
 
                 <!-- Placement -->
-                <div class="card mb-3">
-                    <div class="card-header bg-light">Placement</div>
+                <div class="card mb-3" aria-labelledby="section-placement">
+                    <div class="card-header bg-light">
+                        <h2 id="section-placement" class="h5 mb-0">Placement</h2>
+                    </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -47,8 +51,10 @@
                 </div>
 
                 <!-- Type & Lifespan -->
-                <div class="card mb-3">
-                    <div class="card-header bg-light">Type & Lifespan</div>
+                <div class="card mb-3" aria-labelledby="section-type-lifespan">
+                    <div class="card-header bg-light">
+                        <h2 id="section-type-lifespan" class="h5 mb-0">Type & Lifespan</h2>
+                    </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -60,10 +66,19 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Notes -->
                 {{ form.notes|as_crispy_field }}
+
                 <!-- Buttons -->
                 <div class="mt-3 d-flex justify-content-between">
-                    <a href="{% url 'plant_list' %}" class="btn btn-secondary" style="min-width: 98px;">Cancel</a>
+                    <a href="{% url 'plant_list' %}"
+                       class="btn btn-secondary"
+                       aria-label="Cancel and return to plant list"
+                       style="min-width: 98px;">
+                        Cancel
+                    </a>
+
                     <button type="submit" class="btn btn-primary">Save Plant</button>
                 </div>
 
