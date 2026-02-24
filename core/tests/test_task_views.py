@@ -106,11 +106,15 @@ class TaskViewTests(TestCase):
     def setUp(self):
         # Users
         self.user = User.objects.create_user(username="mark", password="pass")
-        self.other_user = User.objects.create_user(username="other", password="pass")
+        self.other_user = User.objects.create_user(
+            username="other", password="pass"
+        )
 
         # Beds
         self.bed = GardenBed.objects.create(owner=self.user, name="Main Bed")
-        self.other_bed = GardenBed.objects.create(owner=self.other_user, name="Other Bed")
+        self.other_bed = GardenBed.objects.create(
+            owner=self.other_user, name="Other Bed"
+        )
 
         # Plants
         self.plant = Plant.objects.create(
@@ -165,7 +169,9 @@ class TaskViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_task_mark_done_requires_login(self):
-        response = self.client.get(reverse("task_mark_done", args=[self.task.pk]))
+        response = self.client.get(
+            reverse("task_mark_done", args=[self.task.pk])
+        )
         self.assertEqual(response.status_code, 302)
 
     def test_task_skip_requires_login(self):
@@ -183,7 +189,9 @@ class TaskViewTests(TestCase):
 
     def test_user_cannot_view_other_users_task(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.get(reverse("task_detail", args=[self.other_task.pk]))
+        response = self.client.get(
+            reverse("task_detail", args=[self.other_task.pk])
+        )
         self.assertEqual(response.status_code, 404)
 
     # ---------------------------------------------------------
@@ -250,13 +258,17 @@ class TaskViewTests(TestCase):
 
     def test_user_can_delete_own_task(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.post(reverse("task_delete", args=[self.task.pk]))
+        response = self.client.post(
+            reverse("task_delete", args=[self.task.pk])
+        )
         self.assertEqual(response.status_code, 302)
         self.assertFalse(PlantTask.objects.filter(pk=self.task.pk).exists())
 
     def test_user_cannot_delete_other_users_task(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.post(reverse("task_delete", args=[self.other_task.pk]))
+        response = self.client.post(
+            reverse("task_delete", args=[self.other_task.pk])
+        )
         self.assertEqual(response.status_code, 404)
 
     # ---------------------------------------------------------
@@ -266,7 +278,9 @@ class TaskViewTests(TestCase):
     def test_user_can_mark_task_done(self):
         self.client.login(username="mark", password="pass")
         old_due = self.task.next_due
-        response = self.client.get(reverse("task_mark_done", args=[self.task.pk]))
+        response = self.client.get(
+            reverse("task_mark_done", args=[self.task.pk])
+        )
         self.assertEqual(response.status_code, 302)
 
         self.task.refresh_from_db()
@@ -275,7 +289,9 @@ class TaskViewTests(TestCase):
 
     def test_user_cannot_mark_other_users_task_done(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.get(reverse("task_mark_done", args=[self.other_task.pk]))
+        response = self.client.get(
+            reverse("task_mark_done", args=[self.other_task.pk])
+        )
         self.assertEqual(response.status_code, 404)
 
     # ---------------------------------------------------------
@@ -293,5 +309,7 @@ class TaskViewTests(TestCase):
 
     def test_user_cannot_skip_other_users_task(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.get(reverse("task_skip", args=[self.other_task.pk]))
+        response = self.client.get(
+            reverse("task_skip", args=[self.other_task.pk])
+        )
         self.assertEqual(response.status_code, 404)
