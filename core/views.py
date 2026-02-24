@@ -892,7 +892,8 @@ class PlantUpdateView(LoginRequiredMixin, UpdateView):
         template clean and maintains separation of concerns.
         """
         context = super().get_context_data(**kwargs)
-        context["bed_form"] = GardenBedForm()
+        # Add prefix to solve issue #244 (dupe ids)
+        context["bed_form"] = GardenBedForm(prefix="bed")
         return context
 
 
