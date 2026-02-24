@@ -1,4 +1,5 @@
 // core/utils.js
+/* jshint esversion: 11 */
 
 // Normalise text for case-insensitive search
 export function normalise(text) {
