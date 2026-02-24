@@ -258,9 +258,9 @@
                         >
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="card-title mb-0">
+                                    <h2 class="card-title mb-0 h5">
                                         <a href="{% url 'task_detail' task.id %}">{{ task.name }}</a>
-                                    </h5>
+                                    </h2>
                                     <div class="text-end">
                                         {% if item.overdue %}
                                             <span class="badge bg-danger">Overdue</span>
@@ -306,7 +306,7 @@
                             <div class="modal-content">
 
                                 <div class="modal-header">
-                                    <h5 class="modal-title">Delete Task</h5>
+                                    <h2 class="modal-title h5">Delete Task</h2>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
 
@@ -345,7 +345,7 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">Delete Plant</h5>
+                <h2 class="modal-title h5">Delete Plant</h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
