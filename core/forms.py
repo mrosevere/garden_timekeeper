@@ -204,4 +204,6 @@ class PlantTaskForm(forms.ModelForm):
 
         # Boolean fields need form-check styling
         if "all_year" in self.fields:
-            self.fields["all_year"].widget.attrs.update({"class": "form-check-input"})
+            self.fields["all_year"].widget.attrs.update(
+                {"class": "form-check-input"}
+            )
