@@ -103,7 +103,9 @@ class PlantForm(forms.ModelForm):
         ]
 
         widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "name": forms.TextInput(
+                attrs={"class": "form-control", "required": "required"}
+            ),
             "latin_name": forms.TextInput(attrs={"class": "form-control"}),
             "lifespan": forms.Select(attrs={"class": "form-select"}),
             "type": forms.Select(attrs={"class": "form-select"}),
@@ -137,6 +139,7 @@ class PlantForm(forms.ModelForm):
         # Crispy helper setup
         # -------------------------------------------------------------
         self.helper = FormHelper()
+        # Use custom setup rather than crispy default
         self.helper.form_tag = False
         self.helper.include_media = False
 
