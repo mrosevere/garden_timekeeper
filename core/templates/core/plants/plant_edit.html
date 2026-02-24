@@ -59,7 +59,6 @@
                             <!-- Image Preview and Delete Button Column -->
                              <!-- Image size set in CSS -->
                             <div class="col-12 d-flex flex-column align-items-center">
-                                {{ form.image.label_tag }}
 
                                 {% if form.instance.image %}
                                     <div id="current-image-block" class="mb-2">
@@ -161,7 +160,14 @@
 </div>
 
 <!-- Create Bed Modal -->
-<div class="modal fade" id="createBedModal" tabindex="-1" aria-labelledby="createBedModalLabel" aria-hidden="true">
+<div class="modal fade"
+     id="createBedModal"
+     tabindex="-1"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="createBedModalLabel"
+     aria-hidden="true">
+
     <div class="modal-dialog">
         <div class="modal-content">
 
