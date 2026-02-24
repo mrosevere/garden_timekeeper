@@ -239,3 +239,42 @@ function initSummernoteWithBootstrap5(selector, height = 200) {
         }
     });
 }
+
+
+// -------------------------------------------------------------
+// 5. Summernote Accessibility + Tooltip Guard 
+// 
+// This block fixes: 
+// • Missing accessible name on .note-editable 
+// • Prohibited ARIA attributes on .note-resizebar 
+// • Bootstrap tooltip double‑initialisation errors 
+// 
+// // Runs after Summernote has fully initialised. 
+// -------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Wait for Summernote to finish initialising
+    setTimeout(() => {
+
+        // 1. Add accessible name to Summernote editable region
+        document.querySelectorAll('.note-editable').forEach(el => {
+            if (!el.hasAttribute('aria-label')) {
+                el.setAttribute('aria-label', 'Notes field');
+            }
+        });
+
+        // 2. Remove prohibited ARIA attributes from resize bar
+        document.querySelectorAll('.note-resizebar').forEach(el => {
+            el.removeAttribute('aria-label');
+            el.removeAttribute('role');
+        });
+
+        // 3. Prevent Bootstrap tooltip double-initialisation
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            if (!bootstrap.Tooltip.getInstance(el)) {
+                new bootstrap.Tooltip(el);
+            }
+        });
+
+    }, 50); // small delay ensures Summernote DOM is ready
+});

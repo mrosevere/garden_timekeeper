@@ -8,8 +8,8 @@
     /* Light Mode Palette */
     --color-text: #040a09;
     --color-background: #e3f3e6;
-    --color-primary: #5a9db6;
-    --color-secondary: #4f7da6;
+    --color-primary: #3d6f87;
+    --color-secondary: #456c8f;
     --color-accent: #555b8c;
     --color-nav-footer: #f5f8f5;
 
@@ -52,6 +52,40 @@ main {
 footer {
     background-color: var(--color-nav-footer);
 }
+
+/* ==========================================================================
+   ACCESSIBILITY CHANGES
+   Improve Contrast Scores
+  ========================================================================== */
+
+a {
+    color: #0d55c2;
+}
+
+a:hover, a:focus {
+    color: #2f566a;
+}
+
+.text-danger {
+    color: #b02a37 !important;
+}
+
+.text-danger a {
+    color: #9a1f2c !important;
+}
+
+.page-item.disabled .page-link {
+    color: #495057 !important;   /* darker grey */
+    border-color: #adb5bd !important; /* optional, improves contrast */
+    opacity: 1 !important; /* Bootstrap dims disabled items; remove that */
+}
+
+/* Accessible danger badge */
+.badge.bg-danger {
+    background-color: #b02a37 !important; /* darker red */
+    color: #ffffff !important;
+}
+
 
 /* ==========================================================================
    NAVIGATION & HEADER

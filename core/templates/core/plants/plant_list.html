@@ -14,7 +14,7 @@
 </div>
 
 <!-- ======================================================== -->
-<!-- FILTER BAR (Desktop Open, Mobile Collapsible) -->
+<!-- FILTER BAR -->
 <!-- ======================================================== -->
 <div class="container mb-4">
   <div class="card shadow-sm">
@@ -38,18 +38,19 @@
 
           <!-- Search -->
           <div class="col-md-3">
-            <label class="form-label">Search</label>
+            <label for="search-input" class="form-label">Search</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-search"></i></span>
-              <input type="text" name="search" class="form-control" placeholder="Search plants..."
+              <input id="search-input" type="text" name="search" class="form-control"
+                     placeholder="Search plants..."
                      value="{{ request.GET.search }}">
             </div>
           </div>
 
           <!-- Bed Filter -->
           <div class="col-md-3">
-            <label class="form-label">Bed</label>
-            <select name="bed" class="form-select">
+            <label for="bed-select" class="form-label">Bed</label>
+            <select id="bed-select" name="bed" class="form-select">
               <option value="">All</option>
               {% for bed in request.user.garden_beds.all %}
                 <option value="{{ bed.id }}" {% if request.GET.bed == bed.id|stringformat:"s" %}selected{% endif %}>
@@ -61,8 +62,8 @@
 
           <!-- Lifespan -->
           <div class="col-md-2">
-            <label class="form-label">Lifespan</label>
-            <select name="lifespan" class="form-select">
+            <label for="lifespan-select" class="form-label">Lifespan</label>
+            <select id="lifespan-select" name="lifespan" class="form-select">
               <option value="">All</option>
               {% for value, label in lifespan_choices %}
                 <option value="{{ value }}" {% if request.GET.lifespan == value %}selected{% endif %}>
@@ -74,8 +75,8 @@
 
           <!-- Type -->
           <div class="col-md-2">
-            <label class="form-label">Type</label>
-            <select name="type" class="form-select">
+            <label for="type-select" class="form-label">Type</label>
+            <select id="type-select" name="type" class="form-select">
               <option value="">All</option>
               {% for value, label in type_choices %}
                 <option value="{{ value }}" {% if request.GET.type == value %}selected{% endif %}>
@@ -84,7 +85,6 @@
               {% endfor %}
             </select>
           </div>
-
 
           <!-- Apply + Reset -->
           <div class="col-12 col-lg-2 d-flex gap-2 align-items-end">
@@ -99,7 +99,7 @@
 </div>
 
 <!-- ======================================================== -->
-<!-- MOBILE CARD VIEW (below md) -->
+<!-- MOBILE CARD VIEW -->
 <!-- ======================================================== -->
 <div class="d-block d-md-none container mb-4">
   <div class="row g-3">
@@ -134,7 +134,9 @@
 
             <!-- Details -->
             <div class="flex-grow-1 text-muted small">
-              <b>Bed:</b> {{ plant.bed|default:"—" }} | <b>Type:</b> {{ plant.get_type_display }} | <b>Lifespan:</b> {{ plant.get_lifespan_display }}
+              <b>Bed:</b> {{ plant.bed|default:"—" }} |
+              <b>Type:</b> {{ plant.get_type_display }} |
+              <b>Lifespan:</b> {{ plant.get_lifespan_display }}
               <br>
               {% if plant.planting_date %}
                 <b>Planted:</b> {{ plant.planting_date|date:"Y-m-d" }}
@@ -148,30 +150,40 @@
 
         <!-- Card Footer -->
         <div class="card-footer d-flex justify-content-end gap-2">
-          <a href="{% url 'plant_edit' plant.pk %}" class="btn btn-sm btn-secondary" style="min-width: 60px;">Edit</a>
-          <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ plant.pk }}">Delete</button>
+          <a href="{% url 'plant_edit' plant.pk %}"
+             class="btn btn-sm btn-secondary"
+             aria-label="Edit plant {{ plant.name }}"
+             style="min-width: 60px;">Edit</a>
+
+          <button class="btn btn-sm btn-danger"
+                  aria-label="Delete plant {{ plant.name }}"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteModal-{{ plant.pk }}">
+            Delete
+          </button>
         </div>
 
       </div>
     </div>
-      {% empty %}
-      <div class="col-12">
-        <div class="card shadow-sm">
-          <div class="card-body text-center text-muted">
-            {% if total_plants == 0 %}
-              You don’t have any plants yet.
-            {% else %}
-              No plants match your filters.
-            {% endif %}
-          </div>
+
+    {% empty %}
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body text-center text-muted">
+          {% if total_plants == 0 %}
+            You don’t have any plants yet.
+          {% else %}
+            No plants match your filters.
+          {% endif %}
         </div>
       </div>
-      {% endfor %}
+    </div>
+    {% endfor %}
   </div>
 </div>
 
 <!-- ======================================================== -->
-<!-- DESKTOP TABLE VIEW (md and above) -->
+<!-- DESKTOP TABLE VIEW -->
 <!-- ======================================================== -->
 <div class="d-none d-md-block">
   <div class="container mb-4">
@@ -180,13 +192,10 @@
 
         <thead>
           <tr>
-            <!-- Fixed Image Column -->
             <th style="width:110px;">Image</th>
 
-            <!-- Loop over sort_options for table headers -->
             {% for option in sort_options %}
             <th>
-              {# Build link preserving current filters #}
               <a href="?sort={{ option.field }}&direction={% if current_sort == option.field and current_direction == 'asc' %}desc{% else %}asc{% endif %}&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}">
                 {{ option.label }}
 
@@ -201,7 +210,6 @@
             </th>
             {% endfor %}
 
-            <!-- Actions Column -->
             <th class="text-end">Actions</th>
           </tr>
         </thead>
@@ -209,6 +217,7 @@
         <tbody>
           {% for plant in object_list %}
           <tr>
+
             <!-- Image -->
             <td>
               {% if plant.image %}
@@ -226,7 +235,7 @@
             <!-- Name -->
             <td><a href="{% url 'plant_detail' plant.pk %}">{{ plant.name }}</a></td>
 
-            <!-- Bed / Location -->
+            <!-- Bed -->
             <td>{{ plant.bed|default:"—" }}</td>
 
             <!-- Planting Date -->
@@ -241,28 +250,39 @@
             <!-- Actions -->
             <td class="text-end">
               <div class="d-inline-flex gap-2">
-                <a href="{% url 'plant_edit' plant.pk %}" class="btn btn-sm btn-primary" style="min-width: 60px;">Edit</a>
-                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ plant.pk }}">Delete</button>
+                <a href="{% url 'plant_edit' plant.pk %}"
+                   class="btn btn-sm btn-primary"
+                   aria-label="Edit plant {{ plant.name }}"
+                   style="min-width: 60px;">Edit</a>
+
+                <button class="btn btn-sm btn-danger"
+                        aria-label="Delete plant {{ plant.name }}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal-{{ plant.pk }}">
+                  Delete
+                </button>
               </div>
             </td>
+
           </tr>
-          {% empty %} 
+
+          {% empty %}
           <tr>
             <td colspan="{{ sort_options|length|add:'1' }}" class="text-center text-muted py-4">
-              {% if total_plants == 0 %} 
-                You don’t have any plants yet. 
+              {% if total_plants == 0 %}
+                You don’t have any plants yet.
               {% else %}
-                No plants match your filters. 
+                No plants match your filters.
               {% endif %}
             </td>
           </tr>
           {% endfor %}
         </tbody>
+
       </table>
     </div>
   </div>
 </div>
-
 
 <!-- ======================================================== -->
 <!-- PAGINATION -->
@@ -272,33 +292,35 @@
   <nav aria-label="Plant list pagination">
     <ul class="pagination justify-content-center flex-wrap gap-1">
 
-      <!-- First Page Button -->
+      <!-- First -->
       {% if page_obj.has_previous %}
       <li class="page-item">
-        <a class="page-link" href="?page=1&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}&sort={{ current_sort }}&direction={{ current_direction }}" aria-label="First">
+        <a class="page-link" aria-label="First page"
+           href="?page=1&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}&sort={{ current_sort }}&direction={{ current_direction }}">
           &laquo;&laquo;
         </a>
       </li>
       {% else %}
       <li class="page-item disabled">
-        <span class="page-link">&laquo;&laquo;</span>
+        <span class="page-link" aria-hidden="true">&laquo;&laquo;</span>
       </li>
       {% endif %}
 
-      <!-- Previous Page -->
+      <!-- Previous -->
       {% if page_obj.has_previous %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}&sort={{ current_sort }}&direction={{ current_direction }}" aria-label="Previous">
+        <a class="page-link" aria-label="Previous page"
+           href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}&sort={{ current_sort }}&direction={{ current_direction }}">
           &laquo;
         </a>
       </li>
       {% else %}
       <li class="page-item disabled">
-        <span class="page-link">&laquo;</span>
+        <span class="page-link" aria-hidden="true">&laquo;</span>
       </li>
       {% endif %}
 
-      <!-- Page Numbers (Window around current page) -->
+      <!-- Page Numbers -->
       {% for num in paginator.page_range %}
         {% if num == page_obj.number %}
           <li class="page-item active" aria-current="page">
@@ -306,34 +328,39 @@
           </li>
         {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ num }}&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}&sort={{ current_sort }}&direction={{ current_direction }}">{{ num }}</a>
+            <a class="page-link"
+               href="?page={{ num }}&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}&sort={{ current_sort }}&direction={{ current_direction }}">
+              {{ num }}
+            </a>
           </li>
         {% endif %}
       {% endfor %}
 
-      <!-- Next Page -->
+      <!-- Next -->
       {% if page_obj.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}&sort={{ current_sort }}&direction={{ current_direction }}" aria-label="Next">
+        <a class="page-link" aria-label="Next page"
+           href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}&sort={{ current_sort }}&direction={{ current_direction }}">
           &raquo;
         </a>
       </li>
       {% else %}
       <li class="page-item disabled">
-        <span class="page-link">&raquo;</span>
+        <span class="page-link" aria-hidden="true">&raquo;</span>
       </li>
       {% endif %}
 
-      <!-- Last Page Button -->
+      <!-- Last -->
       {% if page_obj.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ paginator.num_pages }}&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}&sort={{ current_sort }}&direction={{ current_direction }}" aria-label="Last">
+        <a class="page-link" aria-label="Last page"
+           href="?page={{ paginator.num_pages }}&search={{ request.GET.search }}&bed={{ request.GET.bed }}&lifespan={{ request.GET.lifespan }}&type={{ request.GET.type }}&sort={{ current_sort }}&direction={{ current_direction }}">
           &raquo;&raquo;
         </a>
       </li>
       {% else %}
       <li class="page-item disabled">
-        <span class="page-link">&raquo;&raquo;</span>
+        <span class="page-link" aria-hidden="true">&raquo;&raquo;</span>
       </li>
       {% endif %}
 
@@ -341,7 +368,6 @@
   </nav>
 </div>
 {% endif %}
-
 
 <!-- ======================================================== -->
 <!-- DELETE MODALS -->
