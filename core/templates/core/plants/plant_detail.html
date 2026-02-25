@@ -13,9 +13,9 @@
         </a>
     </div>
 
-    <!-- ------------------------------------------------------ -->
+    <!-- ====================================================== -->
     <!-- Top section: two cards side-by-side on large screens   -->
-    <!-- ------------------------------------------------------ -->
+    <!-- ====================================================== -->
     <div class="row g-3">
 
         <!-- Left card: Plant details -->
@@ -126,9 +126,9 @@
 
     </div> <!-- end row -->
 
-    <!-- -------------------------------------------------------- -->
-    <!-- Tasks Section                                            -->
-    <!-- -------------------------------------------------------- -->
+    <!-- ====================================================== -->
+    <!-- Tasks Section                                          -->
+    <!-- ====================================================== -->
     <div class="mt-4">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -174,7 +174,6 @@
             <!-- Desktop table of tasks -->
             <div class="table-responsive d-none d-md-block">
                 <table class="table table-striped align-middle" id="plant-tasks-table">
-                    <!-- Table Head -->
                     <thead>
                         <tr>
                             <th scope="col" class="sortable" data-sort="name" aria-sort="none">
@@ -213,11 +212,9 @@
                             </th>
 
                             <th scope="col" class="text-end">Actions</th>
-
                         </tr>
                     </thead>
-                    
-                    <!-- Table Body -->
+
                     <tbody>
                         {% for item in task_info %}
                             {% with task=item.task %}
@@ -235,19 +232,16 @@
                                     data-next-due="{{ task.next_due|date:'Y-m-d' }}"
                                 >
 
-                                    <!-- Task Name -->
                                     <td scope="row">
                                         <a href="{% url 'task_detail' task.id %}">
                                             {{ task.name }}
                                         </a>
                                     </td>
 
-                                    <!-- Next Due -->
                                     <td>
                                         {{ task.next_due|date:"F j, Y"|default:"Not set" }}
                                     </td>
 
-                                    <!-- Status Badge -->
                                     <td>
                                         {% if item.overdue %}
                                             <span class="badge bg-danger">Overdue</span>
@@ -258,7 +252,6 @@
                                         {% endif %}
                                     </td>
 
-                                    <!-- Season Badge -->
                                     <td>
                                         {% if item.in_season %}
                                             <span class="badge bg-success">In Season</span>
@@ -267,15 +260,11 @@
                                         {% endif %}
                                     </td>
 
-                                    <!-- Frequency -->
                                     <td>
                                         {{ task.get_frequency_display }}
                                     </td>
 
-                                    <!-- Actions -->
                                     <td class="text-end">
-
-                                        <!-- Edit Button -->
                                         <a
                                             href="{% url 'task_update' task.id %}"
                                             class="btn btn-sm btn-secondary"
@@ -284,7 +273,6 @@
                                             Edit
                                         </a>
 
-                                        <!-- Delete Button -->
                                         <button
                                             type="button"
                                             class="btn btn-sm btn-danger"
@@ -294,7 +282,6 @@
                                         >
                                             Delete
                                         </button>
-
                                     </td>
 
                                 </tr>
@@ -315,16 +302,16 @@
                                 {% elif not item.in_season %}border-secondary
                                 {% endif %}
                             "
+                            role="group"
+                            aria-label="Task card for {{ task.name }}"
                             data-task-name="{{ task.name|lower }}"
                             data-status="{% if item.overdue %}overdue{% elif item.due_soon %}due-soon{% else %}scheduled{% endif %}"
                             data-season="{% if item.in_season %}in-season{% else %}out-of-season{% endif %}"
                             data-frequency="{{ task.get_frequency_display|lower }}"
                             data-next-due="{{ task.next_due|date:'Y-m-d' }}"
-                            aria-label="Task card for {{ task.name }}"
                         >
                             <div class="card-body">
 
-                                <!-- Title + Badges -->
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h2 class="card-title mb-0 h5">
                                         <a href="{% url 'task_detail' task.id %}">
@@ -349,7 +336,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Details -->
                                 <p class="mb-1">
                                     <strong>Next Due:</strong>
                                     {{ task.next_due|date:"F j, Y"|default:"Not set" }}
@@ -360,10 +346,7 @@
                                     {{ task.get_frequency_display }}
                                 </p>
 
-                                <!-- Actions -->
                                 <div class="d-flex flex-wrap gap-2">
-
-                                    <!-- Edit -->
                                     <a
                                         href="{% url 'task_update' task.id %}"
                                         class="btn btn-sm btn-secondary"
@@ -372,7 +355,6 @@
                                         Edit
                                     </a>
 
-                                    <!-- Delete -->
                                     <button
                                         type="button"
                                         class="btn btn-sm btn-danger"
@@ -382,7 +364,6 @@
                                     >
                                         Delete
                                     </button>
-
                                 </div>
 
                             </div>
@@ -391,78 +372,74 @@
                 {% endfor %}
             </div>
 
+            <!-- Delete Task Modals -->
+            {% for item in task_info %}
+                {% with task=item.task %}
+                    <div
+                        class="modal fade"
+                        id="deleteTaskModal{{ task.id }}"
+                        tabindex="-1"
+                        aria-hidden="true"
+                    >
+                        <div class="modal-dialog">
+                            <div class="modal-content">
 
-        <!-- Delete Task Modals -->
-        {% for item in task_info %}
-            {% with task=item.task %}
-                <div
-                    class="modal fade"
-                    id="deleteTaskModal{{ task.id }}"
-                    tabindex="-1"
-                    aria-labelledby="deleteTaskLabel{{ task.id }}"
-                    aria-describedby="deleteTaskDesc{{ task.id }}"
-                >
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-
-                            <div class="modal-header">
-                                <h2 class="modal-title h5" id="deleteTaskLabel{{ task.id }}">
-                                    Delete Task: {{ task.name }}
-                                </h2>
-                                <button
-                                    type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close delete task modal"
-                                ></button>
-                            </div>
-
-                            <div class="modal-body" id="deleteTaskDesc{{ task.id }}">
-                                Are you sure you want to delete <strong>{{ task.name }}</strong>?
-                            </div>
-
-                            <div class="modal-footer">
-                                <button
-                                    class="btn btn-secondary"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Cancel deletion of task {{ task.name }}"
-                                >
-                                    Cancel
-                                </button>
-
-                                <form method="post" action="{% url 'task_delete' task.id %}">
-                                    {% csrf_token %}
+                                <div class="modal-header">
+                                    <h2 class="modal-title h5" id="deleteTaskLabel{{ task.id }}">
+                                        Delete Task: {{ task.name }}
+                                    </h2>
                                     <button
-                                        class="btn btn-danger"
-                                        aria-label="Confirm delete task {{ task.name }}"
-                                    >
-                                        Delete
-                                    </button>
-                                </form>
-                            </div>
+                                        type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Close delete task modal"
+                                    ></button>
+                                </div>
 
+                                <div class="modal-body" id="deleteTaskDesc{{ task.id }}">
+                                    Are you sure you want to delete <strong>{{ task.name }}</strong>?
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button
+                                        class="btn btn-secondary"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Cancel deletion of task {{ task.name }}"
+                                    >
+                                        Cancel
+                                    </button>
+
+                                    <form method="post" action="{% url 'task_delete' task.id %}">
+                                        {% csrf_token %}
+                                        <button
+                                            class="btn btn-danger"
+                                            aria-label="Confirm delete task {{ task.name }}"
+                                        >
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endwith %}
-        {% endfor %}
+                {% endwith %}
+            {% endfor %}
 
         {% else %}
             <p class="text-muted">No tasks yet.</p>
         {% endif %}
 
-        <!-- Pagination container -->
         <div id="task-pagination" class="mt-3 d-flex justify-content-center"></div>
-    </div> <!-- end tasks section -->
-</div> <!-- end container -->
+    </div>
+</div>
 
 <!-- Delete Plant Modal -->
 <div
     class="modal fade"
     id="deletePlantModal"
     tabindex="-1"
-    aria-labelledby="deletePlantLabel"
-    aria-describedby="deletePlantDesc"
+    aria-hidden="true"
 >
     <div class="modal-dialog">
         <div class="modal-content">
