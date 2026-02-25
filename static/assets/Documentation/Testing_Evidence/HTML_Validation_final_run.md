@@ -37,7 +37,7 @@ The process was performed on the deployed [Heroku app](https://garden-timekeeper
 | core\beds\bed_create.html | 
 | core\beds\bed_detail.html | 
 | core\beds\bed_edit.html | 
-| core\beds\bed_list.html | 
+| core\beds\bed_list.html | Document checking completed. No errors or warnings to show.| [issue-272](https://github.com/mrosevere/garden_timekeeper/issues/272)|
 | core\plants\plant_create.html | Document checking completed. No errors or warnings to show. | |
 | core\plants\plant_detail.html | Document checking completed. No errors or warnings to show. | |
 | core\plants\plant_edit.html | Document checking completed. No errors or warnings to show. | |
