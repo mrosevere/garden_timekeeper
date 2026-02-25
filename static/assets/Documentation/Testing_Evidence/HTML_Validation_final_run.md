@@ -8,6 +8,10 @@ The process was performed on the deployed [Heroku app](https://garden-timekeeper
 3. Copy the source code and paste it into the [W3 Validator](https://validator.w3.org/#validate_by_input)
 4. Record the results below. Any issues are logged in the [GitHub Project](https://github.com/users/mrosevere/projects/17) as bugs.
 
+> **ℹ️ NOTE:**
+> On HTML Validation: The application uses Summernote to allow rich‑text notes. Because Summernote allows users to insert headings, inline styles, and other HTML elements, user‑generated content may trigger HTML validation warnings (e.g., nested headings, deprecated <font> tags). These warnings originate from user input rather than template markup.
+
+
 ## Results
 
 ### Accounts App
@@ -34,9 +38,9 @@ The process was performed on the deployed [Heroku app](https://garden-timekeeper
 | core\beds\bed_detail.html | 
 | core\beds\bed_edit.html | 
 | core\beds\bed_list.html | 
-| core\plants\plant_create.html | 
-| core\plants\plant_detail.html | 
-| core\plants\plant_edit.html | 
+| core\plants\plant_create.html | Document checking completed. No errors or warnings to show. | |
+| core\plants\plant_detail.html | Document checking completed. No errors or warnings to show. | |
+| core\plants\plant_edit.html | Document checking completed. No errors or warnings to show. | |
 | core\plants\plant_list.html | Document checking completed. No errors or warnings to show. | |
 | core\tasks\task_detail.html | Document checking completed. No errors or warnings to show.| [issue-269](https://github.com/mrosevere/garden_timekeeper/issues/269)|
 | core\tasks\task_form.html | Document checking completed. No errors or warnings to show.||

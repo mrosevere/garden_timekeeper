@@ -8,6 +8,9 @@ The process was performed on the deployed [Heroku app](https://garden-timekeeper
 3. Copy the source code and paste it into the [W3 Validator](https://validator.w3.org/#validate_by_input)
 4. Record the results below. Any issues are logged in the [GitHub Project](https://github.com/users/mrosevere/projects/17) as bugs.
 
+> **ℹ️ NOTE:**
+> On HTML Validation: The application uses Summernote to allow rich‑text notes. Because Summernote allows users to insert headings, inline styles, and other HTML elements, user‑generated content may trigger HTML validation warnings (e.g., nested headings, deprecated <font> tags). These warnings originate from user input rather than template markup.
+
 ## Results
 
 ### Accounts App
