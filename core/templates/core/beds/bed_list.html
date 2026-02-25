@@ -129,10 +129,7 @@
         <thead>
           <tr>
             {% for option in sort_options %}
-              <th
-                scope="col"
-                aria-sort="{% if current_sort == option.field %}{{ current_direction }}{% else %}none{% endif %}"
-              >
+              <th scope="col">
                 <a
                   href="?sort={{ option.field }}&direction={% if current_sort == option.field and current_direction == 'asc' %}desc{% else %}asc{% endif %}&search={{ request.GET.search }}&location={{ request.GET.location }}"
                   aria-label="Sort by {{ option.label }}{% if current_sort == option.field %} (currently {{ current_direction }}){% endif %}"
