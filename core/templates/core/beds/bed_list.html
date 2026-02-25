@@ -129,22 +129,31 @@
         <thead>
           <tr>
             {% for option in sort_options %}
-            <th>
-              <a href="?sort={{ option.field }}&direction={% if current_sort == option.field and current_direction == 'asc' %}desc{% else %}asc{% endif %}&search={{ request.GET.search }}&location={{ request.GET.location }}">
-                {{ option.label }}
-                {% if current_sort == option.field %}
-                  {% if current_direction == "asc" %}
-                    <i class="fa-solid fa-arrow-up ms-1"></i>
-                  {% else %}
-                    <i class="fa-solid fa-arrow-down ms-1"></i>
+              <th
+                scope="col"
+                aria-sort="{% if current_sort == option.field %}{{ current_direction }}{% else %}none{% endif %}"
+              >
+                <a
+                  href="?sort={{ option.field }}&direction={% if current_sort == option.field and current_direction == 'asc' %}desc{% else %}asc{% endif %}&search={{ request.GET.search }}&location={{ request.GET.location }}"
+                  aria-label="Sort by {{ option.label }}{% if current_sort == option.field %} (currently {{ current_direction }}){% endif %}"
+                >
+                  {{ option.label }}
+
+                  {% if current_sort == option.field %}
+                    {% if current_direction == 'asc' %}
+                      <i class="fa-solid fa-arrow-up ms-1" aria-hidden="true"></i>
+                    {% else %}
+                      <i class="fa-solid fa-arrow-down ms-1" aria-hidden="true"></i>
+                    {% endif %}
                   {% endif %}
-                {% endif %}
-              </a>
-            </th>
+                </a>
+              </th>
             {% endfor %}
-            <th class="text-end">Actions</th>
+
+            <th scope="col" class="text-end">Actions</th>
           </tr>
         </thead>
+
         <!-- Table body -->
         <tbody>
           {% for bed in object_list %}
