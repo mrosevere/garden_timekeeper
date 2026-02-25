@@ -38,8 +38,8 @@ I added SEO to the analysis for the core app (not selected by default).
 | core\plants\plant_detail.html | 97 | 100 | 100 | 100 |
 | core\plants\plant_edit.html | 98 | 100 | 96 | 91 |
 | core\plants\plant_list.html | 99 | 100 | 100 | 100 |
-| core\tasks\task_detail.html | 99 | 100 | 100 | 100 |
-| core\tasks\task_form.html | 98 | 100 | 96 | 91 |
+| core\tasks\task_detail.html | 97 | 100 | 100 | 100 |
+| core\tasks\task_form.html | 96 | 100 | 96 | 91 |
 | core\dashboard.html | 99 | 100 | 100 | 100 |
 | core\home.html | 99 | 100 | 100 | 100 |
 
@@ -109,3 +109,95 @@ Lighthouse runs its audit without authentication, so all protected URLs return r
 
 This does not affect real SEO.  
 All public pages (Home, Login, Register) are fully crawlable.
+
+# Screenshots:
+
+## accounts\login.html
+#### Before Fixes
+![login before fixes](/static/assets/images/lighthouse/login.png)
+#### After Fixes
+![login after fixes](/static/assets/images/lighthouse/login_after.png)
+
+## accounts\register.html
+#### Before Fixes
+![Register before fixes](/static/assets/images/lighthouse/Register.png)
+#### After Fixes
+![Register after fixes](/static/assets/images/lighthouse/Register_after.png)
+
+## accounts\account_edit.html
+#### Before Fixes
+![Account Edit before fixes](/static/assets/images/lighthouse/account_edit.png)
+#### After Fixes
+![Account Edit after fixes](/static/assets/images/lighthouse/account_edit_after.png)
+
+## accounts\account_settings.html
+![Account Settings](/static/assets/images/lighthouse/account_settings.png)
+
+## accounts\delete_account.html
+#### Before Fixes
+![Account Delete before fixes](/static/assets/images/lighthouse/delete_account_before.png)
+#### After Fixes
+![Account Delete after fixes](/static/assets/images/lighthouse/delete_account_after.png)
+
+## accounts\password_edit_done.html
+![Account Password Edit Done](/static/assets/images/lighthouse/password_edit_done.png)
+
+## accounts\password_edit.html
+![Account Password Edit](/static/assets/images/lighthouse/password_edit.png)
+
+## accounts\password_reset_complete.html
+![Account Password Reset Complete](/static/assets/images/lighthouse/password_reset_complete.png)
+
+## accounts\password_reset_confirm.html
+![Account Password Reset Confirm](/static/assets/images/lighthouse/password_reset_confirm.png)
+
+## accounts\password_reset_done.html
+![Account Password Reset Done](/static/assets/images/lighthouse/password_reset_done.png)
+
+## accounts\password_reset.html
+#### Before Fixes
+![Account Password Reset](/static/assets/images/lighthouse/password_reset.png)
+#### After Fixes
+![Account Password Reset](/static/assets/images/lighthouse/password_reset_after.png)
+
+# core\beds\bed_create.html
+![Bed Create](/static/assets/images/lighthouse/bed_create.png)
+
+# core\beds\bed_detail.html
+![Bed Detail](/static/assets/images/lighthouse/bed_detail.png)
+
+# core\beds\bed_edit.html
+![Bed Edit](/static/assets/images/lighthouse/bed_edit.png)
+
+# core\beds\bed_list.html
+![Bed List](/static/assets/images/lighthouse/bed_list.png)
+
+# core\plants\plant_create.html
+![Plant Create](/static/assets/images/lighthouse/plant_create.png)
+
+# core\plants\plant_detail.html
+![Plant Detail](/static/assets/images/lighthouse/plant_details.png)
+
+# core\plants\plant_edit.html
+![Plant Edit](/static/assets/images/lighthouse/plant_edit.png)
+
+# core\plants\plant_list.html
+![Plant List](/static/assets/images/lighthouse/plant_list.png)
+
+# core\tasks\task_detail.html
+![Task Detail](/static/assets/images/lighthouse/task_detail.png)
+
+# core\tasks\task_form.html
+![Task Form](/static/assets/images/lighthouse/task_form.png)
+
+# core\dashboard.html
+#### Before Fixes
+![Dashboard Before Fixes](/static/assets/images/lighthouse/dashboard_before.png)
+#### After Fixes
+![Dashboard After Fixes](/static/assets/images/lighthouse/dashboard_after.png)
+
+# core\home.html 
+#### Before Fixes
+![Home before fixes](/static/assets/images/lighthouse/home_before.png)
+#### After Fixes
+![Home after fixes](/static/assets/images/lighthouse/home_after.png)
