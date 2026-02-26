@@ -228,7 +228,7 @@ class BedListView(LoginRequiredMixin, ListView):
 
     model = GardenBed
     template_name = "core/beds/bed_list.html"
-    paginate_by = 3  # Small page size for mobile-friendly UX
+    paginate_by = 5  # x per page
 
     def get_queryset(self):
         """
@@ -315,9 +315,15 @@ class BedListView(LoginRequiredMixin, ListView):
 
         # Track current sort state to show arrows
         context['current_sort'] = self.request.GET.get('sort', 'name')
-        context['current_direction'] = self.request.GET.get('direction', 'asc')
+        context['current_direction'] = (
+            self.request.GET.get('direction', 'asc')
+        )
         context["beds"] = context["object_list"]
-        context["total_beds"] = GardenBed.objects.filter(owner=self.request.user).count()
+        context["total_beds"] = (
+            GardenBed.objects
+            .filter(owner=self.request.user)
+            .count()
+        )
 
         return context
 
@@ -572,7 +578,7 @@ class PlantListView(LoginRequiredMixin, ListView):
 
     model = Plant
     template_name = "core/plants/plant_list.html"
-    paginate_by = 3  # Mobile‑friendly page size
+    paginate_by = 5  # x per page
 
     def get_queryset(self):
         """
@@ -671,7 +677,9 @@ class PlantListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["lifespan_choices"] = PlantLifespan.choices
         context["type_choices"] = PlantType.choices
-        context["total_plants"] = Plant.objects.filter(owner=self.request.user).count()
+        context["total_plants"] = (
+            Plant.objects.filter(owner=self.request.user).count()
+        )
 
         # Sort options for template
         context["sort_options"] = [
