@@ -363,7 +363,7 @@ The Beds section allows users to create, view, update, and delete garden beds. I
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
 | Delete bed via modal | 1. Click **Delete**.<br>2. Confirm in modal. | Bed removed from list | Passed |
-| Cancel delete | 1. Click **Delete**.<br>2. Click **Cancel**. | No deletion occurs | Bug # 280 |
+| Cancel delete | 1. Click **Delete**.<br>2. Click **Cancel**. | No deletion occurs | [issue-281](https://github.com/mrosevere/garden_timekeeper/issues/281) |
 | Delete bed with related plants/tasks | 1. Create bed with plants/tasks.<br>2. Delete bed. | Bed deleted; related items handled per app logic (reassigned or cascaded) | Passed |
 | Modal displays correct bed name | Open delete modal | Modal shows correct bed name for confirmation | Passed |
 
@@ -385,7 +385,7 @@ The Beds section allows users to create, view, update, and delete garden beds. I
 |------|--------|-----------------|--------|
 | Search by name | Enter text in search box | Only matching beds displayed | Passed |
 | Search is case-insensitive | Search for lowercase/uppercase variations | Results identical | Passed |
-| Filter by location | Select a location from dropdown | Only beds in that location shown | Issue-282 |
+| Filter by location | Select a location from dropdown | Only beds in that location shown | [Issue-282](https://github.com/mrosevere/garden_timekeeper/issues/282) |
 | Clear filters | Apply filters then click **Reset** | Full bed list restored | Passed |
 
 ---
@@ -421,5 +421,125 @@ The Beds section allows users to create, view, update, and delete garden beds. I
 | Invalid bed ID | Visit /beds/9999 | 404 page displayed | Passed |
 | Server-side validation enforced | Submit manipulated form data | Invalid data rejected | Passed |
 | Beds page while logged out | Visit /beds | Redirect to login | Passed |
+
+---
+
+## 5. Plants
+
+The Plants section allows users to create, view, update, and delete plants associated with their garden beds. It includes rich‑text notes via Summernote, table sorting, search filtering, modal confirmations, and navigation links to related beds and tasks. This test suite validates all delivered functionality.
+
+---
+
+### 5.1 Viewing Plants
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Plants list loads | Navigate to **Plants** from navbar | Plants table displays all plants belonging to the logged‑in user | x |
+| Plants sorted by default | Open Plants page | Default sort order is alphabetical by plant name | x |
+| No plants created | Ensure user has no plants | Empty-state message displayed | x |
+| Plant count accurate | Create multiple plants | All plants appear in list | x |
+| Bed names displayed | View Plants list | Each plant shows its associated bed | x |
+
+---
+
+### 5.2 Creating Plants
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Create plant with valid data | 1. Click **Add Plant**.<br>2. Enter name, select bed, optional notes.<br>3. Submit form. | Plant is created and appears in list | x |
+| Create plant with missing name | 1. Click **Add Plant**.<br>2. Leave name blank.<br>3. Submit. | Field-level validation error shown | x |
+| Create plant with missing bed | 1. Click **Add Plant**.<br>2. Do not select a bed.<br>3. Submit. | Validation error shown | x |
+| Create plant with duplicate name in same bed | 1. Create “Tomatoes” in Bed A.<br>2. Attempt another “Tomatoes” in Bed A. | Error shown (unique constraint enforced per bed) | x |
+| Create plant with same name in different bed | 1. Create “Tomatoes” in Bed A.<br>2. Create “Tomatoes” in Bed B. | Allowed (unique per bed, not global) | x |
+| Cancel creation | 1. Click **Add Plant**.<br>2. Click **Cancel**. | User returned to Plants list with no changes | x |
+
+---
+
+### 5.3 Editing Plants
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Edit plant with valid data | 1. Click **Edit** on a plant.<br>2. Update name/bed/notes.<br>3. Submit. | Changes saved and reflected in list | x |
+| Edit plant with invalid data | 1. Remove name.<br>2. Submit. | Validation error shown | x |
+| Edit plant and cancel | 1. Click **Edit**.<br>2. Click **Cancel**. | No changes saved | x |
+| Edit updates related pages | 1. Edit plant name.<br>2. Visit Tasks page. | Updated plant name appears everywhere | x |
+
+---
+
+### 5.4 Deleting Plants
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Delete plant via modal | 1. Click **Delete**.<br>2. Confirm in modal. | Plant removed from list | x |
+| Cancel delete | 1. Click **Delete**.<br>2. Click **Cancel**. | No deletion occurs | x |
+| Delete plant with related tasks | 1. Create tasks for a plant.<br>2. Delete plant. | Plant deleted; tasks handled per app logic (cascade or reassignment) | x |
+| Modal displays correct plant name | Open delete modal | Modal shows correct plant name for confirmation | x |
+
+---
+
+### 5.5 Notes (Summernote)
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Add notes | 1. Create plant.<br>2. Enter formatted text in Summernote.<br>3. Save. | Notes saved and displayed correctly | x |
+| Edit notes | 1. Open Edit Plant.<br>2. Modify notes.<br>3. Save. | Updated notes displayed | x |
+| Rich text formatting preserved | Add headings, bold, lists | Formatting preserved on display | x |
+| Invalid HTML sanitised | Paste invalid HTML | Sanitised safely by Summernote/Django | x |
+
+---
+
+### 5.6 Sorting
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Sort by name | 1. Click **Name** column header.<br>2. Click again. | Ascending/descending toggle works | x |
+| Sort by bed | 1. Click **Bed** header.<br>2. Toggle sort. | Plants sort alphabetically by bed | x |
+| Sort by date added (if implemented) | Click **Created** header | Sorts correctly | x |
+| Sort persists after actions | 1. Sort by name.<br>2. Edit a plant.<br>3. Return to list. | Sort order remains applied | x |
+
+---
+
+### 5.7 Filtering & Search
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Search by name | Enter text in search box | Only matching plants displayed | x |
+| Search is case-insensitive | Search for lowercase/uppercase variations | Results identical | x |
+| Filter by bed | Select a bed from dropdown | Only plants in that bed shown | x |
+| Clear filters | Apply filters then click **Clear** | Full plant list restored | x |
+
+---
+
+### 5.8 Link Integrity
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Plant name links to detail page | Click plant name | Opens Plant Detail page | x |
+| Bed link | Click bed name in Plants list | Opens Bed Detail page | x |
+| Tasks link from plant detail | On Plant Detail, click a task | Opens Task Detail page | x |
+| “Add Task” from plant detail | Click **Add Task** | Opens task creation form with plant preselected | x |
+
+---
+
+### 5.9 Layout & UI Behaviour
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Table layout consistent | View Plants list | Columns aligned, spacing consistent | x |
+| Mobile layout | Resize to mobile width | Plants display as stacked cards | x |
+| Filters collapse on mobile | View on small screen | Filters collapse into toggle panel | x |
+| No horizontal scrolling | View on mobile | Layout fits screen width | x |
+| Flash messages appear correctly | Create/edit/delete plant | Success/error messages displayed and styled correctly | x |
+
+---
+
+### 5.10 Error Handling & Permissions
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Access plant not owned by user | Change plant ID in URL | 404 or redirect (permission denied) | x |
+| Invalid plant ID | Visit /plants/9999 | 404 page displayed | x |
+| Server-side validation enforced | Submit manipulated form data | Invalid data rejected | x |
+| Plants page while logged out | Visit /plants | Redirect to login | X |
 
 ---
