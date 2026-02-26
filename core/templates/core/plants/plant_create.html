@@ -10,8 +10,15 @@
     <div class="card shadow-sm">
         <div class="card-body">
 
-            <form method="post" enctype="multipart/form-data">
+            <!-- IMPORTANT: novalidate forces Django to handle validation -->
+            <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
+
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        Please correct the errors below.
+                    </div>
+                {% endif %}
 
                 <!-- Name & Image -->
                 <div class="card mb-3" role="group" aria-labelledby="section-name-image">
@@ -20,15 +27,22 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
+
                             <div class="col-sm-12 col-md-6">
                                 {{ form.name|as_crispy_field }}
+                                {{ form.name.errors }}
                             </div>
+
                             <div class="col-sm-12 col-md-6">
                                 {{ form.latin_name|as_crispy_field }}
+                                {{ form.latin_name.errors }}
                             </div>
+
                             <div class="col-12 mb-3">
                                 {{ form.image|as_crispy_field }}
+                                {{ form.image.errors }}
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -40,12 +54,17 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
+
                             <div class="col-md-6 mb-3">
                                 {{ form.bed|as_crispy_field }}
+                                {{ form.bed.errors }}
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 {{ form.planting_date|as_crispy_field }}
+                                {{ form.planting_date.errors }}
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -57,18 +76,24 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
+
                             <div class="col-md-6 mb-3">
                                 {{ form.type|as_crispy_field }}
+                                {{ form.type.errors }}
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 {{ form.lifespan|as_crispy_field }}
+                                {{ form.lifespan.errors }}
                             </div>
+
                         </div>
                     </div>
                 </div>
 
                 <!-- Notes -->
                 {{ form.notes|as_crispy_field }}
+                {{ form.notes.errors }}
 
                 <!-- Buttons -->
                 <div class="mt-3 d-flex justify-content-between">
