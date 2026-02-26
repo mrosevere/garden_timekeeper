@@ -290,21 +290,29 @@ class BedListView(LoginRequiredMixin, ListView):
         """
         context = super().get_context_data(**kwargs)
 
-        # Get all unique locations for current user
+        # Get all raw locations for the current user
         raw_locations = (
             GardenBed.objects
             .filter(owner=self.request.user)
             .values_list("location", flat=True)
-            .distinct()
         )
 
-        # Convert blank locations to ('none', 'None') for filter dropdown
-        context['location_choices'] = [
-            (
-                loc if loc else 'none',
-                loc if loc else 'None'
-            ) for loc in raw_locations
+        # Normalise, dedupe, and sort (Title Case as requested)
+        normalised_locations = sorted({
+            loc.strip().title()
+            for loc in raw_locations
+            if loc and loc.strip()
+        })
+
+        # Build final choices, including the special "None" entry
+        location_choices = [
+            ("none", "None")
+        ] + [
+            (loc, loc)
+            for loc in normalised_locations
         ]
+
+        context["location_choices"] = location_choices
 
         # Table sort headers
         context['sort_options'] = [
