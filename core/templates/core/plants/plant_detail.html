@@ -397,7 +397,10 @@
                                 </div>
 
                                 <div class="modal-body" id="deleteTaskDesc{{ task.id }}">
-                                    Are you sure you want to delete <strong>{{ task.name }}</strong>?
+                                    Are you sure you want to delete the <strong>{{ task.name }}</strong> task?
+                                    <p class="text-secondary mt-2">
+                                        This will permanently remove the task from your plant. If you want mark the task as completed or skipped, please go to the <a href="{% url 'dashboard' %}">Dashboard</a> instead.
+                                    </p>
                                 </div>
 
                                 <div class="modal-footer">
@@ -458,6 +461,9 @@
 
             <div class="modal-body" id="deletePlantDesc">
                 Are you sure you want to delete <strong>{{ plant.name }}</strong>?
+                <p class="text-secondary mt-2">
+                    This will permanently remove the plant from your garden.
+                </p>
             </div>
 
             <div class="modal-footer">
