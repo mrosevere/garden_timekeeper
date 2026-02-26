@@ -146,13 +146,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------------------
     function render() {
         const tableBody = qs("#dashboard-table-body");
-        const cardContainer = qs("#dashboard-cards .row");
+        const cardContainer = qs("#dashboard-cards");
 
         // If either container is missing, bail safely
         if (!tableBody || !cardContainer) return;
 
         clear(tableBody);
         clear(cardContainer);
+        const row = document.createElement("div");
+        row.className = "row";
+        cardContainer.appendChild(row);
 
         const pageItems = paginator.getPageItems();
 
@@ -166,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const col = document.createElement("div");
                 col.className = "col-12";
                 col.appendChild(task.dom.card);
-                cardContainer.appendChild(col);
+                row.appendChild(col);
             }
         });
 
@@ -177,70 +180,134 @@ document.addEventListener("DOMContentLoaded", () => {
     // 6. Pagination controls
     // ---------------------------------------------------------
     function renderPaginationControls() {
-    const container = qs("#dashboard-pagination");
-    if (!container) return;
+        const container = qs("#dashboard-pagination");
+        if (!container) return;
 
-    clear(container);
+        clear(container);
 
-    const total = paginator.totalPages();
-    if (total <= 1) return;
+        const total = paginator.totalPages();
+        if (total <= 1) return;
 
-    const current = paginator.currentPage;
+        const current = paginator.currentPage;
 
-    function makeButton(label, disabled, onClick) {
-        const btn = document.createElement("button");
-        btn.className = "btn btn-outline-secondary btn-sm mx-1";
-        btn.textContent = label;
-        btn.disabled = disabled;
-        btn.onclick = onClick;
-        return btn;
-    }
+        // Helper to create Bootstrap pagination items
+        function makePageItem({ label, disabled = false, active = false, onClick = null }) {
+            const li = document.createElement("li");
+            li.className = "page-item";
 
-    // First <<
-    container.appendChild(
-        makeButton("<<", current === 1, () => {
-            paginator.goToPage(1);
-            render();
-        })
-    );
+            // Disabled or active items use <span>
+            if (disabled || active) {
+                if (disabled) li.classList.add("disabled");
+                if (active) li.classList.add("active");
 
-    // Previous <
-    container.appendChild(
-        makeButton("<", current === 1, () => {
-            paginator.prev();
-            render();
-        })
-    );
+                const span = document.createElement("span");
+                span.className = "page-link";
 
-    // Page numbers
-    for (let i = 1; i <= total; i++) {
-        const btn = makeButton(i, false, () => {
-            paginator.goToPage(i);
-            render();
-        });
-        if (i === current) {
-            btn.classList.remove("btn-outline-secondary");
-            btn.classList.add("btn-secondary");
+                // Use innerHTML only for HTML entities
+                if (typeof label === "number") {
+                    span.textContent = label;
+                } else {
+                    span.innerHTML = label;
+                }
+
+                li.appendChild(span);
+                return li;
+            }
+
+            // Clickable items use <a>
+            const a = document.createElement("a");
+            a.className = "page-link";
+            a.href = "#";
+
+            if (typeof label === "number") {
+                a.textContent = label;
+            } else {
+                a.innerHTML = label;
+            }
+
+            a.onclick = (e) => {
+                e.preventDefault();
+                if (onClick) onClick();
+            };
+
+            li.appendChild(a);
+            return li;
         }
-        container.appendChild(btn);
+
+        // Create <nav> wrapper
+        const nav = document.createElement("nav");
+        nav.setAttribute("aria-label", "Dashboard pagination");
+
+        // Create <ul> for Bootstrap pagination
+        const ul = document.createElement("ul");
+        ul.className = "pagination justify-content-center flex-wrap gap-1 pagination-sm";
+
+        // First (««)
+        ul.appendChild(
+            makePageItem({
+                label: "&laquo;&laquo;",
+                disabled: current === 1,
+                onClick: () => {
+                    paginator.goToPage(1);
+                    render();
+                }
+            })
+        );
+
+        // Previous («)
+        ul.appendChild(
+            makePageItem({
+                label: "&laquo;",
+                disabled: current === 1,
+                onClick: () => {
+                    paginator.goToPage(current - 1);
+                    render();
+                }
+            })
+        );
+
+        // Page numbers
+        for (let i = 1; i <= total; i++) {
+            ul.appendChild(
+                makePageItem({
+                    label: i,
+                    active: i === current,
+                    onClick: () => {
+                        paginator.goToPage(i);
+                        render();
+                    }
+                })
+            );
+        }
+
+        // Next (»)
+        ul.appendChild(
+            makePageItem({
+                label: "&raquo;",
+                disabled: current === total,
+                onClick: () => {
+                    paginator.goToPage(current + 1);
+                    render();
+                }
+            })
+        );
+
+        // Last (»»)
+        ul.appendChild(
+            makePageItem({
+                label: "&raquo;&raquo;",
+                disabled: current === total,
+                onClick: () => {
+                    paginator.goToPage(total);
+                    render();
+                }
+            })
+        );
+
+        // Attach <ul> to <nav>, then into container
+        nav.appendChild(ul);
+        container.appendChild(nav);
     }
-
-    // Next >
-    container.appendChild(
-        makeButton(">", current === total, () => {
-            paginator.next();
-            render();
-        })
-    );
-
-    // Last >>
-    container.appendChild(
-        makeButton(">>", current === total, () => {
-            paginator.goToPage(total);
-            render();
-        })
-    );
-}
 
     // ---------------------------------------------------------
     // 7. Filtering events
