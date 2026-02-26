@@ -262,8 +262,8 @@ class BedListView(LoginRequiredMixin, ListView):
                 | qs.filter(location__exact="")
             )
         elif location:
-            # Filter by exact location match
-            qs = qs.filter(location=location)
+            # Filter by exact location match (case insensitive)
+            qs = qs.filter(location__iexact=location)
 
         # -------------------------
         # Sorting (validated)
