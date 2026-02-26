@@ -55,11 +55,17 @@
             {% endif %}
 
             <!-- #########################################################
-                 Plants in this bed
-                 ######################################################### -->
+                Plants in this bed
+                ######################################################### -->
             {% if bed.plants.exists %}
             <hr class="my-4">
-            <h2 class="h6 mb-3">Plants in this Bed</h2>
+
+            <h2 class="h6 mb-3">
+                Plants in this Bed
+                <span class="badge bg-secondary ms-2">
+                    {{ bed.plants.count }} plant{{ bed.plants.count|pluralize }}
+                </span>
+            </h2>
 
             <ul class="list-group mb-3">
                 {% for plant in bed.plants.all %}
