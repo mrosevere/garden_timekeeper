@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------------------
     // 3. Initialise paginator
     // ---------------------------------------------------------
-    const paginator = new Paginator(tasks, 3);
+    const paginator = new Paginator(tasks, 5); //x per page; 
 
     // ---------------------------------------------------------
     // 4. Combined filtering + sorting pipeline

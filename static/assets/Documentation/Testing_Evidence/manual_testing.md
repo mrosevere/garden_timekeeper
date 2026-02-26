@@ -354,7 +354,7 @@ The Beds section allows users to create, view, update, and delete garden beds. I
 | Edit bed with valid data | 1. Click **Edit** on a bed.<br>2. Change name/location.<br>3. Submit. | Changes saved and reflected in list | Passed |
 | Edit bed with invalid data | 1. Remove name.<br>2. Submit. | Validation error shown | Passed |
 | Edit bed and cancel | 1. Click **Edit**.<br>2. Click **Cancel**. | No changes saved | Passed |
-| Edit updates related pages | 1. Edit bed name.<br>2. Visit Plants/Tasks pages. | Updated bed name appears everywhere | x |
+| Edit updates related pages | 1. Edit bed name.<br>2. Visit Plants/Tasks pages. | Updated bed name appears everywhere | Passed |
 
 ---
 
@@ -470,10 +470,10 @@ The Plants section allows users to create, view, update, and delete plants assoc
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Delete plant via modal | 1. Click **Delete**.<br>2. Confirm in modal. | Plant removed from list | x |
-| Cancel delete | 1. Click **Delete**.<br>2. Click **Cancel**. | No deletion occurs | x |
-| Delete plant with related tasks | 1. Create tasks for a plant.<br>2. Delete plant. | Plant deleted; tasks handled per app logic (cascade or reassignment) | x |
-| Modal displays correct plant name | Open delete modal | Modal shows correct plant name for confirmation | x |
+| Delete plant via modal | 1. Click **Delete**.<br>2. Confirm in modal. | Plant removed from list | Passed |
+| Cancel delete | 1. Click **Delete**.<br>2. Click **Cancel**. | No deletion occurs | Passed |
+| Delete plant with related tasks | 1. Create tasks for a plant.<br>2. Delete plant. | Plant deleted; tasks handled per app logic (cascade or reassignment) | Passed |
+| Modal displays correct plant name | Open delete modal | Modal shows correct plant name for confirmation | Passed |
 
 ---
 
@@ -481,10 +481,10 @@ The Plants section allows users to create, view, update, and delete plants assoc
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Add notes | 1. Create plant.<br>2. Enter formatted text in Summernote.<br>3. Save. | Notes saved and displayed correctly | x |
-| Edit notes | 1. Open Edit Plant.<br>2. Modify notes.<br>3. Save. | Updated notes displayed | x |
-| Rich text formatting preserved | Add headings, bold, lists | Formatting preserved on display | x |
-| Invalid HTML sanitised | Paste invalid HTML | Sanitised safely by Summernote/Django | x |
+| Add notes | 1. Create plant.<br>2. Enter formatted text in Summernote.<br>3. Save. | Notes saved and displayed correctly | [issue-290](https://github.com/mrosevere/garden_timekeeper/issues/290) |
+| Edit notes | 1. Open Edit Plant.<br>2. Modify notes.<br>3. Save. | Updated notes displayed | [issue-290](https://github.com/mrosevere/garden_timekeeper/issues/290) |
+| Rich text formatting preserved | Add headings, bold, lists | Formatting preserved on display | Passed |
+| Invalid HTML sanitised | Paste invalid HTML | Sanitised safely by Summernote/Django | Passed |
 
 ---
 
@@ -492,10 +492,9 @@ The Plants section allows users to create, view, update, and delete plants assoc
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Sort by name | 1. Click **Name** column header.<br>2. Click again. | Ascending/descending toggle works | x |
-| Sort by bed | 1. Click **Bed** header.<br>2. Toggle sort. | Plants sort alphabetically by bed | x |
-| Sort by date added (if implemented) | Click **Created** header | Sorts correctly | x |
-| Sort persists after actions | 1. Sort by name.<br>2. Edit a plant.<br>3. Return to list. | Sort order remains applied | x |
+| Sort by name | 1. Click **Name** column header.<br>2. Click again. | Ascending/descending toggle works | Passed |
+| Sort by bed | 1. Click **Bed** header.<br>2. Toggle sort. | Plants sort alphabetically by bed | Passed |
+| Sort by date added (if implemented) | Click **Created** header | Sorts correctly | Passed |
 
 ---
 
@@ -503,10 +502,12 @@ The Plants section allows users to create, view, update, and delete plants assoc
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Search by name | Enter text in search box | Only matching plants displayed | x |
-| Search is case-insensitive | Search for lowercase/uppercase variations | Results identical | x |
-| Filter by bed | Select a bed from dropdown | Only plants in that bed shown | x |
-| Clear filters | Apply filters then click **Clear** | Full plant list restored | x |
+| Search by name | Enter text in search box | Only matching plants displayed | Passed |
+| Search is case-insensitive | Search for lowercase/uppercase variations | Results identical | Passed |
+| Filter by bed | Select a bed from dropdown | Only plants in that bed shown | Passed |
+| Filter by lifespan | Select a lifespan from dropdown | Only plants with that lifespan shown | Passed |
+| Filter by type | Select a type from dropdown | Only plants with that type shown | Passed |
+| Clear filters | Apply filters then click **Clear** | Full plant list restored | Passed |
 
 ---
 
@@ -514,10 +515,10 @@ The Plants section allows users to create, view, update, and delete plants assoc
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Plant name links to detail page | Click plant name | Opens Plant Detail page | x |
-| Bed link | Click bed name in Plants list | Opens Bed Detail page | x |
-| Tasks link from plant detail | On Plant Detail, click a task | Opens Task Detail page | x |
-| “Add Task” from plant detail | Click **Add Task** | Opens task creation form with plant preselected | x |
+| Plant name links to detail page | Click plant name | Opens Plant Detail page | Passed |
+| Bed link | Click bed name in Plants list | Opens Bed Detail page | [issue-291](https://github.com/mrosevere/garden_timekeeper/issues/291) |
+| Tasks link from plant detail | On Plant Detail, click a task | Opens Task Detail page | Passed |
+| “Add Task” from plant detail | Click **Add Task** | Opens task creation form with plant preselected | Passed |
 
 ---
 
@@ -525,11 +526,11 @@ The Plants section allows users to create, view, update, and delete plants assoc
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Table layout consistent | View Plants list | Columns aligned, spacing consistent | x |
-| Mobile layout | Resize to mobile width | Plants display as stacked cards | x |
-| Filters collapse on mobile | View on small screen | Filters collapse into toggle panel | x |
-| No horizontal scrolling | View on mobile | Layout fits screen width | x |
-| Flash messages appear correctly | Create/edit/delete plant | Success/error messages displayed and styled correctly | x |
+| Table layout consistent | View Plants list | Columns aligned, spacing consistent | Passed |
+| Mobile layout | Resize to mobile width | Plants display as stacked cards | Passed |
+| Filters collapse on mobile | View on small screen | Filters collapse into toggle panel | Passed |
+| No horizontal scrolling | View on mobile | Layout fits screen width | Passed |
+| Flash messages appear correctly | Create/edit/delete plant | Success/error messages displayed and styled correctly | Passed |
 
 ---
 
@@ -537,9 +538,9 @@ The Plants section allows users to create, view, update, and delete plants assoc
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Access plant not owned by user | Change plant ID in URL | 404 or redirect (permission denied) | x |
-| Invalid plant ID | Visit /plants/9999 | 404 page displayed | x |
-| Server-side validation enforced | Submit manipulated form data | Invalid data rejected | x |
-| Plants page while logged out | Visit /plants | Redirect to login | X |
+| Access plant not owned by user | Change plant ID in URL | 404 or redirect (permission denied) | Passed |
+| Invalid plant ID | Visit /plants/9999 | 404 page displayed | Passed |
+| Server-side validation enforced | Submit manipulated form data | Invalid data rejected | Passed |
+| Plants page while logged out | Visit /plants | Redirect to login | Passed |
 
 ---
