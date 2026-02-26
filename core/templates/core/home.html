@@ -22,12 +22,15 @@
         <div class="col-12">
             <div class="card h-100 shadow-sm">
                 <div class="card-body p-4">
-                    <h2 class="card-title fw-semibold h5">1. Create Your First Bed</h2>
+                    <h2 class="card-title fw-semibold h5">1. Create Your Garden Beds</h2>
                     <p class="card-text">
                         Start by creating a garden bed or container.  
                         This helps you organise your plants and keep everything tidy.
                     </p>
-                    <a href="{% url 'bed_create' %}" class="btn btn-primary">Create a Bed</a>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'bed_create' %}" class="btn btn-primary">Create a Bed</a>
+                        <a href="{% url 'bed_list' %}" class="btn btn-outline-primary" style="min-width: 112px;">View Beds</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -38,11 +41,11 @@
                 <div class="card-body p-4">
                     <h2 class="card-title fw-semibold h5">2. Add Plants & Their Tasks</h2>
                     <p class="card-text">
-                        Add your plants, assign them to beds, and set up recurring care tasks.
+                        Add your plants, assign them to beds, and create tasks for each plant.
                     </p>
                     <div class="d-flex flex-wrap gap-2">
-                        <a href="{% url 'plant_list' %}" class="btn btn-primary">View Plants</a>
-                        <a href="{% url 'plant_create' %}" class="btn btn-outline-primary">Add Plant</a>
+                        <a href="{% url 'plant_create' %}" class="btn btn-primary" style="min-width: 112px;">Add a Plant</a>
+                        <a href="{% url 'plant_list' %}" class="btn btn-outline-primary" style="min-width: 112px;">View Plants</a>
                     </div>
                 </div>
             </div>
@@ -54,20 +57,31 @@
                 <div class="card-body p-4">
                     <h2 class="card-title fw-semibold h5">3. Stay on Top of Your Tasks</h2>
                     <p class="card-text">
-                        Your dashboard shows everything due today and in the coming week.
+                        Your dashboard shows everything due this month.
                     </p>
-                    <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+                    <p class="card-text">
+                        Tasks automatically show up on your dashboard when they’re due.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Optional: Beds Overview -->
+        <!-- Contact Us -->
         <div class="col-12">
             <div class="card h-100 shadow-sm">
                 <div class="card-body p-4">
-                    <h2 class="card-title fw-semibold h5">Manage Beds & Containers</h2>
-                    <p class="card-text">View, edit, and organise your garden layout.</p>
-                    <a href="{% url 'bed_list' %}" class="btn btn-primary">View Beds</a>
+                    <h2 class="card-title fw-semibold h5">Contact Us</h2>
+                    <p class="card-text">We’d love to hear from you.  Whether you’ve found a bug, have a feature idea, or just want to share feedback, you can reach us anytime.</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="mailto:mark.rosevere@gmail.com" 
+                        class="btn btn-primary" 
+                        style="min-width: 112px;">
+                        Email Us
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
