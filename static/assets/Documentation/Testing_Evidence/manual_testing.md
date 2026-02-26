@@ -434,11 +434,11 @@ The Plants section allows users to create, view, update, and delete plants assoc
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Plants list loads | Navigate to **Plants** from navbar | Plants table displays all plants belonging to the logged‑in user | x |
-| Plants sorted by default | Open Plants page | Default sort order is alphabetical by plant name | x |
-| No plants created | Ensure user has no plants | Empty-state message displayed | x |
-| Plant count accurate | Create multiple plants | All plants appear in list | x |
-| Bed names displayed | View Plants list | Each plant shows its associated bed | x |
+| Plants list loads | Navigate to **Plants** from navbar | Plants table displays all plants belonging to the logged‑in user | [issue-284](https://github.com/mrosevere/garden_timekeeper/issues/284) |
+| Plants sorted by default | Open Plants page | Default sort order is alphabetical by plant name | Passed |
+| No plants created | Ensure user has no plants | Empty-state message displayed | Passed |
+| Plant count accurate | Create multiple plants | All plants appear in list | Passed |
+| Bed names displayed | View Plants list | Each plant shows its associated bed | Passed |
 
 ---
 
@@ -446,7 +446,7 @@ The Plants section allows users to create, view, update, and delete plants assoc
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Create plant with valid data | 1. Click **Add Plant**.<br>2. Enter name, select bed, optional notes.<br>3. Submit form. | Plant is created and appears in list | x |
+| Create plant with valid data | 1. Click **Add Plant**.<br>2. Enter name, select bed, optional notes.<br>3. Submit form. | Plant is created and appears in list | Passed |
 | Create plant with missing name | 1. Click **Add Plant**.<br>2. Leave name blank.<br>3. Submit. | Field-level validation error shown | x |
 | Create plant with missing bed | 1. Click **Add Plant**.<br>2. Do not select a bed.<br>3. Submit. | Validation error shown | x |
 | Create plant with duplicate name in same bed | 1. Create “Tomatoes” in Bed A.<br>2. Attempt another “Tomatoes” in Bed A. | Error shown (unique constraint enforced per bed) | x |
