@@ -222,11 +222,11 @@
             <td>
               {% if plant.image %}
                 <img src="{{ plant.image.url }}" alt="{{ plant.name }}"
-                     class="img-thumbnail" loading="lazy"
-                     style="height:80px; width:80px; object-fit:cover; object-position:center;">
+                    class="img-thumbnail" loading="lazy"
+                    style="height:80px; width:80px; object-fit:cover; object-position:center;">
               {% else %}
                 <div class="bg-light border rounded d-flex align-items-center justify-content-center"
-                     style="height:80px; width:80px;">
+                    style="height:80px; width:80px;">
                   <span class="text-muted small">No image</span>
                 </div>
               {% endif %}
@@ -235,25 +235,25 @@
             <!-- Name -->
             <td><a href="{% url 'plant_detail' plant.pk %}">{{ plant.name }}</a></td>
 
-            <!-- Bed -->
-            <td>{{ plant.bed|default:"—" }}</td>
-
             <!-- Planting Date -->
             <td>{{ plant.planting_date|date:"Y-m-d" }}</td>
+
+            <!-- Type -->
+            <td>{{ plant.get_type_display }}</td>
 
             <!-- Lifespan -->
             <td>{{ plant.get_lifespan_display }}</td>
 
-            <!-- Type -->
-            <td>{{ plant.get_type_display }}</td>
+            <!-- Bed -->
+            <td>{{ plant.bed|default:"—" }}</td>
 
             <!-- Actions -->
             <td class="text-end">
               <div class="d-inline-flex gap-2">
                 <a href="{% url 'plant_edit' plant.pk %}"
-                   class="btn btn-sm btn-primary"
-                   aria-label="Edit plant {{ plant.name }}"
-                   style="min-width: 60px;">Edit</a>
+                  class="btn btn-sm btn-primary"
+                  aria-label="Edit plant {{ plant.name }}"
+                  style="min-width: 60px;">Edit</a>
 
                 <button class="btn btn-sm btn-danger"
                         aria-label="Delete plant {{ plant.name }}"
