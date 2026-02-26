@@ -22,6 +22,13 @@ Testing covers:
 | User Story | Test Steps | Expected Result | Actual Result | Status |
 |-----------|------------|----------------|----------------|--------|
 | As a user, I can register an account | Visit signup page, enter valid details | Account created, redirected to login | Works as expected | Pass |
+| As a user, I cannot register an account with an existing username | Visit signup page, enter duplicate username (case insensitive) | Error message on registration page | Works as expected | Pass |
+| As a user, I cannot register an account without username | Visit signup page, do not enter username | Error message on registration page reflects missing field | Works as expected | Pass |
+| As a user, I cannot register an account without email | Visit signup page, do not enter email | Error message on registration page reflects missing field | Works as expected | Pass |
+| As a user, I cannot register an account without password | Visit signup page, do not enter password | Error message on registration page reflects missing field | Works as expected | Pass |
+| As a user, I cannot register an account with mismatching passwords | Visit signup page, enter different passwords | Error message on registration page reflects passwords do not match | Works as expected | Pass |
+| As a user, I can navigate from the register page to the login page | Visit signup page, click "Log in here" link | User is redirected to the login page | Works as expected | Pass |
+| As a user, I can register an account | Visit signup page, enter valid details | Account created, redirected to login | Works as expected | Pass |
 | As a user, I can log in | Enter valid credentials | Logged in and redirected | Works as expected | Pass |
 | As a user, I can log out | Click Logout | Session ends, redirected | Works as expected | Pass |
 | As a user, I can view my garden beds | Navigate to Beds page | Beds displayed | Works as expected | Pass |
