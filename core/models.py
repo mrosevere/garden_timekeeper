@@ -33,6 +33,15 @@ class GardenBed(models.Model):
     location = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Set python alias as we changed the "description" field to "notes"
+    @property
+    def notes(self):
+        return self.description or ""
+
+    @notes.setter
+    def notes(self, value):
+        self.description = value
+
     class Meta:
         ordering = ["name"]
         constraints = [
@@ -40,7 +49,11 @@ class GardenBed(models.Model):
                 Lower("name"),
                 "owner",
                 name="unique_bed_name_per_user_case_insensitive"
-            )
+            ),
+            models.CheckConstraint(
+                name="bed_name_not_blank",
+                condition=~models.Q(name=""),
+            ),
         ]
 
     def __str__(self):
@@ -122,6 +135,14 @@ class Plant(models.Model):
     # Store images in Cloudinary - not locally or they won't display in Prod.
     image = CloudinaryField("image", blank=True, null=True)
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="plant_name_not_blank",
+                condition=~models.Q(name=""),
+            ),
+        ]
+
     def __str__(self):
         return self.name
 
@@ -142,6 +163,16 @@ class PlantTask(models.Model):
     # Meta data
     class Meta:
         ordering = ["next_due", "last_done", "name"]
+        constraints = [
+            models.CheckConstraint(
+                name="task_name_not_blank",
+                condition=~models.Q(name=""),
+            ),
+            models.CheckConstraint(
+                name="task_frequency_not_blank",
+                condition=~models.Q(frequency=""),
+            ),
+        ]
 
     # link to User
     user = models.ForeignKey(

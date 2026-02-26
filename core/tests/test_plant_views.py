@@ -61,12 +61,15 @@ class PlantFormTests(TestCase):
         self.bed = GardenBed.objects.create(owner=self.user, name="Bed A")
 
     def test_valid_form(self):
-        form = PlantForm(data={
-            "name": "Tomato",
-            "type": PlantType.VEGETABLE,
-            "lifespan": PlantLifespan.ANNUAL,
-            "bed": self.bed.id,
-        })
+        form = PlantForm(
+            data={
+                "name": "Tomato",
+                "type": PlantType.VEGETABLE,
+                "lifespan": PlantLifespan.ANNUAL,
+                "bed": self.bed.id,
+            },
+            user=self.user,  # <-- required
+        )
         self.assertTrue(form.is_valid())
 
     def test_name_required(self):
@@ -239,19 +242,23 @@ class PlantViewTests(TestCase):
 
     def test_edit_requires_login(self):
         response = self.client.get(
-            reverse("plant_update", args=[self.plant1.id])
+            reverse("plant_edit", args=[self.plant1.id])
         )
         self.assertEqual(response.status_code, 302)
 
     def test_user_can_edit_own_plant(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.post(
-            reverse("plant_update", args=[self.plant1.id]), {
+
+        self.client.post(
+            reverse("plant_edit", args=[self.plant1.id]),
+            {
                 "name": "Updated Tomato",
                 "type": PlantType.VEGETABLE,
                 "lifespan": PlantLifespan.ANNUAL,
                 "bed": self.bed2.id,
-            })
+            }
+        )
+
         self.plant1.refresh_from_db()
         self.assertEqual(self.plant1.name, "Updated Tomato")
         self.assertEqual(self.plant1.bed, self.bed2)
@@ -259,7 +266,7 @@ class PlantViewTests(TestCase):
     def test_user_cannot_edit_other_users_plant(self):
         self.client.login(username="mark", password="pass")
         response = self.client.get(
-            reverse("plant_update", args=[self.other_plant.id])
+            reverse("plant_edit", args=[self.other_plant.id])
         )
         self.assertEqual(response.status_code, 404)
 

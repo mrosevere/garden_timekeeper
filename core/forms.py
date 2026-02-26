@@ -54,12 +54,15 @@ class GardenBedForm(forms.ModelForm):
         """
         name = self.cleaned_data["name"].strip()
 
-        # Determine owner:
-        # - CreateView: user passed via get_form_kwargs()
-        # - UpdateView: instance.owner already set
+        # Determine owner if available
         owner = self.user or getattr(self.instance, "owner", None)
 
-        qs = GardenBed.objects.filter(owner=owner, name__iexact=name)
+        # Start with all beds with this name (case-insensitive)
+        qs = GardenBed.objects.filter(name__iexact=name)
+
+        # If we know the owner, scope to them (normal app behaviour)
+        if owner is not None:
+            qs = qs.filter(owner=owner)
 
         # Exclude current instance when editing
         if self.instance.pk:

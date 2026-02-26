@@ -279,26 +279,28 @@ class GardenBedViewTests(TestCase):
         self.client.login(username="mark", password="pass")
         response = self.client.post(reverse("bed_create"), {"name": "New Bed"})
         self.assertEqual(GardenBed.objects.count(), 2)
-        self.assertRedirects(response, reverse("dashboard"))
+        self.assertRedirects(response, reverse("bed_list"))
 
     # UPDATE
     def test_edit_requires_login(self):
-        response = self.client.get(reverse("bed_update", args=[self.bed.id]))
+        response = self.client.get(reverse("bed_edit", args=[self.bed.id]))
         self.assertEqual(response.status_code, 302)
 
     def test_user_can_edit_own_bed(self):
         self.client.login(username="mark", password="pass")
-        response = self.client.post(
-            reverse("bed_update", args=[self.bed.id]),
+
+        self.client.post(
+            reverse("bed_edit", args=[self.bed.id]),
             {"name": "Updated Bed", "location": "", "notes": ""}
         )
+
         self.bed.refresh_from_db()
         self.assertEqual(self.bed.name, "Updated Bed")
 
     def test_user_cannot_edit_other_users_bed(self):
         self.client.login(username="other", password="pass")
-        response = self.client.get(reverse("bed_update", args=[self.bed.id]))
-        self.assertEqual(response.status_code, 403)
+        response = self.client.get(reverse("bed_edit", args=[self.bed.id]))
+        self.assertEqual(response.status_code, 404)
 
     # DELETE
     def test_delete_requires_login(self):
@@ -309,9 +311,9 @@ class GardenBedViewTests(TestCase):
         self.client.login(username="mark", password="pass")
         response = self.client.post(reverse("bed_delete", args=[self.bed.id]))
         self.assertFalse(GardenBed.objects.filter(id=self.bed.id).exists())
-        self.assertRedirects(response, reverse("dashboard"))
+        self.assertRedirects(response, reverse("bed_list"))
 
     def test_user_cannot_delete_other_users_bed(self):
         self.client.login(username="other", password="pass")
         response = self.client.post(reverse("bed_delete", args=[self.bed.id]))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
