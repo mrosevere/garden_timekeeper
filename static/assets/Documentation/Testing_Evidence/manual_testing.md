@@ -447,11 +447,11 @@ The Plants section allows users to create, view, update, and delete plants assoc
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
 | Create plant with valid data | 1. Click **Add Plant**.<br>2. Enter name, select bed, optional notes.<br>3. Submit form. | Plant is created and appears in list | Passed |
-| Create plant with missing name | 1. Click **Add Plant**.<br>2. Leave name blank.<br>3. Submit. | Field-level validation error shown | x |
-| Create plant with missing bed | 1. Click **Add Plant**.<br>2. Do not select a bed.<br>3. Submit. | Validation error shown | x |
-| Create plant with duplicate name in same bed | 1. Create “Tomatoes” in Bed A.<br>2. Attempt another “Tomatoes” in Bed A. | Error shown (unique constraint enforced per bed) | x |
-| Create plant with same name in different bed | 1. Create “Tomatoes” in Bed A.<br>2. Create “Tomatoes” in Bed B. | Allowed (unique per bed, not global) | x |
-| Cancel creation | 1. Click **Add Plant**.<br>2. Click **Cancel**. | User returned to Plants list with no changes | x |
+| Create plant with missing name | 1. Click **Add Plant**.<br>2. Leave name blank.<br>3. Submit. | Field-level validation error shown | [issue-286](https://github.com/mrosevere/garden_timekeeper/issues/286) |
+| Create plant with missing type | 1. Click **Add Plant**.<br>2. Do not select a type.<br>3. Submit. | Validation error shown | Passed |
+| Create plant with duplicate name | 1. Create “Tomatoes” in Bed A.<br>2. Attempt another “Tomatoes” in Bed A. | Multiple plants per bed are permitted  | Passed |
+| Create plant with same name in different bed | 1. Create “Tomatoes” in Bed A.<br>2. Create “Tomatoes” in Bed B. | Allowed (unique per bed is NOT enforced) | Passed |
+| Cancel creation | 1. Click **Add Plant**.<br>2. Click **Cancel**. | User returned to Plants list with no changes | Passed |
 
 ---
 
@@ -459,10 +459,10 @@ The Plants section allows users to create, view, update, and delete plants assoc
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Edit plant with valid data | 1. Click **Edit** on a plant.<br>2. Update name/bed/notes.<br>3. Submit. | Changes saved and reflected in list | x |
-| Edit plant with invalid data | 1. Remove name.<br>2. Submit. | Validation error shown | x |
-| Edit plant and cancel | 1. Click **Edit**.<br>2. Click **Cancel**. | No changes saved | x |
-| Edit updates related pages | 1. Edit plant name.<br>2. Visit Tasks page. | Updated plant name appears everywhere | x |
+| Edit plant with valid data | 1. Click **Edit** on a plant.<br>2. Update name/bed/notes.<br>3. Submit. | Changes saved and reflected in list | Passed |
+| Edit plant with invalid data | 1. Remove name.<br>2. Submit. | Validation error shown | Passed |
+| Edit plant and cancel | 1. Click **Edit**.<br>2. Click **Cancel**. | No changes saved | Passed |
+| Edit updates related pages | 1. Edit plant name.<br>2. Visit Tasks page. | Updated plant name appears everywhere | Passed |
 
 ---
 
