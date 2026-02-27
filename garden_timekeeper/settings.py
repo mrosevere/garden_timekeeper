@@ -103,7 +103,8 @@ if dj_database_url:
     DATABASES = {
         'default': dj_database_url.parse(
             os.getenv("DATABASE_URL", "sqlite:///db.sqlite3"),
-            conn_max_age=600,
+            conn_max_age=0,
+            conn_health_checks=True,
             ssl_require=False
         )
     }
@@ -167,8 +168,14 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 # Where Django collects all static files when collectstatic is run.
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Whitenoise settings
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+if DEBUG:
+    STATICFILES_STORAGE = (
+        'django.contrib.staticfiles.storage.StaticFilesStorage'
+    )
+else:
+    STATICFILES_STORAGE = (
+        'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    )
 
 # -----------------------------------------------------
 # Media Storage
@@ -289,6 +296,7 @@ LOGGING = {
 
 # Security settings for production
 if not DEBUG:
+    # Set to false to allow local Dev Instance to run in http
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

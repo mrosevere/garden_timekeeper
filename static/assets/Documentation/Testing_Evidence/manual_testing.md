@@ -2,6 +2,32 @@
 
 This document outlines the complete manual testing performed for the **Garden Timekeeper** application. All tests were carried out on both the deployed Heroku version and the local development environment. Testing covers all major features, negative scenarios, validation behaviour, responsiveness, accessibility, and deployment reliability.
 
+## How to Use This Document
+
+This document contains the full manual testing evidence for the Garden Timekeeper application.  
+It is organised by **feature area** (Authentication, Navigation, Dashboard, Beds, Plants, Tasks) so that each component can be reviewed independently.
+
+The README provides a high‑level summary of the testing approach.  
+This document provides the **detailed test cases, results, and issue references**.
+
+---
+
+## Mapping to README Testing Summary
+
+The following table shows how the README testing categories map to the sections in this document:
+
+| README Category | Evidence in This Document |
+|-----------------|---------------------------|
+| **Functional Testing** | Dashboard, Beds, Plants, Tasks, Navigation |
+| **Form & Validation Testing** | All Create/Edit forms across Beds, Plants, Tasks, Authentication |
+| **Responsive & Cross‑Browser Testing** | Navigation & Layout → Responsive Layout, plus each feature’s Layout section |
+| **User Flow Testing** | Authentication → Navigation → CRUD flows in Beds/Plants/Tasks |
+| **Permissions Testing** | Authentication → Access Control & Permissions |
+| **Error Handling** | Each feature’s Error Handling section |
+| **Scheduling Logic** | Tasks → Recurring Task Logic (if included) |
+
+This mapping makes it easy for assessors to verify that **every requirement in the README has corresponding evidence** in the manual testing document.
+
 
 ## 1. Authentication
 
@@ -764,5 +790,252 @@ The Task Scheduling section controls when a task occurs throughout the year, inc
 | Frequency and repeat aligned | View form | Fields aligned in two‑column layout | Passed |
 | Cancel button returns to plant | Click **Cancel** | Redirects to Plant Detail page | Passed |
 | Delete button visible only when editing | Open Create Task | Delete button not shown | Passed |
+
+---
+
+## 7. User Flow Testing
+
+This section validates full end‑to‑end user journeys across the Garden Timekeeper application.  
+Unlike feature‑specific tests, these flows ensure that the system behaves correctly when users perform multi‑step actions that span multiple pages, models, and permissions.
+
+User flow testing confirms:
+- Navigation between features works intuitively  
+- Redirects behave correctly  
+- Success/error messages appear at the right time  
+- CRUD operations work in sequence  
+- Users cannot break flows by skipping steps or manipulating URLs  
+
+---
+
+### 7.1 Registration → Login → Dashboard Access
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| New user onboarding | 1. Register a new account.<br>2. Log in with the new credentials.<br>3. Arrive on Home Page.<br>4. Create a Bed.<br>5. From the **Success** message, add a plant.br>6. From the **Success** message, add a task. | User successfully registers, logs in, and is redirected to Home page, where they can follow the flow to create a Bed, Plant and Task. | Passed |
+| Login redirect behaviour | 1. Attempt to access /beds while logged out.<br>2. System redirects to login.<br>3. After login, user is redirected back to /beds. | Redirect chain works correctly. | Passed |
+
+---
+
+### 7.2 Create Bed → Create Plant → Create Task
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Full content creation flow | 1. From Bed List, create a new Bed.<br>2. From Plant List, click **Add Plant**.<br>3. Create a Plant.<br>4. From Plant Detail, click **Add Task**.<br>5. Create a Task. | Bed, Plant, and Task created successfully and linked correctly. | Passed |
+| Success messages appear | Perform each create action | Success messages appear after each creation. | Passed |
+
+---
+
+### 7.3 Edit Flow (Bed → Plant → Task)
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Edit all related objects | 1. Edit a Bed name.<br>2. Edit a Plant name.<br>3. Edit a Task name/date/type.<br>4. Return to Dashboard. | All edits persist and appear correctly across all pages. | Passed |
+| Edited names propagate | 1. Edit Bed name.<br>2. View Plants and Tasks lists. | Updated Bed name appears everywhere. | Passed |
+| Cancel edit | 1. Open Edit form.<br>2. Click Cancel. | No changes saved; user returned to previous page. | Passed |
+
+---
+
+### 7.4 Delete Flow (Task → Plant → Bed)
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Delete task from detail page | 1. Open Task Detail.<br>2. Click Delete.<br>3. Confirm. | Task removed; user redirected to Plant Detail. | Passed |
+| Delete plant with tasks | 1. Create Plant with tasks.<br>2. Delete Plant.<br>3. Confirm. | Plant deleted; tasks handled per app logic (cascade). | Passed |
+| Delete bed with plants | 1. Create Bed with Plants.<br>2. Delete Bed.<br>3. Confirm. | Bed deleted; plants handled per app logic (plant unassigned). | Passed |
+
+---
+
+### 7.5 Dashboard → Task Completion Flow
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Mark task as done | 1. From Dashboard, click Done on a task.<br>2. Confirm action. | Task disappears from Dashboard and shows as completed in Task Detail. | Passed |
+| Mark task as skipped | 1. From Dashboard, click Skip.<br>2. Confirm action. | Task disappears from Dashboard and shows as skipped. | Passed |
+| Dashboard updates immediately | Complete or skip a task | Dashboard refreshes and no longer shows the task. | Passed |
+
+---
+
+### 7.6 Permissions Flow (User A vs User B)
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| User A cannot access User B’s content | 1. Log in as User A.<br>2. Attempt to access User B’s Bed/Plant/Task via URL. | 404 or redirect to Dashboard. | Passed |
+| User B cannot edit User A’s content | 1. Log in as User B.<br>2. Attempt to access edit URLs for User A’s objects. | Access denied (404 or redirect). | Passed |
+| Cross‑user dashboard protection | Log in as User B and attempt /dashboard?user=A | Dashboard only shows User B’s tasks. | Passed |
+
+---
+
+### 6.7 Error & Redirect Flow
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Invalid object ID | Visit /plants/9999 or /beds/9999 | Custom 404 page displayed. | Passed |
+| Form submission with errors | Submit form with missing required fields | Error messages displayed; form retains entered data. | Passed |
+| Cancel buttons behave correctly | Click Cancel on any form | User returned to correct parent page. | Passed |
+
+---
+
+### 7.8 Logout Flow
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Logout from any page | 1. Log in.<br>2. Navigate to any page.<br>3. Click Logout. | User logged out and redirected to Login page. | Passed |
+| Access after logout | Attempt to access /beds, /plants, /tasks after logout | Redirect to Login page. | Passed |
+
+## 8. Cross‑Browser Testing
+
+Cross‑browser testing verifies that the Garden Timekeeper application behaves consistently across different browsers, rendering engines, and device types.  
+Testing was performed on both desktop and mobile versions of:
+
+- **Google Chrome (latest)**
+- **Mozilla Firefox (latest)**
+- **Safari (iOS)**
+- **Microsoft Edge (latest)**
+
+The goal was to ensure consistent layout, navigation, form behaviour, and interactive elements across all supported environments.
+
+---
+
+### 8.1 Page Rendering & Layout Consistency
+
+| Test | Steps | Expected Result | Chrome | Firefox | Safari | Edge |
+|------|--------|-----------------|--------|---------|--------|------|
+| Homepage loads correctly | Open homepage | Layout renders correctly with no visual defects | x | x | x | x |
+| Navbar layout consistent | View navbar on each browser | Navbar items aligned and visible | x | x | x | x |
+| Footer layout consistent | Scroll to bottom | Footer sticks to bottom and does not overlap content | x | x | x | x |
+| Dashboard layout | Open Dashboard | Cards/tables render correctly with no overflow | x | x | x | x |
+| Tables render correctly | Open Beds/Plants/Tasks lists | Columns aligned, no clipping | x | x | x | x |
+| Mobile responsive layout | Resize window or test on mobile | Layout switches to stacked/mobile view | x | x | x | x |
+
+---
+
+### 8.2 Form Behaviour & Validation
+
+| Test | Steps | Expected Result | Chrome | Firefox | Safari | Edge |
+|------|--------|-----------------|--------|---------|--------|------|
+| Form fields render correctly | Open any Create/Edit form | All fields visible and styled correctly | Pass | Pass | Pass | Pass |
+| Client‑side validation disabled | Inspect form (`novalidate`) | Browser does not block submission | Pass | Pass | Pass | Pass |
+| Django validation messages appear | Submit invalid form | Error messages appear under fields | Pass | Pass | Pass | Pass |
+| Date picker behaviour | Use date fields | Date input works consistently | Pass | Pass | Pass | Pass |
+| Summernote editor loads | Open Plant Create/Edit | Editor loads and toolbar works | Pass | Pass | Pass | Pass |
+
+---
+
+### 8.3 Navigation & Interaction
+
+| Test | Steps | Expected Result | Chrome | Firefox | Safari | Edge |
+|------|--------|-----------------|--------|---------|--------|------|
+| Navbar links work | Click each navbar item | Correct pages load | Pass | Pass | Pass | Pass |
+| Hamburger menu works | Test on mobile | Menu opens/closes correctly | Pass | Pass | Pass | Pass |
+| Delete modals open | Click Delete on any item | Modal opens and buttons work | Pass | Pass | Pass | Pass |
+| Sorting works | Click table headers | Sorting toggles correctly | Pass | Pass | Pass | Pass |
+| Filtering works | Apply filters | Results update correctly | Pass | Pass | Pass | Pass |
+
+---
+
+### 8.4 Dashboard Behaviour
+
+| Test | Steps | Expected Result | Chrome | Firefox | Safari | Edge |
+|------|--------|-----------------|--------|---------|--------|------|
+| Tasks grouped correctly | Open Dashboard | Due / Overdue / Upcoming sections display correctly | Pass | Pass | Pass | Pass |
+| Mark task as done | Click Done | Task disappears and updates status | Pass | Pass | Pass | Pass |
+| Mark task as skipped | Click Skip | Task disappears and updates status | Pass | Pass | Pass | Pass |
+| Filters work | Apply filters | Dashboard updates correctly | Pass | Pass | Pass | Pass |
+
+---
+
+### 8.5 Performance & Stability
+
+| Test | Steps | Expected Result | Chrome | Firefox | Safari | Edge |
+|------|--------|-----------------|--------|---------|--------|------|
+| Page load speed acceptable | Load Dashboard, Beds, Plants | Pages load without noticeable delay | Pass | Pass | Pass | Pass |
+| No console errors | Open DevTools console | No JavaScript errors | Pass | Pass | Pass | Pass |
+| No layout shift on load | Refresh pages | Layout stable with no jumping | Pass | Pass | Pass | Pass |
+
+---
+
+### 8.6 Known Cross‑Browser Issues
+
+| Issue | Browser | Description | Status |
+|-------|----------|-------------|--------|
+| None identified | All | No cross‑browser inconsistencies were found during testing. | Passed |
+
+---
+
+## 9. Accessibility & Performance Testing
+
+Accessibility and performance testing ensures that the Garden Timekeeper application is usable by all users, loads efficiently, and follows modern best practices.  
+Testing was carried out using automated tools (WAVE, Lighthouse), browser DevTools, and manual keyboard‑only navigation checks.
+
+---
+
+### 9.1 Accessibility Testing (WAVE & Manual Checks)
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| WAVE automated scan | Run WAVE on key pages (Home, Dashboard, Beds, Plants, Tasks, Forms) | No critical accessibility errors; minor warnings reviewed | x |
+| Colour contrast | Inspect text/background combinations | All text meets WCAG AA contrast ratios | Passed |
+| Alt text on images | Inspect all images (including Cloudinary uploads) | All non‑decorative images have descriptive alt text | Passed |
+| Form label association | Inspect form fields | All inputs have associated `<label>` elements | x |
+| ARIA roles | Inspect navigation, modals, and interactive elements | ARIA roles applied correctly where needed | x |
+| Keyboard navigation | Navigate entire site using Tab/Shift+Tab | All interactive elements reachable in logical order | x |
+| Focus visibility | Tab through forms and navigation | Visible focus outline present on all elements | Passed |
+| Modal accessibility | Open delete confirmation modals | Focus trapped inside modal; Escape closes modal | Passed |
+| Error message accessibility | Submit invalid forms | Errors announced visually and positioned near fields | Passed |
+
+---
+
+### 9.2 Lighthouse Accessibility Audit
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Lighthouse accessibility score | Run Lighthouse on Dashboard, Beds, Plants, Tasks | Score ≥ 90 on all tested pages | x |
+| ARIA validation | Review Lighthouse report | No ARIA misuse or missing attributes | x |
+| Heading structure | Inspect page headings | Logical `<h1> → h2 → h3>` hierarchy | x |
+| Link purpose | Inspect all links | Links have meaningful text (no “click here”) | x |
+
+---
+
+### 9.3 Performance Testing (Lighthouse)
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Lighthouse performance score | Run Lighthouse on key pages | Score ≥ 80 on all tested pages | x |
+| Image optimisation | Inspect Cloudinary‑served images | Images served in modern formats (WebP/auto) | x |
+| Caching behaviour | Inspect network tab | Static assets cached effectively | x |
+| JavaScript execution | Review Lighthouse report | No long‑running scripts; minimal blocking time | x |
+| CSS efficiency | Inspect CSS | No excessive unused CSS; styles load quickly | x |
+
+---
+
+### 9.4 Best Practices & SEO (Lighthouse)
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Lighthouse best‑practice score | Run Lighthouse | Score ≥ 90 | x |
+| HTTPS enforcement | Inspect site URL | All pages served over HTTPS | x |
+| Mixed content | Inspect console | No mixed‑content warnings | x |
+| SEO score | Run Lighthouse SEO audit | Score ≥ 90 | x |
+| Meta tags | Inspect `<head>` | Title, description, viewport meta present | x |
+
+---
+
+### 9.5 Manual Performance Checks
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Page load speed | Load Dashboard, Beds, Plants, Tasks | Pages load within acceptable time | x |
+| No layout shift | Refresh pages | No CLS (Cumulative Layout Shift) issues | x |
+| Smooth navigation | Navigate between pages | No noticeable lag or stutter | x |
+| Modal performance | Open/close modals repeatedly | Modals open instantly with no delay | x |
+| Form submission speed | Submit forms | Server responds promptly; no timeouts | x |
+
+---
+
+### 9.6 Known Accessibility or Performance Issues
+
+| Issue | Description | Status |
+|-------|-------------|--------|
+| None identified | No accessibility or performance issues were found during testing. | Passed |
 
 ---
