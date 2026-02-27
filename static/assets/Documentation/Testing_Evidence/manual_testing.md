@@ -106,7 +106,7 @@ This document outlines the complete manual testing performed for the **Garden Ti
 - [9.5 Manual Performance Checks](#95-manual-performance-checks)
 - [9.6 Known Accessibility or Performance Issues](#96-known-accessibility-or-performance-issues)
 
-## 10. Additional Validation Evidence
+## 10. Additional Manual Validation Evidence
 - [Additional Validation Evidence](#10-additional-validation-evidence)
 
 ## How to Use This Document

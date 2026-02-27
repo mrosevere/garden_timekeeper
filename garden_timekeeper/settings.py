@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import dj_database_url
+import sys
 
 load_dotenv()
 
@@ -306,3 +307,7 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
 
     X_FRAME_OPTIONS = "DENY"
+
+# Disable SSL redirect during tests
+if 'test' in sys.argv:
+    SECURE_SSL_REDIRECT = False
