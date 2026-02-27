@@ -544,3 +544,225 @@ The Plants section allows users to create, view, update, and delete plants assoc
 | Plants page while logged out | Visit /plants | Redirect to login | Passed |
 
 ---
+
+## 6. Tasks
+
+The Tasks section allows users to create, view, update, complete, skip, and delete tasks associated with plants and beds. It includes recurring task logic, table sorting, search filtering, modal confirmations, and navigation links to related beds and plants. This test suite validates all delivered functionality.
+
+---
+
+### 6.1 Viewing Tasks
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Tasks list loads | Navigate to **Plant List -> Plant Details** | Tasks table displays all tasks belonging to the logged‑in user and the selected plant | Passed |
+| Tasks sorted by default | Open Plant Details page | Default sort order is by due date ascending | Passed |
+| No tasks created | Ensure user has no tasks | Empty-state message displayed | Passed |
+| Task count accurate | Create multiple tasks | All tasks appear in list | Passed |
+| Table fields displayed in Task List | View Plant Details -> Task list | Each task shows its associated Next Due date, Status, Season and Frequency | Passed |
+
+---
+
+### 6.2 Creating Tasks
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Create task with valid data | 1. Click **Add Task**.<br>2. Enter name, Notes and Task Scheduling.<br>3. Submit form. | Task is created and appears in list | Passed |
+| Create task with missing name | Leave name blank and submit | validation error shown | Passed |
+| Cancel creation | Click **Cancel** on Add Task form | User returned to Tasks list with no changes | Passed |
+
+---
+
+### 6.3 Editing Tasks
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Edit task with valid data | 1. Click **Edit**.<br>2. Update fields.<br>3. Submit. | Changes saved and reflected in list | Passed |
+| Edit task with invalid data | Remove required fields and submit | Validation error shown | Passed |
+| Edit recurring task | Change recurrence settings | Updated recurrence applied to future tasks | Passed |
+| Edit and cancel | Click **Cancel** on edit form | No changes saved | Passed |
+| Edit updates related pages | Edit task name or date | Updated values appear on Dashboard and detail pages | Passed |
+
+---
+
+### 6.4 Deleting Tasks
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Delete task via modal | 1. Click **Delete**.<br>2. Confirm in modal. | Task removed from list | Passed |
+| Cancel delete | 1. Click **Delete**.<br>2. Click **Cancel**. | No deletion occurs | Passed |
+| Delete recurring task | Delete a recurring task | Only selected instance deleted (depending on implementation) | Passed |
+| Modal displays correct task name | Open delete modal | Modal shows correct task name for confirmation | Passed |
+
+---
+
+### 6.5 Marking Tasks as Done or Skipped
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Mark task as done | Click **Done** on a task | Task marked complete and removed from active lists | Passed |
+| Mark task as skipped | Click **Skip** on a task | Task marked skipped and removed from active lists | Passed |
+| Recurring task completion | Mark recurring task as done | Next occurrence generated automatically | Passed |
+| Recurring task completion | Mark recurring task as skip | Next occurrence generated automatically | Passed |
+
+---
+
+### 6.6 Sorting
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Sort by name | Click **Task Name** header | Tasks sort alphabetically | Passed |
+| Sort by due date | Click **Next Date** header | Ascending/descending toggle works | Passed |
+| Sort by bed | Click **Status** header | Tasks sort alphabetically by status | Passed |
+| Sort by plant | Click **Season** header | Tasks sort alphabetically by season | Passed |
+| Sort by type | Click **Frequency** header | Tasks sort alphabetically by Frequency | Passed |
+
+---
+
+### 6.7 Filtering & Search
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Search by task name | Enter text in search box | Only matching tasks displayed | Passed |
+| Search is case-insensitive | Search using different casing | Results identical | Passed |
+| Filter by Status | Select a Status from dropdown | Only tasks with that status shown | Passed |
+| Filter by Season | Select "In Season" from dropdown | Only tasks for that are in season are shown | Passed |
+| Filter by Season | Select "Out of Season" from dropdown | Only tasks for that are out of season are shown | Passed | 
+| Clear filters | Remove any filters | Full task list restored | Passed |
+| No results | Search for a task name that doesn't exist | No results display | Passed |
+
+---
+
+### 6.8 Link Integrity
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Task name links to detail page | Click task name | Opens Task Detail page | Passed |
+| “Edit Task” from plant detail | Click **Edit** Task on Plant Detail | Opens task edit form | Passed |
+| “Delete Task” from plant detail | Click **Delete** Task on Plant Detail | Opens task deletion modal | Passed |
+
+---
+
+### 6.9 Layout & UI Behaviour
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Table layout consistent | View Tasks list | Columns aligned, spacing consistent | Passed |
+| Mobile layout | Resize to mobile width | Tasks display as stacked cards | Passed |
+| Filters collapse on mobile | View on small screen | Filters collapse into toggle panel | x |
+| No horizontal scrolling | View on mobile | Layout fits screen width | Passed |
+| Flash messages appear correctly | Create/edit/delete task | Success/error messages displayed and styled correctly | Passed |
+
+---
+
+### 6.10 Error Handling & Permissions
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Access task not owned by user | Change task ID in URL | 404 or redirect (permission denied) | Passed |
+| Invalid task ID | Visit /tasks/9999 | 404 page displayed | Passed |
+| Server-side validation enforced | Submit manipulated form data | Invalid data rejected | Passed |
+| Tasks page while logged out | Visit /tasks | Redirect to login | Passed |
+
+---
+
+## 6.11 Task Scheduling (Create Task Page)
+
+The Task Scheduling section controls when a task occurs throughout the year, including seasonal ranges, all‑year tasks, frequency, and repeat intervals. This suite validates all delivered scheduling functionality and form behaviour.
+
+---
+
+### 6.11.1 All‑Year Toggle
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Enable “All Year” | 1. Open Create Task.<br>2. Tick **All Year** checkbox.<br>3. Submit form. | Task saved with all‑year scheduling; seasonal fields ignored. | Passed |
+| Disable “All Year” | 1. Untick **All Year**.<br>2. Submit form with seasonal months. | Seasonal start/end months required and validated. | Passed |
+| All‑Year + Seasonal window | 1. Tick **All Year**.<br>2. Select Seasonal Start month.<br>3. Select Seasonal End month. | All Year checkbox is unticked. | Passed |
+| All‑Year + frequency | 1. Tick **All Year**.<br>2. Select frequency (e.g., Weekly).<br>3. Submit. | Frequency applied across entire year. | Passed |
+
+---
+
+### 6.11.2 Seasonal Start/End Month
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Valid seasonal range | 1. Untick **All Year**.<br>2. Select Start = March, End = October.<br>3. Submit. | Task saved with seasonal window. | Passed |
+| Missing start month | 1. Untick **All Year**.<br>2. Leave start month blank.<br>3. Submit. | User cannot deselect a start month. | Passed |
+| Missing end month | 1. Untick **All Year**.<br>2. Leave end month blank.<br>3. Submit. | User cannot deselect a start month. | Passed |
+| Start month after end month | 1. Start = October.<br>2. End = March.<br>3. Submit. | Validation error: start must be before end. | Passed |
+| Seasonal range + frequency | 1. Select seasonal months.<br>2. Choose frequency (e.g., Monthly).<br>3. Submit. | Frequency applied only within seasonal window. | Passed |
+| Seasonal range + repeat | 1. Select seasonal months.<br>2. Set repeat interval (e.g., every 2 weeks).<br>3. Submit. | Repeat interval applied within seasonal window. | Passed |
+
+---
+
+### 6.11.3 Frequency Field
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Select Weekly | Choose **Weekly** frequency | Task is scheduled weekly within the seasonal window | Passed |
+| Select Monthly | Choose **Monthly** frequency | Task is scheduled Monthly within the seasonal window | Passed |
+| Select Monthly | Choose **Quarterly** frequency | Task is scheduled Quarterly within the seasonal window | Passed |
+| Select Monthly | Choose **Half Yearly** frequency | Task is scheduled Half Yearly within the seasonal window | Passed |
+| Select Yearly | Choose **Yearly** frequency | Task is scheduled Yearly within the seasonal window | Passed |
+| Frequency required | Leave frequency blank and submit | User cannot deselect a frequency | Passed |
+| Frequency + All Year | Tick All Year + choose frequency | Task scheduled across full year | Passed |
+| Frequency + Seasonal | Select seasonal months + frequency | Task scheduled only within seasonal window | Passed |
+| Frequency + Repeat deselected | Select seasonal months + deselect Repeat | Task scheduled as a ONCE ONLY and does not reoccur | Passed |
+
+---
+
+### 6.11.4 Repeat Interval Field
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Repeat Enabled | Select frequency + repeat (e.g., Weekly) | Task displays on the dashboard weekly during seasonal window | Passed |
+| Repeat Disabled | Select frequency + DISABLE repeat (e.g., Weekly) | Task displays on the dashboard ONCE | Passed |
+| Repeat interval updates dynamically | Change frequency | Repeat options update to match frequency | Passed |
+| Repeat interval + seasonal | Select seasonal months + repeat | Repeat applied only within seasonal window | Passed |
+
+---
+
+### 6.11.5 Notes Field (Interaction With Scheduling)
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Notes saved with scheduling | Enter notes + scheduling fields | Notes saved correctly | Passed |
+| Notes validation independent | Leave notes blank | Scheduling still validated normally | Passed |
+| Notes formatting preserved | Enter formatted text | Formatting preserved on save | Passed |
+
+---
+
+### 6.11.6 Combined Scheduling Logic
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| All Year + Weekly + Repeat | Tick All Year + Weekly + Repeat every 1 week | Task repeats weekly all year | Passed |
+| Seasonal + Weekly + Repeat | Seasonal months + Weekly + Repeat every 2 weeks | Task repeats every 2 weeks within seasonal window | Passed |
+| Seasonal + Monthly + Repeat | Seasonal months + Monthly + Repeat every 1 month | Task repeats monthly within seasonal window | Passed |
+| Seasonal + Yearly | Seasonal months + Yearly | Task occurs once per year within seasonal window | Passed |
+| All Year + Yearly | Tick All Year + Yearly | Task occurs once per year | Passed |
+
+---
+
+### 6.11.7 Form Validation & Error Handling
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| HTML5 validation disabled | Inspect form tag (`novalidate`) | Browser does not block submission; Django handles errors | Passed |
+| Server‑side validation enforced | Manipulate POST data (e.g., invalid month) | Server rejects invalid values | Passed |
+| Error summary displayed | Submit invalid form | “Please correct the errors below.” alert shown | Passed |
+| Field‑level errors displayed | Submit invalid form | Errors appear under each invalid field | Passed |
+
+---
+
+### 6.11.8 UI Behaviour
+
+| Test | Steps | Expected Result | Status |
+|------|--------|-----------------|--------|
+| Scheduling card collapses correctly | View on mobile | Card layout adapts to mobile width | Passed |
+| Frequency and repeat aligned | View form | Fields aligned in two‑column layout | Passed |
+| Cancel button returns to plant | Click **Cancel** | Redirects to Plant Detail page | Passed |
+| Delete button visible only when editing | Open Create Task | Delete button not shown | Passed |
+
+---
