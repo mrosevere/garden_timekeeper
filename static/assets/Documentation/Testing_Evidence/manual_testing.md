@@ -2,6 +2,113 @@
 
 This document outlines the complete manual testing performed for the **Garden Timekeeper** application. All tests were carried out on both the deployed Heroku version and the local development environment. Testing covers all major features, negative scenarios, validation behaviour, responsiveness, accessibility, and deployment reliability.
 
+# Table of Contents
+
+- [How to Use This Document](#how-to-use-this-document)
+- [Mapping to README Testing Summary](#mapping-to-readme-testing-summary)
+
+## 1. Authentication
+- [1.1 Registration](#11-registration)
+- [1.2 Login](#12-login)
+- [1.3 Logout](#13-logout)
+- [1.4 Password Reset (Forgot Password)](#14-password-reset-forgot-password)
+- [1.5 Password Change (Logged-In Users)](#15-password-change-logged-in-users)
+- [1.6 Account Page (Profile)](#16-account-page-profile)
+- [1.7 Access Control & Permissions](#17-access-control--permissions)
+- [1.8 Session & Cookie Behaviour](#18-session--cookie-behaviour)
+- [1.9 Usability & UX](#19-usability--ux)
+
+## 2. Navigation & Layout
+- [2.1 Navbar Behaviour](#21-navbar-behaviour)
+- [2.2 Footer](#22-footer)
+- [2.3 Layout Consistency](#23-layout-consistency)
+- [2.4 Navigation Error Handling](#24-navigation-error-handling)
+- [2.5 Internal Link Integrity](#25-internal-link-integrity)
+- [2.6 Responsive Navigation Layout](#26-responsive-navigation-layout)
+
+## 3. Dashboard
+- [3.1 Display of Due, Upcoming, and Overdue Tasks](#31-display-of-due-upcoming-and-overdue-tasks)
+- [3.2 Filtering](#32-filtering)
+- [3.3 Sorting](#33-sorting)
+- [3.4 Pagination and Month Navigation](#34-pagination-and-month-navigation-if-applicable)
+- [3.5 Task Actions (Done / Skipped)](#35-task-actions-done--skipped)
+- [3.6 Link Integrity](#36-link-integrity)
+- [3.7 Layout and UI Behaviour](#37-layout-and-ui-behaviour)
+- [3.8 Error Handling](#38-error-handling)
+
+## 4. Beds
+- [4.1 Viewing Beds](#41-viewing-beds)
+- [4.2 Creating Beds](#42-creating-beds)
+- [4.3 Editing Beds](#43-editing-beds)
+- [4.4 Deleting Beds](#44-deleting-beds)
+- [4.5 Sorting](#45-sorting)
+- [4.6 Filtering & Search](#46-filtering--search)
+- [4.7 Link Integrity](#47-link-integrity)
+- [4.8 Layout & UI Behaviour](#48-layout--ui-behaviour)
+- [4.9 Error Handling & Permissions](#49-error-handling--permissions)
+
+## 5. Plants
+- [5.1 Viewing Plants](#51-viewing-plants)
+- [5.2 Creating Plants](#52-creating-plants)
+- [5.3 Editing Plants](#53-editing-plants)
+- [5.4 Deleting Plants](#54-deleting-plants)
+- [5.5 Notes (Summernote)](#55-notes-summernote)
+- [5.6 Sorting](#56-sorting)
+- [5.7 Filtering & Search](#57-filtering--search)
+- [5.8 Link Integrity](#58-link-integrity)
+- [5.9 Layout & UI Behaviour](#59-layout--ui-behaviour)
+- [5.10 Error Handling & Permissions](#510-error-handling--permissions)
+
+## 6. Tasks
+- [6.1 Viewing Tasks](#61-viewing-tasks)
+- [6.2 Creating Tasks](#62-creating-tasks)
+- [6.3 Editing Tasks](#63-editing-tasks)
+- [6.4 Deleting Tasks](#64-deleting-tasks)
+- [6.5 Marking Tasks as Done or Skipped](#65-marking-tasks-as-done-or-skipped)
+- [6.6 Sorting](#66-sorting)
+- [6.7 Filtering & Search](#67-filtering--search)
+- [6.8 Link Integrity](#68-link-integrity)
+- [6.9 Layout & UI Behaviour](#69-layout--ui-behaviour)
+- [6.10 Error Handling & Permissions](#610-error-handling--permissions)
+- [6.11 Task Scheduling (Create Task Page)](#611-task-scheduling-create-task-page)
+  - [6.11.1 All‑Year Toggle](#6111-allyear-toggle)
+  - [6.11.2 Seasonal Start/End Month](#6112-seasonal-startend-month)
+  - [6.11.3 Frequency Field](#6113-frequency-field)
+  - [6.11.4 Repeat Interval Field](#6114-repeat-interval-field)
+  - [6.11.5 Notes Field (Interaction With Scheduling)](#6115-notes-field-interaction-with-scheduling)
+  - [6.11.6 Combined Scheduling Logic](#6116-combined-scheduling-logic)
+  - [6.11.7 Form Validation & Error Handling](#6117-form-validation--error-handling)
+  - [6.11.8 UI Behaviour](#6118-ui-behaviour)
+
+## 7. User Flow Testing
+- [7.1 Registration → Login → Dashboard Access](#71-registration--login--dashboard-access)
+- [7.2 Create Bed → Create Plant → Create Task](#72-create-bed--create-plant--create-task)
+- [7.3 Edit Flow (Bed → Plant → Task)](#73-edit-flow-bed--plant--task)
+- [7.4 Delete Flow (Task → Plant → Bed)](#74-delete-flow-task--plant--bed)
+- [7.5 Dashboard → Task Completion Flow](#75-dashboard--task-completion-flow)
+- [7.6 Permissions Flow (User A vs User B)](#76-permissions-flow-user-a-vs-user-b)
+- [7.7 Error & Redirect Flow](#77-error--redirect-flow)
+- [7.8 Logout Flow](#78-logout-flow)
+
+## 8. Cross‑Browser Testing
+- [8.1 Page Rendering & Layout Consistency](#81-page-rendering--layout-consistency)
+- [8.2 Form Behaviour & Validation](#82-form-behaviour--validation)
+- [8.3 Navigation & Interaction](#83-navigation--interaction)
+- [8.4 Dashboard Behaviour](#84-dashboard-behaviour)
+- [8.5 Performance & Stability](#85-performance--stability)
+- [8.6 Known Cross‑Browser Issues](#86-known-crossbrowser-issues)
+
+## 9. Accessibility & Performance Testing
+- [9.1 Accessibility Testing (WAVE & Manual Checks)](#91-accessibility-testing-wave--manual-checks)
+- [9.2 Lighthouse Accessibility Audit](#92-lighthouse-accessibility-audit)
+- [9.3 Performance Testing (Lighthouse)](#93-performance-testing-lighthouse)
+- [9.4 Best Practices & SEO (Lighthouse)](#94-best-practices--seo-lighthouse)
+- [9.5 Manual Performance Checks](#95-manual-performance-checks)
+- [9.6 Known Accessibility or Performance Issues](#96-known-accessibility-or-performance-issues)
+
+## 10. Additional Validation Evidence
+- [Additional Validation Evidence](#10-additional-validation-evidence)
+
 ## How to Use This Document
 
 This document contains the full manual testing evidence for the Garden Timekeeper application.  
@@ -973,15 +1080,24 @@ Testing was carried out using automated tools (WAVE, Lighthouse), browser DevToo
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| WAVE automated scan | Run WAVE on key pages (Home, Dashboard, Beds, Plants, Tasks, Forms) | No critical accessibility errors; minor warnings reviewed | x |
 | Colour contrast | Inspect text/background combinations | All text meets WCAG AA contrast ratios | Passed |
 | Alt text on images | Inspect all images (including Cloudinary uploads) | All non‑decorative images have descriptive alt text | Passed |
-| Form label association | Inspect form fields | All inputs have associated `<label>` elements | x |
-| ARIA roles | Inspect navigation, modals, and interactive elements | ARIA roles applied correctly where needed | x |
-| Keyboard navigation | Navigate entire site using Tab/Shift+Tab | All interactive elements reachable in logical order | x |
+| Form label association | Inspect form fields | All inputs have associated `<label>` elements | Passed |
+| ARIA roles | Inspect navigation, modals, and interactive elements | ARIA roles applied correctly where needed | Passed |
+| Keyboard navigation | Navigate entire site using Tab/Shift+Tab | All interactive elements reachable in logical order | Passed |
 | Focus visibility | Tab through forms and navigation | Visible focus outline present on all elements | Passed |
 | Modal accessibility | Open delete confirmation modals | Focus trapped inside modal; Escape closes modal | Passed |
 | Error message accessibility | Submit invalid forms | Errors announced visually and positioned near fields | Passed |
+
+**NOTE** WAVE generated warnings for "Skipped heading level" even when the HTML was valid;
+For example:
+```
+    <h1 class="mb-4 h2">Login</h1>
+```
+- It is an &lt;h1> element, but set to display as &lt;h2>
+- WAVE considers this a skipped heading level still.
+
+<br>
 
 ---
 
@@ -989,10 +1105,14 @@ Testing was carried out using automated tools (WAVE, Lighthouse), browser DevToo
 
 | Test | Steps | Expected Result | Status |
 |------|--------|-----------------|--------|
-| Lighthouse accessibility score | Run Lighthouse on Dashboard, Beds, Plants, Tasks | Score ≥ 90 on all tested pages | x |
-| ARIA validation | Review Lighthouse report | No ARIA misuse or missing attributes | x |
-| Heading structure | Inspect page headings | Logical `<h1> → h2 → h3>` hierarchy | x |
-| Link purpose | Inspect all links | Links have meaningful text (no “click here”) | x |
+| Lighthouse accessibility score | Run Lighthouse on Dashboard, Beds, Plants, Tasks | Score ≥ 90 on all tested pages | Passed |
+| ARIA validation | Review Lighthouse report | No ARIA misuse or missing attributes | Passed |
+| Heading structure | Inspect page headings | Logical `<h1> → h2 → h3>` hierarchy | Passed |
+| Link purpose | Inspect all links | Links have meaningful text (no “click here”) | Passed |
+
+See [Lighthouse_validation.md](/static/assets/Documentation/Testing_Evidence/Lighthouse_validation.md)
+
+<br>
 
 ---
 
@@ -1006,6 +1126,10 @@ Testing was carried out using automated tools (WAVE, Lighthouse), browser DevToo
 | JavaScript execution | Review Lighthouse report | No long‑running scripts; minimal blocking time | x |
 | CSS efficiency | Inspect CSS | No excessive unused CSS; styles load quickly | x |
 
+See [Lighthouse_validation.md](/static/assets/Documentation/Testing_Evidence/Lighthouse_validation.md)
+
+<br>
+
 ---
 
 ### 9.4 Best Practices & SEO (Lighthouse)
@@ -1017,6 +1141,10 @@ Testing was carried out using automated tools (WAVE, Lighthouse), browser DevToo
 | Mixed content | Inspect console | No mixed‑content warnings | x |
 | SEO score | Run Lighthouse SEO audit | Score ≥ 90 | x |
 | Meta tags | Inspect `<head>` | Title, description, viewport meta present | x |
+
+<br>
+
+See [Lighthouse_validation.md](/static/assets/Documentation/Testing_Evidence/Lighthouse_validation.md)
 
 ---
 
@@ -1030,6 +1158,8 @@ Testing was carried out using automated tools (WAVE, Lighthouse), browser DevToo
 | Modal performance | Open/close modals repeatedly | Modals open instantly with no delay | x |
 | Form submission speed | Submit forms | Server responds promptly; no timeouts | x |
 
+<br>
+
 ---
 
 ### 9.6 Known Accessibility or Performance Issues
@@ -1037,5 +1167,28 @@ Testing was carried out using automated tools (WAVE, Lighthouse), browser DevToo
 | Issue | Description | Status |
 |-------|-------------|--------|
 | None identified | No accessibility or performance issues were found during testing. | Passed |
+
+<br>
+
+---
+
+## 10. Additional Validation Evidence
+
+The README references several standalone validation documents that provide full evidence for code‑quality checks.  
+To ensure assessors can easily locate all required validation artefacts, the documents are linked here as well.
+
+These documents are stored in the repository alongside this manual testing file.
+
+| Validation Area | Document | Description |
+|-----------------|----------|-------------|
+| **HTML Validation** | [html_validation.md](/static/assets/Documentation/Testing_Evidence/HTML_Validation_final_run.md) | Full W3C validation results for all templates, including resolved issues and links to GitHub issues. |
+| **CSS Validation** | [css_validation.md](/static/assets/Documentation/Testing_Evidence/CSS_validation.md) | Results from W3C CSS Validator for all custom stylesheets, including warnings and fixes. |
+| **JavaScript Validation** | [javascript_validation.md](/static/assets/Documentation/Testing_Evidence/JavaScript_validation.md) | JSHint validation results for custom JS, with notes on third‑party libraries. |
+| **Python Validation** | [python_validation.md](/static/assets/Documentation/Testing_Evidence/Python_validation.md) | flake8, black, and Django system check results, including any resolved linting issues. |
+| **Defect Report** | [Bug_list.md](/static/assets/Documentation/Testing_Evidence/Bug_list.md) | Table of the issues found and resolved during development and testing, including some high level analysis. |
+
+Each validation document contains the detailed evidence referenced in the README’s “Code Validation” section, ensuring full traceability between the summary and the underlying test artefacts.
+
+Known issues are documented in the [README](/README.md)
 
 ---
